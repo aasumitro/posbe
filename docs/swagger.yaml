@@ -1,0 +1,10 @@
+info:
+  contact:
+    email: hello@aasumitro.id
+    name: '@aasumitro'
+    url: https://aasumitro.id/
+  license:
+    name: MIT
+    url: https://github.com/aasumitro/posbe/blob/main/LICENSE
+paths: {}
+swagger: "2.0"
