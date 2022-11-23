@@ -8,6 +8,7 @@ import (
 	"github.com/aasumitro/posbe/internal/product"
 	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"log"
 )
 
@@ -19,36 +20,57 @@ import (
 
 var (
 	appConfig *config.Config
-	ginEngine *gin.Engine
+	appEngine *gin.Engine
 )
 
 func init() {
-	appConfig = &config.Config{}
-	appConfig.InitDbConn()
+	initConfig()
 
-	if !appConfig.GetAppDebug() {
+	if !appConfig.AppDebug {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	ginEngine = gin.Default()
+	appEngine = gin.Default()
 
-	docs.SwaggerInfo.BasePath = ginEngine.BasePath()
-	docs.SwaggerInfo.Title = appConfig.GetAppName()
-	docs.SwaggerInfo.Description = appConfig.GetAppDesc()
-	docs.SwaggerInfo.Version = appConfig.GetAppVersion()
-	docs.SwaggerInfo.Host = appConfig.GetAppUrl()
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	initSwaggerInfo()
 }
 
 func main() {
-	addModule()
+	// Init database connection
+	appConfig.InitDbConn()
+	// Load registered modules
+	loadModules()
+	// Defer close database
 	appConfig.DeferCloseDbConn()
-	log.Fatal(ginEngine.Run(appConfig.GetAppUrl()))
+	// start server engine
+	log.Fatal(appEngine.Run(appConfig.AppUrl))
 }
 
-func addModule() {
-	_default.InitDefaultModule(ginEngine)
-	account.InitAccountModule(appConfig, ginEngine)
-	product.InitProductModule(appConfig, ginEngine)
-	order.InitOrderModule(appConfig, ginEngine)
+func initConfig() {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found; ignore error if desired
+			panic(".env file not found!, please copy .env.example and paste as .env")
+		} else {
+			panic(err.Error())
+		}
+	}
+	appConfig = cfg
+}
+
+func initSwaggerInfo() {
+	docs.SwaggerInfo.BasePath = appEngine.BasePath()
+	docs.SwaggerInfo.Title = appConfig.AppName
+	docs.SwaggerInfo.Description = appConfig.AppDescription
+	docs.SwaggerInfo.Version = appConfig.AppVersion
+	docs.SwaggerInfo.Host = appConfig.AppUrl
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+}
+
+func loadModules() {
+	_default.InitDefaultModule(appEngine)
+	account.InitAccountModule(appConfig, appEngine)
+	product.InitProductModule(appConfig, appEngine)
+	order.InitOrderModule(appConfig, appEngine)
 }

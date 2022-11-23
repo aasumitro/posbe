@@ -16,12 +16,12 @@ func (cfg Config) InitDbConn() {
 		log.Panicf("DATABASE_ERROR: %s", err.Error())
 	}
 
-	log.Printf("Database connected with %s driver . . . .", cfg.GetDbDriver())
+	log.Printf("Database connected with %s driver . . . .", cfg.DBDriver)
 	setConnection(conn)
 }
 
 func openConnection(cfg Config) (db *sql.DB, err error) {
-	driver, err := sql.Open("postgres", cfg.GetDbDsnUrl())
+	driver, err := sql.Open("postgres", cfg.DBDsnUrl)
 	if err != nil {
 		return nil, err
 	}

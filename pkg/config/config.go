@@ -5,27 +5,33 @@ import (
 	"log"
 )
 
-type Config struct{}
-
-func init() {
-	loadEnv()
+type Config struct {
+	AppName        string `mapstructure:"APP_NAME"`
+	AppDescription string `mapstructure:"APP_DESC"`
+	AppDebug       bool   `mapstructure:"APP_DEBUG"`
+	AppVersion     string `mapstructure:"APP_VERSION"`
+	AppUrl         string `mapstructure:"APP_URL"`
+	DBDriver       string `mapstructure:"DB_DRIVER"`
+	DBDsnUrl       string `mapstructure:"DB_DSN_URL"`
+	JWTSecretKey   string `mapstructure:"JWT_SECRET_KEY"`
+	JWTLifetime    string `mapstructure:"JWT_LIFETIME"`
 }
 
-func loadEnv() Config {
+func LoadConfig() (cfg *Config, err error) {
+	// notify that app try to load config file
 	log.Println("Load configuration file . . . .")
+	// set config file
+	viper.SetConfigFile(".env")
 	// find environment file
-	viper.SetConfigFile(`.env`)
+	viper.AutomaticEnv()
 	// error handling for specific case
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; ignore error if desired
-			panic(".env.example file not found!, please copy .env.example.example and paste as .env.example")
-		} else {
-			// Config file was found but another error was produced
-			panic(err)
-		}
+	if err = viper.ReadInConfig(); err != nil {
+		return
 	}
+	// notify that config file is ready
 	log.Println("configuration file: ready")
-
-	return Config{}
+	// extract config to struct
+	err = viper.Unmarshal(&cfg)
+	// return value
+	return
 }
