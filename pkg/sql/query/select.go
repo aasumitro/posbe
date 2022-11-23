@@ -37,7 +37,7 @@ func (q SQLSelectBuilder) Field(fields string) SQLSelectBuilder {
 }
 
 // OrderBy
-// add order by to query
+// add transaction by to query
 // @usage
 // builder.OrderBy(string)
 // builder.OrderBy("name DESC")

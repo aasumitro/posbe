@@ -5,8 +5,9 @@ import (
 	"github.com/aasumitro/posbe/docs"
 	"github.com/aasumitro/posbe/internal/_default"
 	"github.com/aasumitro/posbe/internal/account"
-	"github.com/aasumitro/posbe/internal/order"
-	"github.com/aasumitro/posbe/internal/product"
+	"github.com/aasumitro/posbe/internal/catalog"
+	"github.com/aasumitro/posbe/internal/store"
+	"github.com/aasumitro/posbe/internal/transaction"
 	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -75,6 +76,7 @@ func initSwaggerInfo() {
 func loadModules() {
 	_default.InitDefaultModule(appEngine)
 	account.InitAccountModule(ctx, appConfig, appEngine)
-	product.InitProductModule(appConfig, appEngine)
-	order.InitOrderModule(appConfig, appEngine)
+	store.InitStoreModule(ctx, appConfig, appEngine)
+	catalog.InitCatalogModule(ctx, appConfig, appEngine)
+	transaction.InitTransactionModule(ctx, appConfig, appEngine)
 }
