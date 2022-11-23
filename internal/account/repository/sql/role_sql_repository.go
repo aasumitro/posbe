@@ -18,12 +18,15 @@ type RoleSQLRepository struct {
 	Db *sql.DB
 }
 
+// All
+// repo.All(context)
+//
+// @usage
+// all(context)
 func (repo RoleSQLRepository) All(ctx context.Context) (roles []domain.Role, err error) {
-	fmt.Println(ctx)
-	// ===========
-
-	q := query.SQLSelectBuilder{}.ForTable(table).Build()
-	rows, err := repo.Db.Query(q)
+	q := query.SQLSelectBuilder{}.Table(table).Build()
+	fmt.Println(q)
+	rows, err := repo.Db.QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -49,29 +52,20 @@ func (repo RoleSQLRepository) All(ctx context.Context) (roles []domain.Role, err
 }
 
 // Find
-// find(context, key, value)
+// repo.Find(context, key, value)
 //
 // @variable
-// var key = interface{} - accepted [string, int]
-// var value = interface - accepted [string, int]
+// var where = []string
 //
 // @usage
-// find(context, "name", "lorem") - search by name value string
-// find(context, "id", 1) - search by id value int
+// find(context, ["id = 1"]) - search one value
+// find(context, ["id 1"]) - search by id value int
 // find(context, nil, "lorem") - key nil and value string = search by name
 // find(context, nil, 1) - key nil and value int = search by id
-func (repo RoleSQLRepository) Find(ctx context.Context, where []string) (role *domain.Role, err error) {
-	// TODO:
-	// 1. impl ctx for tr
-	// 2. impl chain pattern for query
-	fmt.Println(ctx)
-	// ===========
-
-	q := query.SQLSelectBuilder{}.
-		ForTable(table).
-		AddWhere(where).
-		Build()
-	row := repo.Db.QueryRow(q)
+func (repo RoleSQLRepository) Find(ctx context.Context, where string) (role *domain.Role, err error) {
+	q := query.SQLSelectBuilder{}.Table(table).Where(where).Build()
+	fmt.Println(q)
+	row := repo.Db.QueryRowContext(ctx, q)
 
 	var result domain.Role
 	if err := row.Scan(&result.ID, &result.Name, &result.Description); err != nil {

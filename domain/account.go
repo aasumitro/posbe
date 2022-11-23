@@ -48,7 +48,7 @@ type (
 	// RoleRepository Contract
 	RoleRepository interface {
 		All(ctx context.Context) (roles []Role, err error)
-		Find(ctx context.Context, where []string) (role *Role, err error)
+		Find(ctx context.Context, where string) (role *Role, err error)
 		//Create(ctx context.Context)
 		//Update(ctx context.Context)
 		//Delete(ctx context.Context)

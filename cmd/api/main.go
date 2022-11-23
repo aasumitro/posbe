@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/aasumitro/posbe/docs"
 	"github.com/aasumitro/posbe/internal/_default"
 	"github.com/aasumitro/posbe/internal/account"
@@ -21,6 +22,7 @@ import (
 var (
 	appConfig *config.Config
 	appEngine *gin.Engine
+	ctx       context.Context
 )
 
 func init() {
@@ -31,6 +33,8 @@ func init() {
 	}
 
 	appEngine = gin.Default()
+
+	ctx = context.TODO()
 
 	initSwaggerInfo()
 }
@@ -70,7 +74,7 @@ func initSwaggerInfo() {
 
 func loadModules() {
 	_default.InitDefaultModule(appEngine)
-	account.InitAccountModule(appConfig, appEngine)
+	account.InitAccountModule(ctx, appConfig, appEngine)
 	product.InitProductModule(appConfig, appEngine)
 	order.InitOrderModule(appConfig, appEngine)
 }
