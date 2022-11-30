@@ -1,0 +1,94 @@
+### ACCOUNT MODULE HTTP TEST
+===
+
+### Roles END-Point
+===
+### GET - fetch list of roles
+GET http://localhost:8000/roles
+accept: application/json
+
+### GET - show specified role
+GET http://localhost:8000/roles/1
+accept: application/json
+
+### POST - store new role
+POST http://localhost:8000/roles
+Content-Type: application/json
+
+{
+  "name": "lorem",
+  "description": "ipsum"
+}
+
+### PUT - Update specified role data
+PUT http://localhost:8000/roles/84
+Content-Type: application/json
+
+{
+  "id": 84,
+  "name": "Ipsum Lorem",
+  "description": "Lorem ipsum is not a qoute"
+}
+
+### DELETE - Destroy specified role data
+DELETE http://localhost:8000/roles/84
+
+===
+### User END-Point
+===
+
+### GET - fetch list of users
+GET http://localhost:8000/users
+accept: application/json
+
+### GET - show specified users
+GET http://localhost:8000/users/1
+accept: application/json
+
+### POST - store new user
+POST http://localhost:8000/users
+Content-Type: application/json
+
+{
+  "role_id": 1,
+  "name": "lorem ipsum",
+  "username": "lorem",
+  "email": "lorem@ipsum.id",
+  "password": "secret"
+}
+
+### PUT - Update specified user
+PUT http://localhost:8000/users
+Content-Type: application/json
+
+{
+  "role_id": 1,
+  "name": "lorem ipsum",
+  "username": "lorem",
+  "email": "lorem@ipsum.id",
+  "password": "secret12345"
+}
+
+### DELETE - Destroy specified user
+DELETE http://localhost:8000/users/1
+
+===
+### Auth END-Point
+===
+
+### POST - check credentials
+POST http://localhost:8000/auth/check
+Content-Type: application/json
+
+{
+  "username": "lorem"
+}
+
+### POST - logged user in
+POST http://localhost:8000/auth/verify
+Content-Type: application/json
+
+{
+  "username": "lorem",
+  "password": "ipsum"
+}

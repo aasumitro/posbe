@@ -1,75 +1,40 @@
 package domain
 
-import "context"
+import "github.com/aasumitro/posbe/pkg/utils"
 
 type (
-	// User for response
 	User struct {
-		ID       string `json:"id"`
+		ID       int    `json:"id"`
+		RoleId   int    `json:"role_id,omitempty"`
+		Name     string `json:"name"`
 		Username string `json:"username"`
+		Email    string `json:"email"`
+		Phone    string `json:"phone"`
+		Password string `json:"-"`
+		Role     Role   `json:"role"`
 	}
 
-	// UserEntity for request
-	UserEntity struct {
-		ID       string
-		Username string
-		Password string
-	}
-
-	// UserRepository Contract
-	UserRepository interface {
-		by()
-		with()
-		all()
-		find()
-		create()
-		update()
-		delete()
-	}
-
-	// UserHandler Contract
-	UserHandler interface {
-		fetch()
-		show()
-		store()
-		update()
-		destroy()
-	}
-)
-
-type (
-	// Role for response & request
 	Role struct {
-		ID          string
-		Name        string
-		Description string
+		ID          int    `json:"id"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Usage       int    `json:"usage,omitempty"`
 	}
 
-	// RoleRepository Contract
-	RoleRepository interface {
-		All(ctx context.Context) (roles []Role, err error)
-		Find(ctx context.Context, where string) (role *Role, err error)
-		//Create(ctx context.Context)
-		//Update(ctx context.Context)
-		//Delete(ctx context.Context)
-	}
+	// IAccountService contract
+	IAccountService interface {
+		RoleList() (roles []*Role, errData *utils.ServiceError)
+		AddRole(data *Role) (role *Role, errData *utils.ServiceError)
+		EditRole(data *Role) (role *Role, errData *utils.ServiceError)
+		DeleteRole(data *Role) *utils.ServiceError
 
-	// RoleHandler Contract
-	RoleHandler interface {
-		Fetch()
-		Show()
-		Store()
-		Update()
-		Destroy()
-	}
-)
+		UserList() (users []*User, errData *utils.ServiceError)
+		ShowUser(id int) (user *User, errData *utils.ServiceError)
+		AddUser(data *User) (user *User, errData *utils.ServiceError)
+		EditUser(data *User) (user *User, errData *utils.ServiceError)
+		DeleteUser(data *User) *utils.ServiceError
 
-type (
-	// Account for response
-	Account struct {
-	}
-
-	// AccountService contract
-	AccountService interface {
+		VerifyUserCredentials(username, password string) (data any, errData *utils.ServiceError)
+		//LoggedUserOut()
 	}
 )

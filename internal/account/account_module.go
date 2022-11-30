@@ -2,54 +2,162 @@ package account
 
 import (
 	"context"
-	"fmt"
-	"github.com/aasumitro/posbe/internal/account/repository/sql"
+	"github.com/aasumitro/posbe/domain"
+	repository "github.com/aasumitro/posbe/internal/account/repository/sql"
+	"github.com/aasumitro/posbe/internal/account/service"
 	"github.com/aasumitro/posbe/pkg/config"
-	"github.com/aasumitro/posbe/pkg/sql/query"
+	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+	"strconv"
 )
 
 func InitAccountModule(ctx context.Context, config *config.Config, router *gin.Engine) {
-	selectAll := query.SQLSelectBuilder{}.
-		Table("roles").
-		Build()
+	userRepository := repository.NewUserSQlRepository(config.GetDbConn())
+	roleRepository := repository.NewRoleSQlRepository(config.GetDbConn())
+	accountService := service.NewAccountService(ctx, roleRepository, userRepository)
 
-	selectAllWhere := query.SQLSelectBuilder{}.
-		Table("roles").
-		Where("id = 1").
-		Build()
+	//handler.NewAuthHandler(ctx, accountService, router)
+	//handler.NewRoleHandler(ctx, accountService, router)
+	//handler.NewUserHandler(ctx, accountService, router)
 
-	q := query.SQLSelectBuilder{}.
-		Table("lorem").
-		Field("ipsum as i").
-		HasLimit(2).
-		HasOffset(3).
-		GroupBy("lorem").
-		OrderBy("ipsum").
-		Join("mamun ON lorem.id = mamun.lorem_id").
-		InnerJoin("mamun ON lorem.id = mamun.lorem_id").
-		CrossJoin("mamun ON lorem.id = mamun.lorem_id").
-		LeftOuterJoin("mamun ON lorem.id = mamun.lorem_id").
-		RightOuterJoin("mamun ON lorem.id = mamun.lorem_id").
-		FullOuterJoin("mamun ON lorem.id = mamun.lorem_id").
-		Where("").
-		Build()
+	router.GET("/users", func(c *gin.Context) {
+		users, err := userRepository.All(ctx)
+		if err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
 
-	fmt.Println(selectAll)
-	fmt.Println(selectAllWhere)
-	fmt.Println(q)
+		c.JSON(http.StatusOK, gin.H{"data": users})
+	})
 
-	roleRepository := sql.NewRoleSQlRepository(config.GetDbConn())
+	router.GET("/users/:id", func(c *gin.Context) {
+		idParams := c.Param("id")
+		id, _ := strconv.Atoi(idParams)
+		users, err := userRepository.Find(ctx, id)
+		if err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
 
-	roles, err := roleRepository.All(ctx)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	fmt.Println(roles)
+		c.JSON(http.StatusOK, gin.H{"data": users})
+	})
 
-	role, err := roleRepository.Find(ctx, "id = 1")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	fmt.Println(role)
+	router.POST("/users", func(c *gin.Context) {
+		var form domain.User
+		if err := c.ShouldBind(&form); err != nil {
+			c.JSON(400, gin.H{"msg": err})
+			return
+		}
+
+		user, err := userRepository.Create(ctx, &form)
+		if err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
+		user.Password = ""
+		c.JSON(http.StatusOK, gin.H{"data": user})
+	})
+
+	router.PUT("/users/:id", func(c *gin.Context) {
+		idParams := c.Param("id")
+		id, _ := strconv.Atoi(idParams)
+
+		var form domain.User
+		if err := c.ShouldBind(&form); err != nil {
+			c.JSON(400, gin.H{"msg": err})
+			return
+		}
+		form.ID = id
+
+		user, err := userRepository.Update(ctx, &form)
+		if err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
+		user.Password = ""
+		c.JSON(http.StatusOK, gin.H{"data": user})
+	})
+
+	router.DELETE("/users/:id", func(c *gin.Context) {
+		idParams := c.Param("id")
+		id, _ := strconv.Atoi(idParams)
+		user := domain.User{ID: id}
+		if err := userRepository.Delete(ctx, &user); err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
+		c.JSON(http.StatusOK, gin.H{"data": "SUCCESS"})
+	})
+
+	router.GET("/roles", func(ctx *gin.Context) {
+		roles, err := accountService.RoleList()
+		if err != nil {
+			utils.NewHttpRespond(ctx, err.Code, err.Message)
+			return
+		}
+
+		utils.NewHttpRespond(ctx, http.StatusOK, roles)
+		return
+	})
+
+	router.GET("/roles/:id", func(c *gin.Context) {
+		idParams := c.Param("id")
+		id, _ := strconv.Atoi(idParams)
+		role, err := roleRepository.Find(ctx, id)
+		if err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
+
+		c.JSON(http.StatusOK, gin.H{"data": role})
+	})
+
+	router.POST("/roles", func(c *gin.Context) {
+		var form domain.Role
+		if err := c.ShouldBind(&form); err != nil {
+			c.JSON(400, gin.H{"msg": err})
+			return
+		}
+
+		role, err := roleRepository.Create(ctx, &form)
+		if err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
+		c.JSON(http.StatusOK, gin.H{"data": role})
+	})
+
+	router.PUT("/roles/:id", func(c *gin.Context) {
+		idParams := c.Param("id")
+		id, _ := strconv.Atoi(idParams)
+
+		var form domain.Role
+		if err := c.ShouldBind(&form); err != nil {
+			c.JSON(400, gin.H{"msg": err})
+			return
+		}
+		form.ID = id
+
+		role, err := roleRepository.Update(ctx, &form)
+		if err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
+		c.JSON(http.StatusOK, gin.H{"data": role})
+	})
+
+	router.DELETE("/roles/:id", func(c *gin.Context) {
+		idParams := c.Param("id")
+		id, _ := strconv.Atoi(idParams)
+		role := domain.Role{ID: id}
+		if err := roleRepository.Delete(ctx, &role); err != nil {
+			log.Panicf("ERROR_REPO: %s", err.Error())
+		}
+		c.JSON(http.StatusOK, gin.H{"data": "SUCCESS"})
+	})
+
+	router.DELETE("/test/:id", func(c *gin.Context) {
+		idParams := c.Param("id")
+		id, _ := strconv.Atoi(idParams)
+		role := domain.Role{ID: id}
+		if err := accountService.DeleteRole(&role); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"message": err})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"data": "SUCCESS"})
+	})
 }

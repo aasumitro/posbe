@@ -11,7 +11,9 @@ import (
 	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"io"
 	"log"
+	"os"
 )
 
 // @contact.name @aasumitro
@@ -23,19 +25,13 @@ import (
 var (
 	appConfig *config.Config
 	appEngine *gin.Engine
-	ctx       context.Context
+	ctx       = context.Background()
 )
 
 func init() {
 	initConfig()
 
-	if !appConfig.AppDebug {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
-	appEngine = gin.Default()
-
-	ctx = context.TODO()
+	initEngine()
 
 	initSwaggerInfo()
 }
@@ -45,23 +41,37 @@ func main() {
 	appConfig.InitDbConn()
 	// Load registered modules
 	loadModules()
-	// Defer close database
-	appConfig.DeferCloseDbConn()
-	// start server engine
+	// start engine
 	log.Fatal(appEngine.Run(appConfig.AppUrl))
 }
 
 func initConfig() {
 	cfg, err := config.LoadConfig()
+
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found; ignore error if desired
-			panic(".env file not found!, please copy .env.example and paste as .env")
-		} else {
-			panic(err.Error())
+			log.Fatal(".env file not found!, please copy .env.example and paste as .env")
 		}
+
+		log.Fatal(err.Error())
 	}
+
 	appConfig = cfg
+}
+
+func initEngine() {
+	if !appConfig.AppDebug {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	accessLogFile, _ := os.Create("./tmp/access.log")
+	gin.DefaultWriter = io.MultiWriter(accessLogFile, os.Stdout)
+
+	errorLogFile, _ := os.Create("./tmp/errors.log")
+	gin.DefaultErrorWriter = io.MultiWriter(errorLogFile, os.Stdout)
+
+	appEngine = gin.Default()
 }
 
 func initSwaggerInfo() {

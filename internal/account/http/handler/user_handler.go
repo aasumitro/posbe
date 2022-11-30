@@ -3,35 +3,35 @@ package handler
 import "github.com/aasumitro/posbe/domain"
 
 type userHandler struct {
-	accountService domain.AccountService
+	accountService domain.IAccountService
 }
 
-func (h userHandler) fetch() {
+func (handler userHandler) fetch() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (h userHandler) show() {
+func (handler userHandler) show() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (h userHandler) store() {
+func (handler userHandler) store() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (h userHandler) update() {
+func (handler userHandler) update() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (h userHandler) destroy() {
+func (handler userHandler) destroy() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func NewUserHandler(accountService domain.AccountService) {
-	handler := roleHandler{accountService: accountService}
+func NewUserHandler(accountService domain.IAccountService) {
+	handler := userHandler{accountService: accountService}
 	handler.show()
 }

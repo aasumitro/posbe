@@ -10,7 +10,7 @@ import (
 func (handler httpHandler) home(context *gin.Context) {
 	utils.NewHttpRespond(context, http.StatusOK, map[string]interface{}{
 		"01_title":       "POSBE",
-		"02_description": " Point of Sales Backend",
+		"02_description": "Point of Sales Backend",
 		"03_api_spec": fmt.Sprintf(
 			"%s://%s/docs/index.html",
 			"http",

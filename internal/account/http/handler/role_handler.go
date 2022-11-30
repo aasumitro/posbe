@@ -1,37 +1,41 @@
 package handler
 
-import "github.com/aasumitro/posbe/domain"
+import (
+	"github.com/aasumitro/posbe/domain"
+	"github.com/gin-gonic/gin"
+)
 
 type roleHandler struct {
-	accountService domain.AccountService
+	svc    domain.IAccountService
+	router *gin.Engine
 }
 
-func (h roleHandler) fetch() {
+func (handler roleHandler) fetch() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (h roleHandler) show() {
+func (handler roleHandler) show() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (h roleHandler) store() {
+func (handler roleHandler) store() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (h roleHandler) update() {
+func (handler roleHandler) update() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (h roleHandler) destroy() {
+func (handler roleHandler) destroy() {
 	//TODO implement me
 	panic("implement me")
 }
 
-func NewRoleHandler(accountService domain.AccountService) {
-	handler := roleHandler{accountService: accountService}
+func NewRoleHandler(accountService domain.IAccountService, router *gin.Engine) {
+	handler := roleHandler{svc: accountService, router: router}
 	handler.show()
 }

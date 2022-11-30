@@ -5,6 +5,7 @@ erDiagram
     ROLES {
         int id
         string name
+        string description
     }
     
     USERS ||--|| ROLES : has_one

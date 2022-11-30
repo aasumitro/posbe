@@ -13,7 +13,7 @@ func (cfg Config) InitDbConn() {
 	conn, err := openConnection(cfg)
 
 	if err != nil {
-		log.Panicf("DATABASE_ERROR: %s", err.Error())
+		log.Fatalf("DATABASE_ERROR: %s", err.Error())
 	}
 
 	log.Printf("Database connected with %s driver . . . .", cfg.DBDriver)
@@ -35,13 +35,4 @@ func setConnection(conn *sql.DB) {
 
 func (cfg Config) GetDbConn() *sql.DB {
 	return db
-}
-
-func (cfg Config) DeferCloseDbConn() {
-	defer func() {
-		err := db.Close()
-		if err != nil {
-			log.Panicf("DATABASE_ERROR: %s", err.Error())
-		}
-	}()
 }

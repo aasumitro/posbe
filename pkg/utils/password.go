@@ -11,8 +11,7 @@ import (
 
 func HashPassword(password string) (string, error) {
 	salt := make([]byte, 32)
-	_, err := rand.Read(salt)
-	if err != nil {
+	if _, err := rand.Read(salt); err != nil {
 		return "", err
 	}
 
@@ -28,19 +27,16 @@ func HashPassword(password string) (string, error) {
 
 func ComparePasswords(storedPassword string, suppliedPassword string) (bool, error) {
 	pwsalt := strings.Split(storedPassword, ".")
-
 	if len(pwsalt) < 2 {
 		return false, errors.ErrorPasswordNotProvideValidHash
 	}
 
 	salt, err := hex.DecodeString(pwsalt[1])
-
 	if err != nil {
 		return false, errors.ErrorPasswordUnableToVerify
 	}
 
 	shash, err := scrypt.Key([]byte(suppliedPassword), salt, 32768, 8, 1, 32)
-
 	if err != nil {
 		return false, errors.ErrorPasswordUnableToVerify
 	}
