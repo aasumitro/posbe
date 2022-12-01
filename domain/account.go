@@ -1,23 +1,25 @@
 package domain
 
-import "github.com/aasumitro/posbe/pkg/utils"
+import (
+	"github.com/aasumitro/posbe/pkg/utils"
+)
 
 type (
 	User struct {
 		ID       int    `json:"id"`
-		RoleId   int    `json:"role_id,omitempty"`
-		Name     string `json:"name"`
-		Username string `json:"username"`
-		Email    string `json:"email"`
-		Phone    string `json:"phone"`
-		Password string `json:"-"`
-		Role     Role   `json:"role"`
+		RoleId   int    `json:"role_id,omitempty" form:"role_id" binding:"required"`
+		Name     string `json:"name" form:"name" binding:"required"`
+		Username string `json:"username" form:"username" binding:"required"`
+		Email    string `json:"email" form:"email"`
+		Phone    string `json:"phone" form:"phone"`
+		Password string `json:"password" form:"password" binding:"required"`
+		Role     Role   `json:"role" binding:"-"`
 	}
 
 	Role struct {
 		ID          int    `json:"id"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
+		Name        string `json:"name" form:"name" binding:"required"`
+		Description string `json:"description" form:"description"  binding:"required"`
 		Usage       int    `json:"usage,omitempty"`
 	}
 
@@ -34,7 +36,7 @@ type (
 		EditUser(data *User) (user *User, errData *utils.ServiceError)
 		DeleteUser(data *User) *utils.ServiceError
 
-		VerifyUserCredentials(username, password string) (data any, errData *utils.ServiceError)
+		//VerifyUserCredentials(username, password string) (data any, errData *utils.ServiceError)
 		//LoggedUserOut()
 	}
 )

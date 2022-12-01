@@ -1,0 +1,96 @@
+### ACCOUNT MODULE HTTP TEST
+===
+
+===
+### Auth END-Point
+===
+### POST - logged user in
+POST http://localhost:8000/v1/login
+Content-Type: application/json
+
+{
+  "username": "lorem",
+  "password": "ipsum"
+}
+
+### POST - logged user out
+POST http://localhost:8000/v1/logout
+Authorization: Bearer "TOKEN_HERE"
+
+===
+### Roles END-Point
+===
+### GET - fetch list of roles
+GET http://localhost:8000/v1/roles
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new role
+POST http://localhost:8000/v1/roles
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem",
+  "description": "ipsum"
+}
+
+### PUT - Update specified role data
+PUT http://localhost:8000/v1/roles/4
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "Ipsum Lorem",
+  "description": "Lorem ipsum is not a qoute"
+}
+
+### DELETE - Destroy specified role data
+DELETE http://localhost:8000/v1/roles/5
+Authorization: Bearer "TOKEN_HERE"
+
+===
+### User END-Point
+===
+
+### GET - fetch list of users
+GET http://localhost:8000/v1/users
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### GET - show specified users
+GET http://localhost:8000/v1/users/1
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new user
+POST http://localhost:8000/v1/users
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "role_id": 1,
+  "name": "lorem ipsum",
+  "username": "lorem",
+  "email": "lorem@ipsum.id",
+  "password": "secret",
+  "phone": "82271111"
+}
+
+### PUT - Update specified user
+PUT http://localhost:8000/v1/users/2
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "role_id": 2,
+  "name": "lorem ipsum",
+  "username": "lorem",
+  "email": "lorem@ipsum.id",
+  "password": "secret12345",
+  "phone": "82272222"
+}
+
+### DELETE - Destroy specified user
+DELETE http://localhost:8000/v1/users/2
+Authorization: Bearer "TOKEN_HERE"

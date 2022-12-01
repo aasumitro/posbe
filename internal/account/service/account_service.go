@@ -94,7 +94,7 @@ func (service accountService) ShowUser(id int) (user *domain.User, errorData *ut
 func (service accountService) AddUser(data *domain.User) (user *domain.User, errorData *utils.ServiceError) {
 	password := data.Password
 	if password != "" {
-		pwd, err := utils.HashPassword(user.Password)
+		pwd, err := utils.HashPassword(password)
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -102,7 +102,7 @@ func (service accountService) AddUser(data *domain.User) (user *domain.User, err
 			}
 		}
 
-		user.Password = pwd
+		data.Password = pwd
 	}
 
 	data, err := service.userRepo.Create(service.ctx, data)
@@ -113,7 +113,7 @@ func (service accountService) AddUser(data *domain.User) (user *domain.User, err
 func (service accountService) EditUser(data *domain.User) (user *domain.User, errorData *utils.ServiceError) {
 	password := data.Password
 	if password != "" {
-		pwd, err := utils.HashPassword(user.Password)
+		pwd, err := utils.HashPassword(password)
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -121,7 +121,7 @@ func (service accountService) EditUser(data *domain.User) (user *domain.User, er
 			}
 		}
 
-		user.Password = pwd
+		data.Password = pwd
 	}
 
 	data, err := service.userRepo.Update(service.ctx, data)
@@ -149,10 +149,10 @@ func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError 
 	return nil
 }
 
-func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
-	//TODO implement me
-	panic("implement me")
-}
+//func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
+//	//TODO implement me
+//	panic("implement me")
+//}
 
 func NewAccountService(
 	ctx context.Context,

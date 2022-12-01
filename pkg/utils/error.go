@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"github.com/lib/pq"
 	"net/http"
 )
 
@@ -26,15 +25,9 @@ func checkError(err error) *ServiceError {
 	var errData *ServiceError = nil
 
 	if err != nil {
-		msg := err.Error()
-
-		if pqErr, ok := err.(*pq.Error); ok {
-			msg = pqErr.Error()
-		}
-
 		errData = &ServiceError{
 			Code:    http.StatusInternalServerError,
-			Message: msg,
+			Message: err.Error(),
 		}
 	}
 
