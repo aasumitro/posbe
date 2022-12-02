@@ -45,11 +45,27 @@ func (repo UserSQLRepository) All(ctx context.Context) (users []*domain.User, er
 	return users, nil
 }
 
-func (repo UserSQLRepository) Find(ctx context.Context, id int) (user *domain.User, err error) {
+func (repo UserSQLRepository) Find(ctx context.Context, key domain.FindWith, val any) (user *domain.User, err error) {
 	q := "SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, u.password, "
 	q += "r.id as role_id, r.name as role_name, r.description FROM users as u "
-	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
-	row := repo.Db.QueryRowContext(ctx, q, id)
+	q += "JOIN roles as r ON r.id = u.role_id WHERE "
+
+	switch key {
+	case domain.FindWithId:
+		q += "u.id = $1"
+	case domain.FindWithName:
+		q += "u.name LIKE %$1%"
+	case domain.FindWithUsername:
+		q += "u.username = $1"
+	case domain.FindWithEmail:
+		q += "u.email = $1"
+	case domain.FindWithPhone:
+		q += "u.phone = $1"
+	}
+
+	q += "LIMIT 1"
+
+	row := repo.Db.QueryRowContext(ctx, q, val)
 	return scanData(row)
 }
 

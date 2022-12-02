@@ -93,7 +93,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Find_ExpectedSuccess() 
 	q += "WHERE roles.id = $1 GROUP BY roles.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(role)
-	res, err := suite.roleRepo.Find(context.TODO(), 1)
+	res, err := suite.roleRepo.Find(context.TODO(), domain.FindWithId, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -108,7 +108,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Find_ExpectedError() {
 	q += "WHERE roles.id = $1 GROUP BY roles.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(role)
-	res, err := suite.roleRepo.Find(context.TODO(), 1)
+	res, err := suite.roleRepo.Find(context.TODO(), domain.FindWithId, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }

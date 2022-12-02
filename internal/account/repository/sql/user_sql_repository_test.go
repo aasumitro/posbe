@@ -88,10 +88,60 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Find_ExpectedSuccess() 
 	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
-	res, err := suite.userRepo.Find(context.TODO(), 1)
+	res, err := suite.userRepo.Find(context.TODO(), domain.FindWithId, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
+}
+
+func (suite *userRepositoryTestSuite) TestUserRepository_FindBY_ExpectedSuccess() {
+	tests := []struct {
+		name  string
+		args  string
+		key   domain.FindWith
+		value string
+	}{
+		{
+			name:  "test find with name",
+			args:  "u.name LIKE %$1%",
+			key:   domain.FindWithName,
+			value: "lorem",
+		},
+		{
+			name:  "test find with username",
+			args:  "u.username = $1",
+			key:   domain.FindWithUsername,
+			value: "lorem",
+		},
+		{
+			name:  "test find with email",
+			args:  "u.email = $1",
+			key:   domain.FindWithEmail,
+			value: "lorem@ipsum.id",
+		},
+		{
+			name:  "test find with phone",
+			args:  "u.phone = $1",
+			key:   domain.FindWithPhone,
+			value: "+6275555",
+		},
+	}
+	for _, tt := range tests {
+		user := suite.mock.
+			NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
+			AddRow(1, 1, "lorem ipsum", "lorem", "lorem@ipsum.id", "+6275555", "qwe123", 1, "test", "test 12345")
+		q := "SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, u.password, "
+		q += "r.id as role_id, r.name as role_name, r.description FROM users as u "
+		q += "JOIN roles as r ON r.id = u.role_id WHERE "
+		q += tt.args
+		q += "LIMIT 1"
+		expectedQuery := regexp.QuoteMeta(q)
+		suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
+		res, err := suite.userRepo.Find(context.TODO(), tt.key, tt.value)
+		require.Nil(suite.T(), err)
+		require.NoError(suite.T(), err)
+		require.NotNil(suite.T(), res)
+	}
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Find_ExpectedError() {
@@ -103,7 +153,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Find_ExpectedError() {
 	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
-	res, err := suite.userRepo.Find(context.TODO(), 1)
+	res, err := suite.userRepo.Find(context.TODO(), domain.FindWithId, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }

@@ -176,7 +176,7 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldSuccess() {
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(suite.roles[1], nil)
 	roleRepoMock.
@@ -194,7 +194,7 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorInternal
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(nil, errors.New("UNEXPECTED"))
 	err := accSvc.DeleteRole(suite.role)
@@ -209,7 +209,7 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorUsage() 
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(suite.role, nil)
 	err := accSvc.DeleteRole(suite.role)
@@ -227,7 +227,7 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorWhenDele
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(suite.roles[1], nil)
 	roleRepoMock.
@@ -278,7 +278,7 @@ func (suite *accountTestSuite) TestAccountService_ShowUser_ShouldSuccess() {
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(suite.user, nil)
 	data, err := accSvc.ShowUser(suite.user.ID)
@@ -294,7 +294,7 @@ func (suite *accountTestSuite) TestAccountService_ShowUser_ShouldError() {
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(nil, errors.New("UNEXPECTED"))
 	data, err := accSvc.ShowUser(suite.user.ID)
@@ -377,7 +377,7 @@ func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldSuccess() {
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(suite.user, nil)
 	userRepoMock.
@@ -395,7 +395,7 @@ func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldErrorWhenFind
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(nil, errors.New("UNEXPECTED"))
 	err := accSvc.DeleteUser(suite.user)
@@ -410,7 +410,7 @@ func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldErrorWhenDele
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
-		On("Find", mock.Anything, mock.Anything).
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(suite.user, nil)
 	userRepoMock.

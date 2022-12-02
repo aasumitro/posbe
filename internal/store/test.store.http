@@ -1,0 +1,83 @@
+### STORE MODULE HTTP TEST
+===
+
+===
+### FLOOR END-Point
+===
+
+### GET - fetch list of floors with tables
+GET http://localhost:8000/v1/floors/tables
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### GET - fetch list of floors
+GET http://localhost:8000/v1/floors
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new floor
+POST http://localhost:8000/v1/floors
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem"
+}
+
+### PUT - Update specified floor data
+PUT http://localhost:8000/v1/floors/5
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "Ipsum Lorem"
+}
+
+### DELETE - Destroy specified floors data
+DELETE http://localhost:8000/v1/floors/5
+Authorization: Bearer "TOKEN_HERE"
+
+===
+### TABLE END-Point
+===
+
+### GET - fetch list of tables
+GET http://localhost:8000/v1/tables
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new table
+POST http://localhost:8000/v1/tables
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "floor_id": 1,
+  "name": "lorem",
+  "x_pos": 1,
+  "y_pos": 1,
+  "w_size": 2,
+  "h_size": 2,
+  "capacity": 3,
+  "type": "round"
+}
+
+### PUT - Update specified tables data
+PUT http://localhost:8000/v1/tables/3
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "floor_id": 1,
+  "name": "Ipsum Lorem",
+  "x_pos": 1,
+  "y_pos": 1,
+  "w_size": 2,
+  "h_size": 2,
+  "capacity": 3,
+  "type": "round"
+}
+
+### DELETE - Destroy specified table data
+DELETE http://localhost:8000/v1/tables/4
+Authorization: Bearer "TOKEN_HERE"

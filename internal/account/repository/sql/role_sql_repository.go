@@ -36,11 +36,11 @@ func (repo RoleSQLRepository) All(ctx context.Context) (roles []*domain.Role, er
 	return roles, nil
 }
 
-func (repo RoleSQLRepository) Find(ctx context.Context, id int) (role *domain.Role, err error) {
+func (repo RoleSQLRepository) Find(ctx context.Context, _ domain.FindWith, val any) (role *domain.Role, err error) {
 	q := "SELECT roles.id, roles.name, roles.description, COUNT(users.role_id) as usage "
 	q += "FROM roles LEFT OUTER JOIN users ON users.role_id = roles.id "
 	q += "WHERE roles.id = $1 GROUP BY roles.id LIMIT 1"
-	row := repo.Db.QueryRowContext(ctx, q, id)
+	row := repo.Db.QueryRowContext(ctx, q, val)
 
 	role = &domain.Role{}
 	if err := row.Scan(

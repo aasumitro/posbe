@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
@@ -14,10 +15,6 @@ import (
 // 3. GET FROM STORAGE
 // 4. STORE TO CACHE
 // 5. RETURN DATA
-
-import (
-	"context"
-)
 
 // TODO WRAP IN-MEMORY & IN-STORAGE DB;
 // getDataFromCacheRepo(ctx, func() {
@@ -53,7 +50,7 @@ func (service accountService) EditRole(data *domain.Role) (role *domain.Role, er
 }
 
 func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError {
-	role, err := service.roleRepo.Find(service.ctx, data.ID)
+	role, err := service.roleRepo.Find(service.ctx, domain.FindWithId, data.ID)
 	if err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
@@ -86,7 +83,7 @@ func (service accountService) UserList() (users []*domain.User, errorData *utils
 }
 
 func (service accountService) ShowUser(id int) (user *domain.User, errorData *utils.ServiceError) {
-	data, err := service.userRepo.Find(service.ctx, id)
+	data, err := service.userRepo.Find(service.ctx, domain.FindWithId, id)
 
 	return utils.ValidateDataRow[domain.User](data, err)
 }
@@ -130,7 +127,7 @@ func (service accountService) EditUser(data *domain.User) (user *domain.User, er
 }
 
 func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError {
-	user, err := service.userRepo.Find(service.ctx, data.ID)
+	user, err := service.userRepo.Find(service.ctx, domain.FindWithId, data.ID)
 	if err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
