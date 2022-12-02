@@ -39,6 +39,31 @@ func (_m *IStoreService) AddFloor(data *domain.Floor) (*domain.Floor, *utils.Ser
 	return r0, r1
 }
 
+// AddRoom provides a mock function with given fields: data
+func (_m *IStoreService) AddRoom(data *domain.Room) (*domain.Room, *utils.ServiceError) {
+	ret := _m.Called(data)
+
+	var r0 *domain.Room
+	if rf, ok := ret.Get(0).(func(*domain.Room) *domain.Room); ok {
+		r0 = rf(data)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Room)
+		}
+	}
+
+	var r1 *utils.ServiceError
+	if rf, ok := ret.Get(1).(func(*domain.Room) *utils.ServiceError); ok {
+		r1 = rf(data)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*utils.ServiceError)
+		}
+	}
+
+	return r0, r1
+}
+
 // AddTable provides a mock function with given fields: data
 func (_m *IStoreService) AddTable(data *domain.Table) (*domain.Table, *utils.ServiceError) {
 	ret := _m.Called(data)
@@ -80,6 +105,22 @@ func (_m *IStoreService) DeleteFloor(data *domain.Floor) *utils.ServiceError {
 	return r0
 }
 
+// DeleteRoom provides a mock function with given fields: data
+func (_m *IStoreService) DeleteRoom(data *domain.Room) *utils.ServiceError {
+	ret := _m.Called(data)
+
+	var r0 *utils.ServiceError
+	if rf, ok := ret.Get(0).(func(*domain.Room) *utils.ServiceError); ok {
+		r0 = rf(data)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*utils.ServiceError)
+		}
+	}
+
+	return r0
+}
+
 // DeleteTable provides a mock function with given fields: data
 func (_m *IStoreService) DeleteTable(data *domain.Table) *utils.ServiceError {
 	ret := _m.Called(data)
@@ -111,6 +152,31 @@ func (_m *IStoreService) EditFloor(data *domain.Floor) (*domain.Floor, *utils.Se
 
 	var r1 *utils.ServiceError
 	if rf, ok := ret.Get(1).(func(*domain.Floor) *utils.ServiceError); ok {
+		r1 = rf(data)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*utils.ServiceError)
+		}
+	}
+
+	return r0, r1
+}
+
+// EditRoom provides a mock function with given fields: data
+func (_m *IStoreService) EditRoom(data *domain.Room) (*domain.Room, *utils.ServiceError) {
+	ret := _m.Called(data)
+
+	var r0 *domain.Room
+	if rf, ok := ret.Get(0).(func(*domain.Room) *domain.Room); ok {
+		r0 = rf(data)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Room)
+		}
+	}
+
+	var r1 *utils.ServiceError
+	if rf, ok := ret.Get(1).(func(*domain.Room) *utils.ServiceError); ok {
 		r1 = rf(data)
 	} else {
 		if ret.Get(1) != nil {
@@ -187,6 +253,31 @@ func (_m *IStoreService) FloorsWith(s interface{}) ([]*domain.Floor, *utils.Serv
 	var r1 *utils.ServiceError
 	if rf, ok := ret.Get(1).(func(interface{}) *utils.ServiceError); ok {
 		r1 = rf(s)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*utils.ServiceError)
+		}
+	}
+
+	return r0, r1
+}
+
+// RoomList provides a mock function with given fields:
+func (_m *IStoreService) RoomList() ([]*domain.Room, *utils.ServiceError) {
+	ret := _m.Called()
+
+	var r0 []*domain.Room
+	if rf, ok := ret.Get(0).(func() []*domain.Room); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*domain.Room)
+		}
+	}
+
+	var r1 *utils.ServiceError
+	if rf, ok := ret.Get(1).(func() *utils.ServiceError); ok {
+		r1 = rf()
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(*utils.ServiceError)

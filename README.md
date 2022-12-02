@@ -33,6 +33,7 @@ flowchart TB
         store_http_handler<--*ctx,uRepo,rRepo-->store_service
         store_service<--cfg.DBCon-->floor_repository
         store_service<--cfg.DBCon-->table_repository
+        store_service<--cfg.DBCon-->room_repository
       end
       
       subgraph CATALOG_MODULE

@@ -13,6 +13,7 @@ type storeService struct {
 	ctx       context.Context
 	floorRepo domain.ICRUDRepository[domain.Floor]
 	tableRepo domain.ICRUDAddOnRepository[domain.Table]
+	roomRepo  domain.ICRUDAddOnRepository[domain.Room]
 }
 
 func (service storeService) FloorList() (floors []*domain.Floor, errData *utils.ServiceError) {
@@ -98,6 +99,44 @@ func (service storeService) DeleteTable(data *domain.Table) *utils.ServiceError 
 	return nil
 }
 
+func (service storeService) RoomList() (rooms []*domain.Room, errData *utils.ServiceError) {
+	data, err := service.roomRepo.All(service.ctx)
+
+	return utils.ValidateDataRows[domain.Room](data, err)
+}
+
+func (service storeService) AddRoom(data *domain.Room) (room *domain.Room, errData *utils.ServiceError) {
+	data, err := service.roomRepo.Create(service.ctx, data)
+
+	return utils.ValidateDataRow[domain.Room](data, err)
+}
+
+func (service storeService) EditRoom(data *domain.Room) (room *domain.Room, errData *utils.ServiceError) {
+	data, err := service.roomRepo.Update(service.ctx, data)
+
+	return utils.ValidateDataRow[domain.Room](data, err)
+}
+
+func (service storeService) DeleteRoom(data *domain.Room) *utils.ServiceError {
+	room, err := service.roomRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	if err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	err = service.roomRepo.Delete(service.ctx, room)
+	if err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	return nil
+}
+
 func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *utils.ServiceError) {
 	data, err := service.floorRepo.All(service.ctx)
 	if err != nil {
@@ -128,16 +167,19 @@ func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *
 
 		if sName == "Room" && floor.TotalRooms >= 1 {
 			f := floor
-			// TODO
-			//rooms, err := service.roomRepo.AllWhere(service.ctx,
-			//	domain.FindWithRelationId, floor.ID)
-			//if err != nil {
-			//	f.Rooms = nil
-			//}
-			f.Rooms = nil
+
+			if rooms, err := service.roomRepo.AllWhere(
+				service.ctx,
+				domain.FindWithRelationId,
+				floor.ID,
+			); err != nil {
+				f.Rooms = nil
+			} else {
+				f.Rooms = rooms
+			}
+
 			fa = append(fa, f)
 		}
-
 	}
 
 	return fa, nil
@@ -147,10 +189,12 @@ func NewStoreService(
 	ctx context.Context,
 	floorRepo domain.ICRUDRepository[domain.Floor],
 	tableRepo domain.ICRUDAddOnRepository[domain.Table],
+	roomRepo domain.ICRUDAddOnRepository[domain.Room],
 ) domain.IStoreService {
 	return &storeService{
 		ctx:       ctx,
 		tableRepo: tableRepo,
 		floorRepo: floorRepo,
+		roomRepo:  roomRepo,
 	}
 }

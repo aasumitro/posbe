@@ -12,10 +12,12 @@ import (
 func InitStoreModule(ctx context.Context, config *config.Config, router *gin.Engine) {
 	floorRepo := repository.NewFloorSQLRepository(config.GetDbConn())
 	tableRepo := repository.NewTableSQLRepository(config.GetDbConn())
-	storeService := service.NewStoreService(ctx, floorRepo, tableRepo)
+	roomRepo := repository.NewRoomSQLRepository(config.GetDbConn())
+	storeService := service.NewStoreService(ctx, floorRepo, tableRepo, roomRepo)
 	routerGroup := router.Group("v1")
 	protectedRouter := routerGroup
 	//protectedRoute.Use() // TODO ADD AUTH MIDDLEWARE
 	http.NewFloorHandler(storeService, protectedRouter)
 	http.NewTableHandler(storeService, protectedRouter)
+	http.NewRoomHandler(storeService, protectedRouter)
 }
