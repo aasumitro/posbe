@@ -365,18 +365,20 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldSuccess() {
 		Once().
 		Return(suite.floors, nil)
 
-	for _, data := range suite.floors {
-		require.NotNil(suite.T(), data)
-		tableRepoMock.
-			On("AllWhere", mock.Anything, mock.Anything, mock.Anything).
-			Once().
-			Return(suite.tables, nil)
+	for _, floor := range suite.floors {
+		if floor.TotalTables >= 1 {
+			require.NotNil(suite.T(), floor)
+			tableRepoMock.
+				On("AllWhere", mock.Anything, mock.Anything, mock.Anything).
+				Once().
+				Return(suite.tables, nil)
+		}
 	}
 
 	data, err := svc.FloorsWith(domain.Table{})
 	require.Nil(suite.T(), err)
 	require.NotNil(suite.T(), data)
-	require.Equal(suite.T(), data, suite.floors)
+	require.Equal(suite.T(), data, []*domain.Floor{suite.floors[0]})
 	floorRepoMock.AssertExpectations(suite.T())
 }
 
@@ -406,18 +408,20 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldErrorAllWher
 		Once().
 		Return(suite.floors, nil)
 
-	for _, data := range suite.floors {
-		require.NotNil(suite.T(), data)
-		tableRepoMock.
-			On("AllWhere", mock.Anything, mock.Anything, mock.Anything).
-			Once().
-			Return(nil, errors.New("UNEXPECTED"))
+	for _, floor := range suite.floors {
+		if floor.TotalTables >= 1 {
+			require.NotNil(suite.T(), floor)
+			tableRepoMock.
+				On("AllWhere", mock.Anything, mock.Anything, mock.Anything).
+				Once().
+				Return(nil, errors.New("UNEXPECTED"))
+		}
 	}
 
 	data, err := svc.FloorsWith(domain.Table{})
 	require.Nil(suite.T(), err)
 	require.NotNil(suite.T(), data)
-	require.Equal(suite.T(), data, suite.floors)
+	require.Equal(suite.T(), data, []*domain.Floor{suite.floors[0]})
 	floorRepoMock.AssertExpectations(suite.T())
 }
 

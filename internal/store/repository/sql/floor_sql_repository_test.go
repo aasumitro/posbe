@@ -39,13 +39,15 @@ func (suite *floorRepositoryTestSuite) AfterTest(_, _ string) {
 
 func (suite *floorRepositoryTestSuite) TestFloorRepository_All_ExpectedReturnDataRows() {
 	floors := suite.mock.
-		NewRows([]string{"id", "name", "total_tables", "created_at", "updated_at"}).
-		AddRow(1, "test", 1, "13123", "123123").
-		AddRow(2, "test 2", 1, "13123", "123123")
+		NewRows([]string{"id", "name", "total_tables", "total_rooms", "created_at", "updated_at"}).
+		AddRow(1, "test", 1, 1, "13123", "123123").
+		AddRow(2, "test 2", 1, 2, "13123", "123123")
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
-	q += "as total_tables, floors.created_at, floors.updated_at "
+	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
+	q += "floors.created_at, floors.updated_at "
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
-	q += "GROUP BY floors.id ORDER BY floors.id"
+	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
+	q += "GROUP BY floors.id ORDER BY floors.id ASC"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(floors)
 	res, err := suite.floorRepo.All(context.TODO())
@@ -56,9 +58,11 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_All_ExpectedReturnDat
 
 func (suite *floorRepositoryTestSuite) TestFloorRepository_All_ExpectedReturnErrorFromQuery() {
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
-	q += "as total_tables, floors.created_at, floors.updated_at "
+	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
+	q += "floors.created_at, floors.updated_at "
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
-	q += "GROUP BY floors.id ORDER BY floors.id"
+	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
+	q += "GROUP BY floors.id ORDER BY floors.id ASC"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnError(errors.New(""))
 	res, err := suite.floorRepo.All(context.TODO())
@@ -72,9 +76,11 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_All_ExpectedReturnErr
 		AddRow(1, "test").
 		AddRow(nil, nil)
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
-	q += "as total_tables, floors.created_at, floors.updated_at "
+	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
+	q += "floors.created_at, floors.updated_at "
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
-	q += "GROUP BY floors.id ORDER BY floors.id"
+	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
+	q += "GROUP BY floors.id ORDER BY floors.id ASC"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(floors)
 	res, err := suite.floorRepo.All(context.TODO())
@@ -84,11 +90,13 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_All_ExpectedReturnErr
 
 func (suite *floorRepositoryTestSuite) TestFloorRepository_Find_ExpectedSuccess() {
 	floor := suite.mock.
-		NewRows([]string{"id", "name", "total_tables", "created_at", "updated_at"}).
-		AddRow(1, "test", 1, "13123", "123123")
+		NewRows([]string{"id", "name", "total_tables", "total_rooms", "created_at", "updated_at"}).
+		AddRow(1, "test", 1, 1, "13123", "123123")
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
-	q += "as total_tables, floors.created_at, floors.updated_at "
+	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
+	q += "floors.created_at, floors.updated_at"
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
+	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(floor)
@@ -103,8 +111,10 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Find_ExpectedError() 
 		NewRows([]string{"id", "name"}).
 		AddRow(nil, nil)
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
-	q += "as total_tables, floors.created_at, floors.updated_at "
+	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
+	q += "floors.created_at, floors.updated_at"
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
+	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(floor)
