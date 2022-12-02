@@ -10,6 +10,12 @@ GET http://localhost:8000/v1/floors/tables
 Authorization: Bearer "TOKEN_HERE"
 accept: application/json
 
+### GET - fetch list of floors with rooms
+GET http://localhost:8000/v1/floors/rooms
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+
 ### GET - fetch list of floors
 GET http://localhost:8000/v1/floors
 Authorization: Bearer "TOKEN_HERE"
@@ -80,4 +86,49 @@ Content-Type: application/json
 
 ### DELETE - Destroy specified table data
 DELETE http://localhost:8000/v1/tables/4
+Authorization: Bearer "TOKEN_HERE"
+
+===
+### ROOM END-Point
+===
+
+### GET - fetch list of rooms
+GET http://localhost:8000/v1/rooms
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new room
+POST http://localhost:8000/v1/rooms
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "floor_id": 1,
+  "name": "lorem",
+  "x_pos": 1,
+  "y_pos": 1,
+  "w_size": 2,
+  "h_size": 2,
+  "capacity": 3,
+  "price": 1
+}
+
+### PUT - Update specified room data
+PUT http://localhost:8000/v1/rooms/2
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "floor_id": 1,
+  "name": "Ipsum Lorem",
+  "x_pos": 1,
+  "y_pos": 1,
+  "w_size": 2,
+  "h_size": 2,
+  "capacity": 3,
+  "price": 1
+}
+
+### DELETE - Destroy specified room data
+DELETE http://localhost:8000/v1/rooms/2
 Authorization: Bearer "TOKEN_HERE"

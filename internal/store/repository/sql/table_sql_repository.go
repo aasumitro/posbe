@@ -67,10 +67,11 @@ func (repo TableSQLRepository) Find(ctx context.Context, key domain.FindWith, va
 	q := "SELECT * FROM tables WHERE "
 	switch key {
 	case domain.FindWithId:
-		q += "id = $1"
+		q += "id = $1 "
 	case domain.FindWithRelationId:
-		q += "floor_id = $1"
+		q += "floor_id = $1 "
 	}
+	q += "LIMIT 1"
 	row := repo.Db.QueryRowContext(ctx, q, val)
 
 	table = &domain.Table{}

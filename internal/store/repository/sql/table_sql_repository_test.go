@@ -113,7 +113,7 @@ func (suite *tableRepositoryTestSuite) TestTableRepository_Find_ExpectedSuccess(
 	table := suite.mock.
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "type", "created_at", "updated_at"}).
 		AddRow(1, 1, "test", 1, 2, 3, 4, 5, "sq", "13123", "123123")
-	q := "SELECT * FROM tables WHERE id = $1"
+	q := "SELECT * FROM tables WHERE id = $1 LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(table)
 	res, err := suite.tableRepo.Find(context.TODO(), domain.FindWithId, 1)
@@ -126,7 +126,7 @@ func (suite *tableRepositoryTestSuite) TestTableRepository_FindRelation_Expected
 	table := suite.mock.
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "type", "created_at", "updated_at"}).
 		AddRow(1, 1, "test", 1, 2, 3, 4, 5, "sq", "13123", "123123")
-	q := "SELECT * FROM tables WHERE floor_id = $1"
+	q := "SELECT * FROM tables WHERE floor_id = $1 LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(table)
 	res, err := suite.tableRepo.Find(context.TODO(), domain.FindWithRelationId, 1)

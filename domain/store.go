@@ -42,7 +42,7 @@ type (
 		WSize     float32        `json:"w_size" form:"w_size" binding:"required"`
 		HSize     float32        `json:"h_size" form:"h_size" binding:"required"`
 		Capacity  int            `json:"capacity" form:"capacity" binding:"required"`
-		Price     float32        `json:"price" form:"type"`
+		Price     float32        `json:"price" form:"price" binding:"required"`
 		CreatedAt sql.NullString `json:"created_at"`
 		UpdatedAt sql.NullString `json:"updated_at,omitempty"`
 	}
@@ -57,6 +57,11 @@ type (
 		AddTable(data *Table) (table *Table, errData *utils.ServiceError)
 		EditTable(data *Table) (table *Table, errData *utils.ServiceError)
 		DeleteTable(data *Table) *utils.ServiceError
+
+		RoomList() (rooms []*Room, errData *utils.ServiceError)
+		AddRoom(data *Room) (room *Room, errData *utils.ServiceError)
+		EditRoom(data *Room) (room *Room, errData *utils.ServiceError)
+		DeleteRoom(data *Room) *utils.ServiceError
 
 		FloorsWith(s any) (floors []*Floor, errData *utils.ServiceError)
 	}
