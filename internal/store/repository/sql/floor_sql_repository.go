@@ -12,8 +12,10 @@ type FloorSQLRepository struct {
 
 func (repo FloorSQLRepository) All(ctx context.Context) (floors []*domain.Floor, err error) {
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
-	q += "as total_tables, floors.created_at, floors.updated_at "
+	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
+	q += "floors.created_at, floors.updated_at "
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
+	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
 	q += "GROUP BY floors.id ORDER BY floors.id ASC"
 	rows, err := repo.Db.QueryContext(ctx, q)
 	if err != nil {
@@ -26,8 +28,8 @@ func (repo FloorSQLRepository) All(ctx context.Context) (floors []*domain.Floor,
 
 		if err := rows.Scan(
 			&floor.ID, &floor.Name,
-			&floor.TotalTables, &floor.CreatedAt,
-			&floor.UpdatedAt,
+			&floor.TotalTables, &floor.TotalRooms,
+			&floor.CreatedAt, &floor.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -40,16 +42,18 @@ func (repo FloorSQLRepository) All(ctx context.Context) (floors []*domain.Floor,
 
 func (repo FloorSQLRepository) Find(ctx context.Context, _ domain.FindWith, val any) (floor *domain.Floor, err error) {
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
-	q += "as total_tables, floors.created_at, floors.updated_at "
+	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
+	q += "floors.created_at, floors.updated_at"
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
+	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
 	row := repo.Db.QueryRowContext(ctx, q, val)
 
 	floor = &domain.Floor{}
 	if err := row.Scan(
 		&floor.ID, &floor.Name,
-		&floor.TotalTables, &floor.CreatedAt,
-		&floor.UpdatedAt,
+		&floor.TotalTables, &floor.TotalRooms,
+		&floor.CreatedAt, &floor.UpdatedAt,
 	); err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"net/http"
+	"reflect"
 )
 
 type storeService struct {
@@ -97,7 +98,7 @@ func (service storeService) DeleteTable(data *domain.Table) *utils.ServiceError 
 	return nil
 }
 
-func (service storeService) FloorsWithTables() (floors []*domain.Floor, errData *utils.ServiceError) {
+func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *utils.ServiceError) {
 	data, err := service.floorRepo.All(service.ctx)
 	if err != nil {
 		return nil, &utils.ServiceError{
@@ -106,18 +107,40 @@ func (service storeService) FloorsWithTables() (floors []*domain.Floor, errData 
 		}
 	}
 
+	sName := reflect.TypeOf(s).Name()
+	var fa []*domain.Floor = nil
 	for _, floor := range data {
-		var f = floor
-		tables, err := service.tableRepo.AllWhere(service.ctx,
-			domain.FindWithRelationId, floor.ID)
-		if err != nil {
-			f.Tables = nil
+		if sName == "Table" && floor.TotalTables >= 1 {
+			f := floor
+
+			if tables, err := service.tableRepo.AllWhere(
+				service.ctx,
+				domain.FindWithRelationId,
+				floor.ID,
+			); err != nil {
+				f.Tables = nil
+			} else {
+				f.Tables = tables
+			}
+
+			fa = append(fa, f)
 		}
-		f.Tables = tables
-		floors = append(floors, f)
+
+		if sName == "Room" && floor.TotalRooms >= 1 {
+			f := floor
+			// TODO
+			//rooms, err := service.roomRepo.AllWhere(service.ctx,
+			//	domain.FindWithRelationId, floor.ID)
+			//if err != nil {
+			//	f.Rooms = nil
+			//}
+			f.Rooms = nil
+			fa = append(fa, f)
+		}
+
 	}
 
-	return data, nil
+	return fa, nil
 }
 
 func NewStoreService(

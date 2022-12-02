@@ -14,13 +14,13 @@ type tableHandler struct {
 }
 
 func (handler tableHandler) fetch(ctx *gin.Context) {
-	roles, err := handler.svc.TableList()
+	tables, err := handler.svc.TableList()
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, roles)
+	utils.NewHttpRespond(ctx, http.StatusOK, tables)
 }
 
 func (handler tableHandler) store(ctx *gin.Context) {
@@ -30,13 +30,13 @@ func (handler tableHandler) store(ctx *gin.Context) {
 		return
 	}
 
-	role, err := handler.svc.AddTable(&form)
+	table, err := handler.svc.AddTable(&form)
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, role)
+	utils.NewHttpRespond(ctx, http.StatusCreated, table)
 }
 
 func (handler tableHandler) update(ctx *gin.Context) {
@@ -56,13 +56,13 @@ func (handler tableHandler) update(ctx *gin.Context) {
 	}
 
 	form.ID = id
-	role, err := handler.svc.EditTable(&form)
+	table, err := handler.svc.EditTable(&form)
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, role)
+	utils.NewHttpRespond(ctx, http.StatusOK, table)
 }
 
 func (handler tableHandler) destroy(ctx *gin.Context) {

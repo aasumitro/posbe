@@ -38,7 +38,7 @@ func (suite *floorHandlerTestSuite) SetupSuite() {
 func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithTable_ShouldSuccess() {
 	svcMock := new(mocks.IStoreService)
 	svcMock.
-		On("FloorsWithTables").
+		On("FloorsWith", mock.Anything).
 		Return(suite.floors, nil).
 		Once()
 	writer := httptest.NewRecorder()
@@ -54,7 +54,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithTable_ShouldSucces
 func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithTable_ShouldError() {
 	svcMock := new(mocks.IStoreService)
 	svcMock.
-		On("FloorsWithTables").
+		On("FloorsWith", mock.Anything).
 		Return(nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: "UNEXPECTED_ERROR",

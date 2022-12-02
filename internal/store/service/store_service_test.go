@@ -373,7 +373,7 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldSuccess() {
 			Return(suite.tables, nil)
 	}
 
-	data, err := svc.FloorsWithTables()
+	data, err := svc.FloorsWith(domain.Table{})
 	require.Nil(suite.T(), err)
 	require.NotNil(suite.T(), data)
 	require.Equal(suite.T(), data, suite.floors)
@@ -389,7 +389,7 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldErrorFind() 
 		On("All", mock.Anything).
 		Once().
 		Return(nil, errors.New("UNEXPECTED"))
-	data, err := svc.FloorsWithTables()
+	data, err := svc.FloorsWith(domain.Table{})
 	require.Nil(suite.T(), data)
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), err, suite.svcErr)
@@ -414,7 +414,7 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldErrorAllWher
 			Return(nil, errors.New("UNEXPECTED"))
 	}
 
-	data, err := svc.FloorsWithTables()
+	data, err := svc.FloorsWith(domain.Table{})
 	require.Nil(suite.T(), err)
 	require.NotNil(suite.T(), data)
 	require.Equal(suite.T(), data, suite.floors)

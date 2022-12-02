@@ -18,5 +18,4 @@ func InitStoreModule(ctx context.Context, config *config.Config, router *gin.Eng
 	//protectedRoute.Use() // TODO ADD AUTH MIDDLEWARE
 	http.NewFloorHandler(storeService, protectedRouter)
 	http.NewTableHandler(storeService, protectedRouter)
-
 }

@@ -171,13 +171,13 @@ func (_m *IStoreService) FloorList() ([]*domain.Floor, *utils.ServiceError) {
 	return r0, r1
 }
 
-// FloorsWithTables provides a mock function with given fields:
-func (_m *IStoreService) FloorsWithTables() ([]*domain.Floor, *utils.ServiceError) {
-	ret := _m.Called()
+// FloorsWith provides a mock function with given fields: s
+func (_m *IStoreService) FloorsWith(s interface{}) ([]*domain.Floor, *utils.ServiceError) {
+	ret := _m.Called(s)
 
 	var r0 []*domain.Floor
-	if rf, ok := ret.Get(0).(func() []*domain.Floor); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(interface{}) []*domain.Floor); ok {
+		r0 = rf(s)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*domain.Floor)
@@ -185,8 +185,8 @@ func (_m *IStoreService) FloorsWithTables() ([]*domain.Floor, *utils.ServiceErro
 	}
 
 	var r1 *utils.ServiceError
-	if rf, ok := ret.Get(1).(func() *utils.ServiceError); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(interface{}) *utils.ServiceError); ok {
+		r1 = rf(s)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).(*utils.ServiceError)

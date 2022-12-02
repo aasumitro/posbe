@@ -13,13 +13,13 @@ type userHandler struct {
 }
 
 func (handler userHandler) fetch(ctx *gin.Context) {
-	roles, err := handler.svc.UserList()
+	users, err := handler.svc.UserList()
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, roles)
+	utils.NewHttpRespond(ctx, http.StatusOK, users)
 }
 
 func (handler userHandler) show(ctx *gin.Context) {
@@ -32,13 +32,13 @@ func (handler userHandler) show(ctx *gin.Context) {
 		return
 	}
 
-	roles, err := handler.svc.ShowUser(id)
+	user, err := handler.svc.ShowUser(id)
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, roles)
+	utils.NewHttpRespond(ctx, http.StatusOK, user)
 }
 
 func (handler userHandler) store(ctx *gin.Context) {
@@ -48,13 +48,13 @@ func (handler userHandler) store(ctx *gin.Context) {
 		return
 	}
 
-	role, err := handler.svc.AddUser(&form)
+	user, err := handler.svc.AddUser(&form)
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, role)
+	utils.NewHttpRespond(ctx, http.StatusCreated, user)
 }
 
 func (handler userHandler) update(ctx *gin.Context) {
@@ -74,13 +74,13 @@ func (handler userHandler) update(ctx *gin.Context) {
 	}
 
 	form.ID = id
-	role, err := handler.svc.EditUser(&form)
+	user, err := handler.svc.EditUser(&form)
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, role)
+	utils.NewHttpRespond(ctx, http.StatusOK, user)
 }
 
 func (handler userHandler) destroy(ctx *gin.Context) {
