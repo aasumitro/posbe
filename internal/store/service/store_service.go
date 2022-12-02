@@ -107,8 +107,7 @@ func (service storeService) FloorsWithTables() (floors []*domain.Floor, errData 
 	}
 
 	for _, floor := range data {
-		var f *domain.Floor
-		f = floor
+		var f = floor
 		tables, err := service.tableRepo.AllWhere(service.ctx,
 			domain.FindWithRelationId, floor.ID)
 		if err != nil {

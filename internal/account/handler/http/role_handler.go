@@ -20,7 +20,6 @@ func (handler roleHandler) fetch(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, roles)
-	return
 }
 
 func (handler roleHandler) store(ctx *gin.Context) {
@@ -37,7 +36,6 @@ func (handler roleHandler) store(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusCreated, role)
-	return
 }
 
 func (handler roleHandler) update(ctx *gin.Context) {
@@ -64,7 +62,6 @@ func (handler roleHandler) update(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, role)
-	return
 }
 
 func (handler roleHandler) destroy(ctx *gin.Context) {
@@ -85,7 +82,6 @@ func (handler roleHandler) destroy(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
-	return
 }
 
 func NewRoleHandler(accountService domain.IAccountService, router *gin.RouterGroup) {

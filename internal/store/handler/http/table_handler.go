@@ -21,7 +21,6 @@ func (handler tableHandler) fetch(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, roles)
-	return
 }
 
 func (handler tableHandler) store(ctx *gin.Context) {
@@ -38,7 +37,6 @@ func (handler tableHandler) store(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusCreated, role)
-	return
 }
 
 func (handler tableHandler) update(ctx *gin.Context) {
@@ -65,7 +63,6 @@ func (handler tableHandler) update(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, role)
-	return
 }
 
 func (handler tableHandler) destroy(ctx *gin.Context) {
@@ -86,7 +83,6 @@ func (handler tableHandler) destroy(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
-	return
 }
 
 func NewTableHandler(svc domain.IStoreService, router *gin.RouterGroup) {

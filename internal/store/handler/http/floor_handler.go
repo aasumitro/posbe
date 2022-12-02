@@ -21,7 +21,6 @@ func (handler floorHandler) floorsWithTables(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, roles)
-	return
 }
 
 func (handler floorHandler) fetch(ctx *gin.Context) {
@@ -32,7 +31,6 @@ func (handler floorHandler) fetch(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, roles)
-	return
 }
 
 func (handler floorHandler) store(ctx *gin.Context) {
@@ -49,7 +47,6 @@ func (handler floorHandler) store(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusCreated, role)
-	return
 }
 
 func (handler floorHandler) update(ctx *gin.Context) {
@@ -76,7 +73,6 @@ func (handler floorHandler) update(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, role)
-	return
 }
 
 func (handler floorHandler) destroy(ctx *gin.Context) {
@@ -97,7 +93,6 @@ func (handler floorHandler) destroy(ctx *gin.Context) {
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
-	return
 }
 
 func NewFloorHandler(svc domain.IStoreService, router *gin.RouterGroup) {
