@@ -188,10 +188,10 @@ func (suite *tableRepositoryTestSuite) TestTableRepository_Update_ExpectedSucces
 	rows := suite.mock.
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "type", "created_at", "updated_at"}).
 		AddRow(1, 1, "test", 1, 2, 3, 4, 5, "sq", "13123", "123123")
-	q := "UPDATE floors SET"
-	q += "floor_id = $1, name = $2, x_pos = $3"
-	q += "y_pos = $4, w_size = $5, h_size = $6"
-	q += "capacity= $7, type = $8"
+	q := "UPDATE tables SET "
+	q += "floor_id = $1, name = $2, x_pos = $3, "
+	q += "y_pos = $4, w_size = $5, h_size = $6, "
+	q += "capacity= $7, type = $8 "
 	q += "WHERE id = $9 RETURNING *"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
@@ -208,10 +208,10 @@ func (suite *tableRepositoryTestSuite) TestTableRepository_Update_ExpectedError(
 	rows := suite.mock.
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "type", "created_at", "updated_at"}).
 		AddRow(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
-	q := "UPDATE floors SET"
-	q += "floor_id = $1, name = $2, x_pos = $3"
-	q += "y_pos = $4, w_size = $5, h_size = $6"
-	q += "capacity= $7, type = $8"
+	q := "UPDATE tables SET "
+	q += "floor_id = $1, name = $2, x_pos = $3, "
+	q += "y_pos = $4, w_size = $5, h_size = $6, "
+	q += "capacity= $7, type = $8 "
 	q += "WHERE id = $9 RETURNING *"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
