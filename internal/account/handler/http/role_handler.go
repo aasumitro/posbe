@@ -12,6 +12,17 @@ type roleHandler struct {
 	svc domain.IAccountService
 }
 
+// roles godoc
+// @Schemes
+// @Summary 	 Role List
+// @Description  Get Role List.
+// @Tags 		 Roles
+// @Accept       json
+// @Produce      json
+// @Success 200 {array} domain.Role "OK RESPOND"
+// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
+// @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
+// @Router /v1/roles [GET]
 func (handler roleHandler) fetch(ctx *gin.Context) {
 	roles, err := handler.svc.RoleList()
 	if err != nil {
@@ -22,10 +33,24 @@ func (handler roleHandler) fetch(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusOK, roles)
 }
 
+// roles godoc
+// @Schemes
+// @Summary 	 Store Role Data
+// @Description  Create new Role.
+// @Tags 		 Roles
+// @Accept       mpfd
+// @Produce      json
+// @Param name 			formData string true "name"
+// @Param description 	formData string true "description"
+// @Success 201 {object} domain.Role "CREATED RESPOND"
+// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
+// @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
+// @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
+// @Router /v1/roles [POST]
 func (handler roleHandler) store(ctx *gin.Context) {
 	var form domain.Role
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusBadRequest, err.Error())
+		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -38,19 +63,35 @@ func (handler roleHandler) store(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusCreated, role)
 }
 
+// roles godoc
+// @Schemes
+// @Summary 	 Update Role Data
+// @Description  Update Role Data by ID.
+// @Tags 		 Roles
+// @Accept       mpfd
+// @Produce      json
+// @Param id   			path     int  	true "role id"
+// @Param name 			formData string true "name"
+// @Param description 	formData string true "description"
+// @Success 200 {object} domain.Role "CREATED RESPOND"
+// @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
+// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
+// @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
+// @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
+// @Router /v1/roles/{id} [PUT]
 func (handler roleHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
 		utils.NewHttpRespond(ctx,
-			http.StatusInternalServerError,
+			http.StatusBadRequest,
 			errParse.Error())
 		return
 	}
 
 	var form domain.Role
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusBadRequest, err.Error())
+		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -64,12 +105,25 @@ func (handler roleHandler) update(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusOK, role)
 }
 
+// roles godoc
+// @Schemes
+// @Summary 	 Delete Role Data
+// @Description  Delete Role Data by ID.
+// @Tags 		 Roles
+// @Accept       json
+// @Produce      json
+// @Param id   			path     int  	true "role id"
+// @Success 204 "NO CONTENT RESPOND"
+// @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
+// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
+// @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
+// @Router /v1/roles/{id} [DELETE]
 func (handler roleHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
 		utils.NewHttpRespond(ctx,
-			http.StatusInternalServerError,
+			http.StatusBadRequest,
 			errParse.Error())
 		return
 	}

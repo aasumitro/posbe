@@ -125,9 +125,9 @@ func (suite *roomHandlerTestSuite) TestRoomHandler_Store_ShouldError_BadRequest(
 	roomHandler{svc: svcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
-	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
-	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
 }
 
 func (suite *roomHandlerTestSuite) TestRoomHandler_Store_ShouldError_Internal() {
@@ -205,9 +205,9 @@ func (suite *roomHandlerTestSuite) TestRoomHandler_Update_ShouldError_BadRequest
 	roomHandler{svc: svcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
-	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
-	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
 }
 
 func (suite *roomHandlerTestSuite) TestRoomHandler_Update_ShouldError_Internal() {

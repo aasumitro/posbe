@@ -22,6 +22,12 @@ import (
 // @license.name  MIT
 // @license.url   https://github.com/aasumitro/posbe/blob/main/LICENSE
 
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description "Type 'Bearer TOKEN' to correctly set the API Key"
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+
 var (
 	appConfig *config.Config
 	appEngine *gin.Engine
