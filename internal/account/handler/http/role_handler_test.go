@@ -116,9 +116,9 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldError_BadRequest(
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 
-	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
-	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
-	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
 }
 
 func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldError_Internal() {
@@ -187,9 +187,9 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldError_BadRequest
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 
-	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
-	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
-	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
 }
 
 func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldError_Internal() {

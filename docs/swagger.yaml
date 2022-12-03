@@ -1,3 +1,75 @@
+definitions:
+  domain.Role:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      usage:
+        type: integer
+    required:
+    - description
+    - name
+    type: object
+  domain.User:
+    properties:
+      email:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        $ref: '#/definitions/sql.NullInt16'
+      role:
+        $ref: '#/definitions/domain.Role'
+      role_id:
+        type: integer
+      username:
+        type: string
+    required:
+    - name
+    - password
+    - role_id
+    - username
+    type: object
+  sql.NullInt16:
+    properties:
+      int16:
+        type: integer
+      valid:
+        description: Valid is true if Int16 is not NULL
+        type: boolean
+    type: object
+  sql.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
+        type: boolean
+    type: object
+  utils.ErrorRespond:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      status:
+        type: string
+    type: object
+  utils.ValidationErrorRespond:
+    properties:
+      code:
+        type: integer
+      data: {}
+      status:
+        type: string
+    type: object
 info:
   contact:
     email: hello@aasumitro.id
@@ -6,5 +78,353 @@ info:
   license:
     name: MIT
     url: https://github.com/aasumitro/posbe/blob/main/LICENSE
-paths: {}
+paths:
+  /v1/roles:
+    get:
+      consumes:
+      - application/json
+      description: Get Role List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Role'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Role List
+      tags:
+      - Roles
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new Role.
+      parameters:
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: description
+        in: formData
+        name: description
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Role'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store Role Data
+      tags:
+      - Roles
+  /v1/roles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Update Role Data by ID.
+      parameters:
+      - description: role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Role Data
+      tags:
+      - Roles
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Role Data by ID.
+      parameters:
+      - description: role id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: description
+        in: formData
+        name: description
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Role'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Role Data
+      tags:
+      - Roles
+  /v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get User List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.User'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: User List
+      tags:
+      - Users
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new User.
+      parameters:
+      - description: role id
+        in: formData
+        name: role_id
+        required: true
+        type: string
+      - description: full name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: username
+        in: formData
+        name: username
+        required: true
+        type: string
+      - description: email address
+        in: formData
+        name: email
+        type: string
+      - description: phone number
+        in: formData
+        name: phone
+        type: string
+      - description: password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.User'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store User Data
+      tags:
+      - Users
+  /v1/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete User By ID.
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Destroy User Data
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Get User By ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            $ref: '#/definitions/domain.User'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Show User
+      tags:
+      - Users
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Specified User Data by ID.
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: role id
+        in: formData
+        name: role_id
+        type: string
+      - description: full name
+        in: formData
+        name: name
+        type: string
+      - description: username
+        in: formData
+        name: username
+        type: string
+      - description: email address
+        in: formData
+        name: email
+        type: string
+      - description: phone number
+        in: formData
+        name: phone
+        type: string
+      - description: password
+        in: formData
+        name: password
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            $ref: '#/definitions/domain.User'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update User Data
+      tags:
+      - Users
+securityDefinitions:
+  Bearer:
+    description: '"Type ''Bearer TOKEN'' to correctly set the API Key"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

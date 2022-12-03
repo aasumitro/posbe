@@ -130,9 +130,9 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldError_BadReques
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 
-	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
-	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
-	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
 }
 
 func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldError_Internal() {
@@ -211,9 +211,9 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldError_BadReque
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 
-	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
-	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
-	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
+	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
 }
 
 func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldError_Internal() {
