@@ -1,4 +1,29 @@
 definitions:
+  domain.Floor:
+    properties:
+      created_at:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      name:
+        type: string
+      rooms:
+        items:
+          $ref: '#/definitions/domain.Room'
+        type: array
+      tables:
+        items:
+          $ref: '#/definitions/domain.Table'
+        type: array
+      total_rooms:
+        type: integer
+      total_tables:
+        type: integer
+      updated_at:
+        $ref: '#/definitions/sql.NullString'
+    required:
+    - name
+    type: object
   domain.Role:
     properties:
       description:
@@ -13,10 +38,77 @@ definitions:
     - description
     - name
     type: object
+  domain.Room:
+    properties:
+      capacity:
+        type: integer
+      created_at:
+        $ref: '#/definitions/sql.NullString'
+      floor_id:
+        type: integer
+      h_size:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      updated_at:
+        $ref: '#/definitions/sql.NullString'
+      w_size:
+        type: number
+      x_pos:
+        type: number
+      y_pos:
+        type: number
+    required:
+    - capacity
+    - floor_id
+    - h_size
+    - name
+    - price
+    - w_size
+    - x_pos
+    - y_pos
+    type: object
+  domain.Table:
+    properties:
+      capacity:
+        type: integer
+      created_at:
+        $ref: '#/definitions/sql.NullString'
+      floor_id:
+        type: integer
+      h_size:
+        type: number
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+      updated_at:
+        $ref: '#/definitions/sql.NullString'
+      w_size:
+        type: number
+      x_pos:
+        type: number
+      y_pos:
+        type: number
+    required:
+    - capacity
+    - floor_id
+    - h_size
+    - name
+    - w_size
+    - x_pos
+    - y_pos
+    type: object
   domain.User:
     properties:
       email:
-        $ref: '#/definitions/sql.NullString'
+        type: string
       id:
         type: integer
       name:
@@ -24,7 +116,7 @@ definitions:
       password:
         type: string
       phone:
-        $ref: '#/definitions/sql.NullInt16'
+        type: string
       role:
         $ref: '#/definitions/domain.Role'
       role_id:
@@ -36,14 +128,6 @@ definitions:
     - password
     - role_id
     - username
-    type: object
-  sql.NullInt16:
-    properties:
-      int16:
-        type: integer
-      valid:
-        description: Valid is true if Int16 is not NULL
-        type: boolean
     type: object
   sql.NullString:
     properties:
@@ -79,11 +163,11 @@ info:
     name: MIT
     url: https://github.com/aasumitro/posbe/blob/main/LICENSE
 paths:
-  /v1/roles:
+  /v1/floors:
     get:
       consumes:
       - application/json
-      description: Get Role List.
+      description: Get Floors List.
       produces:
       - application/json
       responses:
@@ -91,7 +175,7 @@ paths:
           description: OK RESPOND
           schema:
             items:
-              $ref: '#/definitions/domain.Role'
+              $ref: '#/definitions/domain.Floor'
             type: array
         "401":
           description: UNAUTHORIZED RESPOND
@@ -101,9 +185,188 @@ paths:
           description: INTERNAL SERVER ERROR RESPOND
           schema:
             $ref: '#/definitions/utils.ErrorRespond'
-      summary: Role List
+      summary: Floor List
       tags:
-      - Roles
+      - Floors
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new Floor.
+      parameters:
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Floor'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store Floor Data
+      tags:
+      - Floors
+  /v1/floors/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Floor Data by ID.
+      parameters:
+      - description: floor id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Delete Floor Data
+      tags:
+      - Floors
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Floor Data by ID.
+      parameters:
+      - description: floor id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Floor'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Floor Data
+      tags:
+      - Floors
+  /v1/floors/rooms:
+    get:
+      consumes:
+      - application/json
+      description: Get Floors List With Rooms.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Floor'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Floor List With Rooms
+      tags:
+      - Floors
+  /v1/floors/tables:
+    get:
+      consumes:
+      - application/json
+      description: Get Floors List With Tables.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Floor'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Floor List With Tables
+      tags:
+      - Floors
+  /v1/roles:
+    get:
+      consumes:
+      - application/json
+      description: Get Table List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Table'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Table List
+      tags:
+      - Tables
     post:
       consumes:
       - multipart/form-data
@@ -145,7 +408,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Update Role Data by ID.
+      description: Delete Role Data by ID.
       parameters:
       - description: role id
         in: path
@@ -169,7 +432,7 @@ paths:
           description: INTERNAL SERVER ERROR RESPOND
           schema:
             $ref: '#/definitions/utils.ErrorRespond'
-      summary: Update Role Data
+      summary: Delete Role Data
       tags:
       - Roles
     put:
@@ -218,6 +481,380 @@ paths:
       summary: Update Role Data
       tags:
       - Roles
+  /v1/rooms:
+    get:
+      consumes:
+      - application/json
+      description: Get Room List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Room'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Room List
+      tags:
+      - Rooms
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new Room.
+      parameters:
+      - description: floor id
+        in: formData
+        name: floor_id
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: x position
+        in: formData
+        name: x_pos
+        required: true
+        type: string
+      - description: y position
+        in: formData
+        name: y_pos
+        required: true
+        type: string
+      - description: weight
+        in: formData
+        name: w_size
+        required: true
+        type: string
+      - description: height
+        in: formData
+        name: h_size
+        required: true
+        type: string
+      - description: capacity
+        in: formData
+        name: capacity
+        required: true
+        type: string
+      - description: price
+        in: formData
+        name: price
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Room'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store Room Data
+      tags:
+      - Rooms
+  /v1/rooms/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Room Data by ID.
+      parameters:
+      - description: room id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Delete Room Data
+      tags:
+      - Rooms
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Room Data by ID.
+      parameters:
+      - description: room id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: floor id
+        in: formData
+        name: floor_id
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: x position
+        in: formData
+        name: x_pos
+        required: true
+        type: string
+      - description: y position
+        in: formData
+        name: y_pos
+        required: true
+        type: string
+      - description: weight
+        in: formData
+        name: w_size
+        required: true
+        type: string
+      - description: height
+        in: formData
+        name: h_size
+        required: true
+        type: string
+      - description: capacity
+        in: formData
+        name: capacity
+        required: true
+        type: string
+      - description: price
+        in: formData
+        name: price
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Room'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Room Data
+      tags:
+      - Rooms
+  /v1/tables:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new Table.
+      parameters:
+      - description: floor id
+        in: formData
+        name: floor_id
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: x position
+        in: formData
+        name: x_pos
+        required: true
+        type: string
+      - description: y position
+        in: formData
+        name: y_pos
+        required: true
+        type: string
+      - description: weight
+        in: formData
+        name: w_size
+        required: true
+        type: string
+      - description: height
+        in: formData
+        name: h_size
+        required: true
+        type: string
+      - description: capacity
+        in: formData
+        name: capacity
+        required: true
+        type: string
+      - description: type
+        in: formData
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Table'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store Table Data
+      tags:
+      - Tables
+  /v1/tables/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Table Data by ID.
+      parameters:
+      - description: table id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Delete Table Data
+      tags:
+      - Tables
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Table Data by ID.
+      parameters:
+      - description: table id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: floor id
+        in: formData
+        name: floor_id
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: x position
+        in: formData
+        name: x_pos
+        required: true
+        type: string
+      - description: y position
+        in: formData
+        name: y_pos
+        required: true
+        type: string
+      - description: weight
+        in: formData
+        name: w_size
+        required: true
+        type: string
+      - description: height
+        in: formData
+        name: h_size
+        required: true
+        type: string
+      - description: capacity
+        in: formData
+        name: capacity
+        required: true
+        type: string
+      - description: type
+        in: formData
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Table'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Table Data
+      tags:
+      - Tables
   /v1/users:
     get:
       consumes:

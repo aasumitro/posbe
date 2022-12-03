@@ -12,9 +12,9 @@
         }
     },
     "paths": {
-        "/v1/roles": {
+        "/v1/floors": {
             "get": {
-                "description": "Get Role List.",
+                "description": "Get Floors List.",
                 "consumes": [
                     "application/json"
                 ],
@@ -22,16 +22,286 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Roles"
+                    "Floors"
                 ],
-                "summary": "Role List",
+                "summary": "Floor List",
                 "responses": {
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/domain.Role"
+                                "$ref": "#/definitions/domain.Floor"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new Floor.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Floors"
+                ],
+                "summary": "Store Floor Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Floor"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/floors/rooms": {
+            "get": {
+                "description": "Get Floors List With Rooms.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Floors"
+                ],
+                "summary": "Floor List With Rooms",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Floor"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/floors/tables": {
+            "get": {
+                "description": "Get Floors List With Tables.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Floors"
+                ],
+                "summary": "Floor List With Tables",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Floor"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/floors/{id}": {
+            "put": {
+                "description": "Update Floor Data by ID.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Floors"
+                ],
+                "summary": "Update Floor Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "floor id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Floor"
+                        }
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Floor Data by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Floors"
+                ],
+                "summary": "Delete Floor Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "floor id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "NO CONTENT RESPOND"
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/roles": {
+            "get": {
+                "description": "Get Table List.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Table List",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Table"
                             }
                         }
                     },
@@ -175,7 +445,7 @@
                 }
             },
             "delete": {
-                "description": "Update Role Data by ID.",
+                "description": "Delete Role Data by ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -185,11 +455,559 @@
                 "tags": [
                     "Roles"
                 ],
-                "summary": "Update Role Data",
+                "summary": "Delete Role Data",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "role id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "NO CONTENT RESPOND"
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/rooms": {
+            "get": {
+                "description": "Get Room List.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Room List",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Room"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new Room.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Store Room Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "floor id",
+                        "name": "floor_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "x position",
+                        "name": "x_pos",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "y position",
+                        "name": "y_pos",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "weight",
+                        "name": "w_size",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "height",
+                        "name": "h_size",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "capacity",
+                        "name": "capacity",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "price",
+                        "name": "price",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Room"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/rooms/{id}": {
+            "put": {
+                "description": "Update Room Data by ID.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Update Room Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "room id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "floor id",
+                        "name": "floor_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "x position",
+                        "name": "x_pos",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "y position",
+                        "name": "y_pos",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "weight",
+                        "name": "w_size",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "height",
+                        "name": "h_size",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "capacity",
+                        "name": "capacity",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "price",
+                        "name": "price",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Room"
+                        }
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Room Data by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rooms"
+                ],
+                "summary": "Delete Room Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "room id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "NO CONTENT RESPOND"
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/tables": {
+            "post": {
+                "description": "Create new Table.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Store Table Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "floor id",
+                        "name": "floor_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "x position",
+                        "name": "x_pos",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "y position",
+                        "name": "y_pos",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "weight",
+                        "name": "w_size",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "height",
+                        "name": "h_size",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "capacity",
+                        "name": "capacity",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "type",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Table"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/tables/{id}": {
+            "put": {
+                "description": "Update Table Data by ID.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Update Table Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "table id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "floor id",
+                        "name": "floor_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "x position",
+                        "name": "x_pos",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "y position",
+                        "name": "y_pos",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "weight",
+                        "name": "w_size",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "height",
+                        "name": "h_size",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "capacity",
+                        "name": "capacity",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "type",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Table"
+                        }
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete Table Data by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Delete Table Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "table id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -526,6 +1344,44 @@
         }
     },
     "definitions": {
+        "domain.Floor": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "created_at": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "rooms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Room"
+                    }
+                },
+                "tables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Table"
+                    }
+                },
+                "total_rooms": {
+                    "type": "integer"
+                },
+                "total_tables": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "$ref": "#/definitions/sql.NullString"
+                }
+            }
+        },
         "domain.Role": {
             "type": "object",
             "required": [
@@ -547,6 +1403,101 @@
                 }
             }
         },
+        "domain.Room": {
+            "type": "object",
+            "required": [
+                "capacity",
+                "floor_id",
+                "h_size",
+                "name",
+                "price",
+                "w_size",
+                "x_pos",
+                "y_pos"
+            ],
+            "properties": {
+                "capacity": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "floor_id": {
+                    "type": "integer"
+                },
+                "h_size": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "w_size": {
+                    "type": "number"
+                },
+                "x_pos": {
+                    "type": "number"
+                },
+                "y_pos": {
+                    "type": "number"
+                }
+            }
+        },
+        "domain.Table": {
+            "type": "object",
+            "required": [
+                "capacity",
+                "floor_id",
+                "h_size",
+                "name",
+                "w_size",
+                "x_pos",
+                "y_pos"
+            ],
+            "properties": {
+                "capacity": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "floor_id": {
+                    "type": "integer"
+                },
+                "h_size": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "$ref": "#/definitions/sql.NullString"
+                },
+                "w_size": {
+                    "type": "number"
+                },
+                "x_pos": {
+                    "type": "number"
+                },
+                "y_pos": {
+                    "type": "number"
+                }
+            }
+        },
         "domain.User": {
             "type": "object",
             "required": [
@@ -557,7 +1508,7 @@
             ],
             "properties": {
                 "email": {
-                    "$ref": "#/definitions/sql.NullString"
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
@@ -569,7 +1520,7 @@
                     "type": "string"
                 },
                 "phone": {
-                    "$ref": "#/definitions/sql.NullInt16"
+                    "type": "string"
                 },
                 "role": {
                     "$ref": "#/definitions/domain.Role"
@@ -579,18 +1530,6 @@
                 },
                 "username": {
                     "type": "string"
-                }
-            }
-        },
-        "sql.NullInt16": {
-            "type": "object",
-            "properties": {
-                "int16": {
-                    "type": "integer"
-                },
-                "valid": {
-                    "description": "Valid is true if Int16 is not NULL",
-                    "type": "boolean"
                 }
             }
         },
