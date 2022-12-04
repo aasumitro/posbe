@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"time"
 )
 
 type FloorSQLRepository struct {
@@ -62,11 +63,14 @@ func (repo FloorSQLRepository) Find(ctx context.Context, _ domain.FindWith, val 
 }
 
 func (repo FloorSQLRepository) Create(ctx context.Context, params *domain.Floor) (floor *domain.Floor, err error) {
-	q := "INSERT INTO floors (name) values ($1) RETURNING *"
-	row := repo.Db.QueryRowContext(ctx, q, params.Name)
+	q := "INSERT INTO floors (name, created_at) values ($1, $2) RETURNING *"
+	row := repo.Db.QueryRowContext(ctx, q, params.Name, time.Now().Unix())
 
 	floor = &domain.Floor{}
-	if err := row.Scan(&floor.ID, &floor.Name, &floor.CreatedAt, &floor.UpdatedAt); err != nil {
+	if err := row.Scan(
+		&floor.ID, &floor.Name,
+		&floor.CreatedAt, &floor.UpdatedAt,
+	); err != nil {
 		return nil, err
 	}
 
@@ -74,11 +78,14 @@ func (repo FloorSQLRepository) Create(ctx context.Context, params *domain.Floor)
 }
 
 func (repo FloorSQLRepository) Update(ctx context.Context, params *domain.Floor) (floor *domain.Floor, err error) {
-	q := "UPDATE floors SET name = $1 WHERE id = $2 RETURNING *"
-	row := repo.Db.QueryRowContext(ctx, q, params.Name, params.ID)
+	q := "UPDATE floors SET name = $1, updated_at = $2 WHERE id = $3 RETURNING *"
+	row := repo.Db.QueryRowContext(ctx, q, params.Name, time.Now().Unix(), params.ID)
 
 	floor = &domain.Floor{}
-	if err := row.Scan(&floor.ID, &floor.Name, &floor.CreatedAt, &floor.UpdatedAt); err != nil {
+	if err := row.Scan(
+		&floor.ID, &floor.Name,
+		&floor.CreatedAt, &floor.UpdatedAt,
+	); err != nil {
 		return nil, err
 	}
 
