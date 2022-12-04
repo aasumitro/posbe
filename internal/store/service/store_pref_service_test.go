@@ -16,8 +16,7 @@ import (
 
 type storePrefTestSuite struct {
 	suite.Suite
-	Db     *sql.DB
-	svcErr *utils.ServiceError
+	Db *sql.DB
 }
 
 func (suite *storePrefTestSuite) TestStorePrefService_AllPrefs_ShouldSuccess() {

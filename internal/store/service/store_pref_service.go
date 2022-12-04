@@ -19,7 +19,7 @@ func (service storePrefService) AllPrefs() (prefs *domain.StoreSetting, errData 
 }
 
 func (service storePrefService) UpdatePrefs(key, value string) (prefs *domain.StoreSetting, errData *utils.ServiceError) {
-	data, err := service.prefRepo.Find(service.ctx, key)
+	_, err := service.prefRepo.Find(service.ctx, key)
 	if err != nil {
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
@@ -27,7 +27,7 @@ func (service storePrefService) UpdatePrefs(key, value string) (prefs *domain.St
 		}
 	}
 
-	data, err = service.prefRepo.Update(service.ctx, key, value)
+	data, err := service.prefRepo.Update(service.ctx, key, value)
 	if err != nil {
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
