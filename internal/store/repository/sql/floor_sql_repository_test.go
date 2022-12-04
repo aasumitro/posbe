@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"regexp"
 	"testing"
+	"time"
 )
 
 type floorRepositoryTestSuite struct {
@@ -128,9 +129,9 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Create_ExpectedSucces
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "created_at", "updated_at"}).
 		AddRow(1, "test", "123123", "12312312")
-	expectedQuery := regexp.QuoteMeta("INSERT INTO floors (name) values ($1) RETURNING *")
+	expectedQuery := regexp.QuoteMeta("INSERT INTO floors (name, created_at) values ($1, $2) RETURNING *")
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(floor.Name).
+		WithArgs(floor.Name, time.Now().Unix()).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.floorRepo.Create(context.TODO(), floor)
@@ -143,9 +144,9 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Create_ExpectedError(
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "created_at", "updated_at"}).
 		AddRow(1, nil, nil, nil)
-	expectedQuery := regexp.QuoteMeta("INSERT INTO floors (name) values ($1) RETURNING *")
+	expectedQuery := regexp.QuoteMeta("INSERT INTO floors (name, created_at) values ($1, $2) RETURNING *")
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(floor.Name).
+		WithArgs(floor.Name, time.Now().Unix()).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.floorRepo.Create(context.TODO(), floor)
@@ -158,9 +159,9 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Update_ExpectedSucces
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "created_at", "updated_at"}).
 		AddRow(1, "test", "123123", "12312312")
-	expectedQuery := regexp.QuoteMeta("UPDATE floors SET name = $1 WHERE id = $2 RETURNING *")
+	expectedQuery := regexp.QuoteMeta("UPDATE floors SET name = $1, updated_at = $2 WHERE id = $3 RETURNING *")
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(floor.Name, floor.ID).
+		WithArgs(floor.Name, time.Now().Unix(), floor.ID).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.floorRepo.Update(context.TODO(), floor)
@@ -173,9 +174,9 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Update_ExpectedError(
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "created_at", "updated_at"}).
 		AddRow(1, nil, nil, nil)
-	expectedQuery := regexp.QuoteMeta("UPDATE floors SET name = $1 WHERE id = $2 RETURNING *")
+	expectedQuery := regexp.QuoteMeta("UPDATE floors SET name = $1, updated_at = $2 WHERE id = $3 RETURNING *")
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(floor.Name, floor.ID).
+		WithArgs(floor.Name, time.Now().Unix(), floor.ID).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.floorRepo.Update(context.TODO(), floor)

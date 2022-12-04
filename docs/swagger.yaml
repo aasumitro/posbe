@@ -2,7 +2,7 @@ definitions:
   domain.Floor:
     properties:
       created_at:
-        $ref: '#/definitions/sql.NullString'
+        $ref: '#/definitions/sql.NullInt64'
       id:
         type: integer
       name:
@@ -20,7 +20,7 @@ definitions:
       total_tables:
         type: integer
       updated_at:
-        $ref: '#/definitions/sql.NullString'
+        $ref: '#/definitions/sql.NullInt64'
     required:
     - name
     type: object
@@ -43,7 +43,7 @@ definitions:
       capacity:
         type: integer
       created_at:
-        $ref: '#/definitions/sql.NullString'
+        $ref: '#/definitions/sql.NullInt64'
       floor_id:
         type: integer
       h_size:
@@ -55,7 +55,7 @@ definitions:
       price:
         type: number
       updated_at:
-        $ref: '#/definitions/sql.NullString'
+        $ref: '#/definitions/sql.NullInt64'
       w_size:
         type: number
       x_pos:
@@ -72,12 +72,16 @@ definitions:
     - x_pos
     - y_pos
     type: object
+  domain.StoreSetting:
+    additionalProperties:
+      type: string
+    type: object
   domain.Table:
     properties:
       capacity:
         type: integer
       created_at:
-        $ref: '#/definitions/sql.NullString'
+        $ref: '#/definitions/sql.NullInt64'
       floor_id:
         type: integer
       h_size:
@@ -89,7 +93,7 @@ definitions:
       type:
         type: string
       updated_at:
-        $ref: '#/definitions/sql.NullString'
+        $ref: '#/definitions/sql.NullInt64'
       w_size:
         type: number
       x_pos:
@@ -129,12 +133,12 @@ definitions:
     - role_id
     - username
     type: object
-  sql.NullString:
+  sql.NullInt64:
     properties:
-      string:
-        type: string
+      int64:
+        type: integer
       valid:
-        description: Valid is true if String is not NULL
+        description: Valid is true if Int64 is not NULL
         type: boolean
     type: object
   utils.ErrorRespond:
@@ -680,6 +684,68 @@ paths:
       summary: Update Room Data
       tags:
       - Rooms
+  /v1/store/prefs:
+    get:
+      consumes:
+      - application/json
+      description: Get Store Settings List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.StoreSetting'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store Settings
+      tags:
+      - Store
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Floor Data by ID.
+      parameters:
+      - description: key
+        in: formData
+        name: key
+        required: true
+        type: string
+      - description: value
+        in: formData
+        name: value
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.StoreSetting'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Floor Data
+      tags:
+      - Store
   /v1/tables:
     post:
       consumes:

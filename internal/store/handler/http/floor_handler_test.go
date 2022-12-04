@@ -272,6 +272,6 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Destroy_ShouldError() {
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
 }
 
-func TestFloorHandlerService(t *testing.T) {
+func TestFloorHandler(t *testing.T) {
 	suite.Run(t, new(floorHandlerTestSuite))
 }

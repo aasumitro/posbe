@@ -287,6 +287,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Destroy_ShouldError() {
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
 }
 
-func TestTableHandlerService(t *testing.T) {
+func TestTableHandler(t *testing.T) {
 	suite.Run(t, new(tableHandlerTestSuite))
 }

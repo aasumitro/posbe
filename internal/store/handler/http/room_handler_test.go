@@ -281,6 +281,6 @@ func (suite *roomHandlerTestSuite) TestRoomHandler_Destroy_ShouldError() {
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
 }
 
-func TestRoomHandlerService(t *testing.T) {
+func TestRoomHandler(t *testing.T) {
 	suite.Run(t, new(roomHandlerTestSuite))
 }

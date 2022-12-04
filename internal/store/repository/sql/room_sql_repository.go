@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"time"
 )
 
 type RoomSQLRepository struct {
@@ -89,12 +90,12 @@ func (repo RoomSQLRepository) Find(ctx context.Context, key domain.FindWith, val
 
 func (repo RoomSQLRepository) Create(ctx context.Context, params *domain.Room) (room *domain.Room, err error) {
 	q := "INSERT INTO rooms (floor_id, name, x_pos,  "
-	q += "y_pos, w_size, h_size, capacity, price) "
-	q += "values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
+	q += "y_pos, w_size, h_size, capacity, price, created_at) "
+	q += "values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q,
 		params.FloorId, params.Name, params.XPos,
 		params.YPos, params.WSize, params.HSize,
-		params.Capacity, params.Price)
+		params.Capacity, params.Price, time.Now().Unix())
 
 	room = &domain.Room{}
 	if err := row.Scan(&room.ID, &room.FloorId, &room.Name,
@@ -112,12 +113,12 @@ func (repo RoomSQLRepository) Update(ctx context.Context, params *domain.Room) (
 	q := "UPDATE rooms SET "
 	q += "floor_id = $1, name = $2, x_pos = $3, "
 	q += "y_pos = $4, w_size = $5, h_size = $6, "
-	q += "capacity= $7, price = $8 "
-	q += "WHERE id = $9 RETURNING *"
+	q += "capacity= $7, price = $8, updated_at = $9 "
+	q += "WHERE id = $10 RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q,
 		params.FloorId, params.Name, params.XPos,
 		params.YPos, params.WSize, params.HSize,
-		params.Capacity, params.Price, params.ID)
+		params.Capacity, params.Price, time.Now().Unix(), params.ID)
 
 	room = &domain.Room{}
 	if err := row.Scan(&room.ID, &room.FloorId, &room.Name,
