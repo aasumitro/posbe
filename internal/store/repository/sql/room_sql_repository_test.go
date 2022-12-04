@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"regexp"
 	"testing"
+	"time"
 )
 
 type roomRepositoryTestSuite struct {
@@ -153,11 +154,11 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Create_ExpectedSuccess(
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "price", "created_at", "updated_at"}).
 		AddRow(1, 1, "test", 1, 2, 3, 4, 5, 1, "13123", "123123")
 	q := "INSERT INTO rooms (floor_id, name, x_pos,  "
-	q += "y_pos, w_size, h_size, capacity, price) "
-	q += "values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
+	q += "y_pos, w_size, h_size, capacity, price, created_at) "
+	q += "values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(room.FloorId, room.Name, room.XPos, room.YPos, room.WSize, room.HSize, room.Capacity, room.Price).
+		WithArgs(room.FloorId, room.Name, room.XPos, room.YPos, room.WSize, room.HSize, room.Capacity, room.Price, time.Now().Unix()).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.roomRepo.Create(context.TODO(), room)
@@ -171,11 +172,11 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Create_ExpectedError() 
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "price", "created_at", "updated_at"}).
 		AddRow(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
 	q := "INSERT INTO rooms (floor_id, name, x_pos,  "
-	q += "y_pos, w_size, h_size, capacity, price) "
-	q += "values ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
+	q += "y_pos, w_size, h_size, capacity, price, created_at) "
+	q += "values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(room.FloorId, room.Name, room.XPos, room.YPos, room.WSize, room.HSize, room.Capacity, room.Price).
+		WithArgs(room.FloorId, room.Name, room.XPos, room.YPos, room.WSize, room.HSize, room.Capacity, room.Price, time.Now().Unix()).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.roomRepo.Create(context.TODO(), room)
@@ -191,11 +192,11 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Update_ExpectedSuccess(
 	q := "UPDATE rooms SET "
 	q += "floor_id = $1, name = $2, x_pos = $3, "
 	q += "y_pos = $4, w_size = $5, h_size = $6, "
-	q += "capacity= $7, price = $8 "
-	q += "WHERE id = $9 RETURNING *"
+	q += "capacity= $7, price = $8, updated_at = $9 "
+	q += "WHERE id = $10 RETURNING *"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(room.FloorId, room.Name, room.XPos, room.YPos, room.WSize, room.HSize, room.Capacity, room.Price, room.ID).
+		WithArgs(room.FloorId, room.Name, room.XPos, room.YPos, room.WSize, room.HSize, room.Capacity, room.Price, time.Now().Unix(), room.ID).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.roomRepo.Update(context.TODO(), room)
@@ -211,11 +212,11 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Update_ExpectedError() 
 	q := "UPDATE rooms SET "
 	q += "floor_id = $1, name = $2, x_pos = $3, "
 	q += "y_pos = $4, w_size = $5, h_size = $6, "
-	q += "capacity= $7, price = $8 "
-	q += "WHERE id = $9 RETURNING *"
+	q += "capacity= $7, price = $8, updated_at = $9 "
+	q += "WHERE id = $10 RETURNING *"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(room.FloorId, room.Name, room.XPos, room.YPos, room.WSize, room.HSize, room.Capacity, room.Price, room.ID).
+		WithArgs(room.FloorId, room.Name, room.XPos, room.YPos, room.WSize, room.HSize, room.Capacity, room.Price, time.Now().Unix(), room.ID).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.roomRepo.Update(context.TODO(), room)

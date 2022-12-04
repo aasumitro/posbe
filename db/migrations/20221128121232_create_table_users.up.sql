@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE,
     phone BIGINT UNIQUE,
     password VARCHAR(255) NOT NULL,
-    created_at timestamptz NOT NULL DEFAULT (now()),
-    updated_at timestamptz
+    created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
+    updated_at BIGINT
 );

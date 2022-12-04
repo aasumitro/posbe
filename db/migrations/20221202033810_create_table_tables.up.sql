@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS tables (
     h_size FLOAT,
     capacity INT,
     type TABLE_TYPES DEFAULT 'square',
-    created_at timestamptz NOT NULL DEFAULT (now()),
-    updated_at timestamptz
+    created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
+    updated_at BIGINT
 );
 
 ALTER TABLE tables ADD CONSTRAINT fk_floors_tables

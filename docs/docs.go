@@ -794,6 +794,99 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/store/prefs": {
+            "get": {
+                "description": "Get Store Settings List.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Store Settings",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.StoreSetting"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Floor Data by ID.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Store"
+                ],
+                "summary": "Update Floor Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "key",
+                        "name": "key",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "value",
+                        "name": "value",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/domain.StoreSetting"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/tables": {
             "post": {
                 "description": "Create new Table.",
@@ -1363,7 +1456,7 @@ const docTemplate = `{
             ],
             "properties": {
                 "created_at": {
-                    "$ref": "#/definitions/sql.NullString"
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "id": {
                     "type": "integer"
@@ -1390,7 +1483,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "updated_at": {
-                    "$ref": "#/definitions/sql.NullString"
+                    "$ref": "#/definitions/sql.NullInt64"
                 }
             }
         },
@@ -1432,7 +1525,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "created_at": {
-                    "$ref": "#/definitions/sql.NullString"
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "floor_id": {
                     "type": "integer"
@@ -1450,7 +1543,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "updated_at": {
-                    "$ref": "#/definitions/sql.NullString"
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "w_size": {
                     "type": "number"
@@ -1461,6 +1554,12 @@ const docTemplate = `{
                 "y_pos": {
                     "type": "number"
                 }
+            }
+        },
+        "domain.StoreSetting": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
             }
         },
         "domain.Table": {
@@ -1479,7 +1578,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "created_at": {
-                    "$ref": "#/definitions/sql.NullString"
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "floor_id": {
                     "type": "integer"
@@ -1497,7 +1596,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "$ref": "#/definitions/sql.NullString"
+                    "$ref": "#/definitions/sql.NullInt64"
                 },
                 "w_size": {
                     "type": "number"
@@ -1545,14 +1644,14 @@ const docTemplate = `{
                 }
             }
         },
-        "sql.NullString": {
+        "sql.NullInt64": {
             "type": "object",
             "properties": {
-                "string": {
-                    "type": "string"
+                "int64": {
+                    "type": "integer"
                 },
                 "valid": {
-                    "description": "Valid is true if String is not NULL",
+                    "description": "Valid is true if Int64 is not NULL",
                     "type": "boolean"
                 }
             }
