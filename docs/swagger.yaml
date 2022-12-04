@@ -350,7 +350,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get Table List.
+      description: Get Role List.
       produces:
       - application/json
       responses:
@@ -358,7 +358,7 @@ paths:
           description: OK RESPOND
           schema:
             items:
-              $ref: '#/definitions/domain.Table'
+              $ref: '#/definitions/domain.Role'
             type: array
         "401":
           description: UNAUTHORIZED RESPOND
@@ -368,9 +368,9 @@ paths:
           description: INTERNAL SERVER ERROR RESPOND
           schema:
             $ref: '#/definitions/utils.ErrorRespond'
-      summary: Table List
+      summary: Role List
       tags:
-      - Tables
+      - Roles
     post:
       consumes:
       - multipart/form-data
@@ -747,6 +747,30 @@ paths:
       tags:
       - Store
   /v1/tables:
+    get:
+      consumes:
+      - application/json
+      description: Get Table List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Table'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Table List
+      tags:
+      - Tables
     post:
       consumes:
       - multipart/form-data

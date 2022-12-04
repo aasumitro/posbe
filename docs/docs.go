@@ -296,7 +296,7 @@ const docTemplate = `{
         },
         "/v1/roles": {
             "get": {
-                "description": "Get Table List.",
+                "description": "Get Role List.",
                 "consumes": [
                     "application/json"
                 ],
@@ -304,16 +304,16 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tables"
+                    "Roles"
                 ],
-                "summary": "Table List",
+                "summary": "Role List",
                 "responses": {
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/domain.Table"
+                                "$ref": "#/definitions/domain.Role"
                             }
                         }
                     },
@@ -888,6 +888,42 @@ const docTemplate = `{
             }
         },
         "/v1/tables": {
+            "get": {
+                "description": "Get Table List.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Table List",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Table"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create new Table.",
                 "consumes": [
