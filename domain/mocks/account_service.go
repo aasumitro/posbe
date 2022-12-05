@@ -221,6 +221,31 @@ func (_m *IAccountService) UserList() ([]*domain.User, *utils.ServiceError) {
 	return r0, r1
 }
 
+// VerifyUserCredentials provides a mock function with given fields: username, password
+func (_m *IAccountService) VerifyUserCredentials(username string, password string) (interface{}, *utils.ServiceError) {
+	ret := _m.Called(username, password)
+
+	var r0 interface{}
+	if rf, ok := ret.Get(0).(func(string, string) interface{}); ok {
+		r0 = rf(username, password)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interface{})
+		}
+	}
+
+	var r1 *utils.ServiceError
+	if rf, ok := ret.Get(1).(func(string, string) *utils.ServiceError); ok {
+		r1 = rf(username, password)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*utils.ServiceError)
+		}
+	}
+
+	return r0, r1
+}
+
 type mockConstructorTestingTNewIAccountService interface {
 	mock.TestingT
 	Cleanup(func())

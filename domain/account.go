@@ -5,6 +5,11 @@ import (
 )
 
 type (
+	LoginForm struct {
+		Username string `json:"username" form:"username" binding:"required"`
+		Password string `json:"password" form:"password" binding:"required"`
+	}
+
 	User struct {
 		ID       int    `json:"id"`
 		RoleId   int    `json:"role_id,omitempty" form:"role_id" binding:"required"`
@@ -12,7 +17,7 @@ type (
 		Username string `json:"username" form:"username" binding:"required"`
 		Email    string `json:"email" form:"email"`
 		Phone    string `json:"phone" form:"phone"`
-		Password string `json:"password" form:"password" binding:"required"`
+		Password string `json:"password,omitempty" form:"password" binding:"required"`
 		Role     Role   `json:"role" binding:"-"`
 	}
 
@@ -36,7 +41,6 @@ type (
 		EditUser(data *User) (user *User, errData *utils.ServiceError)
 		DeleteUser(data *User) *utils.ServiceError
 
-		//VerifyUserCredentials(username, password string) (data any, errData *utils.ServiceError)
-		//LoggedUserOut()
+		VerifyUserCredentials(username, password string) (data any, errData *utils.ServiceError)
 	}
 )

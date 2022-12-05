@@ -1,71 +1,36 @@
 package utils
 
 import (
-	"encoding/base64"
-	"fmt"
+	"errors"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
 
-func CreateJWTToken(ttl time.Duration, payload interface{}, privateKey string) (string, error) {
-	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey)
-	if err != nil {
-		return "", fmt.Errorf("could not decode key: %w", err)
-	}
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(decodedPrivateKey)
-
-	if err != nil {
-		return "", fmt.Errorf("create: parse key: %w", err)
-	}
-
-	now := time.Now().UTC()
-
-	claims := make(jwt.MapClaims)
-	claims["sub"] = payload
-	claims["exp"] = now.Add(ttl).Unix()
-	claims["iat"] = now.Unix()
-	claims["nbf"] = now.Unix()
-
-	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(key)
-
-	if err != nil {
-		return "", fmt.Errorf("create: sign token: %w", err)
-	}
-
-	return token, nil
+type JWTClaim struct {
+	jwt.RegisteredClaims
+	Payload interface{} `json:"payload"`
 }
 
-func ValidateJWTToken(token string, publicKey string) (interface{}, error) {
-	decodedPublicKey, err := base64.StdEncoding.DecodeString(publicKey)
-	if err != nil {
-		return nil, fmt.Errorf("could not decode: %w", err)
+// ClaimJWTToken
+// args app name, expiration time, secret key, payload
+func ClaimJWTToken(args ...any) (string, error) {
+	if len(args) < 4 {
+		return "", errors.New("args is less than 4, needed args: app_name, exp_time, payload, secret")
 	}
 
-	key, err := jwt.ParseRSAPublicKeyFromPEM(decodedPublicKey)
-
-	if err != nil {
-		return "", fmt.Errorf("validate: parse key: %w", err)
-	}
-
-	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("unexpected method: %s", t.Header["alg"])
-		}
-		return key, nil
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, JWTClaim{
+		RegisteredClaims: jwt.RegisteredClaims{
+			// ISSUER/APP_NAME args[0]
+			Issuer:   args[0].(string),
+			IssuedAt: &jwt.NumericDate{Time: time.Now()},
+			// EXPIRATION TIME args[1]
+			ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(time.Duration(args[1].(int)) * time.Hour)},
+		},
+		// PAYLOAD USER args[2]
+		Payload: args[2],
 	})
 
-	if err != nil {
-		return nil, fmt.Errorf("validate: %w", err)
-	}
-
-	claims, ok := parsedToken.Claims.(jwt.MapClaims)
-	if !ok || !parsedToken.Valid {
-		return nil, fmt.Errorf("validate: invalid token")
-	}
-
-	return claims["sub"], nil
+	// SECRET/SIGNATURE args[3]
+	return token.SignedString(args[3])
 }
 
-func BlacklistJWTToken(token string) {
-	// TODO
-}
