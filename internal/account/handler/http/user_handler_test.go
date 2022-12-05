@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/domain/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
@@ -221,7 +220,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldError_Internal() 
 	userHandler{svc: accSvcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-	fmt.Println(writer)
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)

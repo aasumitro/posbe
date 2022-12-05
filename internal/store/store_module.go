@@ -13,8 +13,8 @@ func InitStoreModule(ctx context.Context, config *config.Config, router *gin.Eng
 	floorRepo := repository.NewFloorSQLRepository(config.GetDbConn())
 	tableRepo := repository.NewTableSQLRepository(config.GetDbConn())
 	roomRepo := repository.NewRoomSQLRepository(config.GetDbConn())
-	storeService := service.NewStoreService(ctx, floorRepo, tableRepo, roomRepo)
 	storePrefRepo := repository.NewStorePrefSQLRepository(config.GetDbConn())
+	storeService := service.NewStoreService(ctx, floorRepo, tableRepo, roomRepo)
 	storePrefService := service.NewStorePrefService(ctx, storePrefRepo)
 	routerGroup := router.Group("v1")
 	protectedRouter := routerGroup

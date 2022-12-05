@@ -296,11 +296,20 @@ paths:
       summary: Update Floor Data
       tags:
       - Floors
-  /v1/floors/rooms:
+  /v1/floors/{join}:
     get:
       consumes:
       - application/json
-      description: Get Floors List With Rooms.
+      description: Get Floors List With Join.
+      parameters:
+      - description: join with data, available join rooms, tables
+        enum:
+        - rooms
+        - tables
+        in: path
+        name: join
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -318,32 +327,7 @@ paths:
           description: INTERNAL SERVER ERROR RESPOND
           schema:
             $ref: '#/definitions/utils.ErrorRespond'
-      summary: Floor List With Rooms
-      tags:
-      - Floors
-  /v1/floors/tables:
-    get:
-      consumes:
-      - application/json
-      description: Get Floors List With Tables.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK RESPOND
-          schema:
-            items:
-              $ref: '#/definitions/domain.Floor'
-            type: array
-        "401":
-          description: UNAUTHORIZED RESPOND
-          schema:
-            $ref: '#/definitions/utils.ErrorRespond'
-        "500":
-          description: INTERNAL SERVER ERROR RESPOND
-          schema:
-            $ref: '#/definitions/utils.ErrorRespond'
-      summary: Floor List With Tables
+      summary: Floor List With Join
       tags:
       - Floors
   /v1/roles:

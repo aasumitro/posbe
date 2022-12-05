@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type floorHandler struct {
@@ -15,38 +16,33 @@ type floorHandler struct {
 
 // floors godoc
 // @Schemes
-// @Summary 	 Floor List With Tables
-// @Description  Get Floors List With Tables.
+// @Summary 	 Floor List With Join
+// @Description  Get Floors List With Join.
 // @Tags 		 Floors
 // @Accept       json
 // @Produce      json
+// @Param 	join path string true "join with data, available join rooms, tables" Enums(rooms, tables)
 // @Success 200 {array} domain.Floor "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/floors/tables [GET]
-func (handler floorHandler) floorsWithTables(ctx *gin.Context) {
-	floors, err := handler.svc.FloorsWith(domain.Table{})
-	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+// @Router /v1/floors/{join} [GET]
+func (handler floorHandler) floorsWith(ctx *gin.Context) {
+	joinParams := strings.ToLower(ctx.Param("join"))
+	if !utils.InArray(joinParams, []string{"rooms", "tables"}) {
+		utils.NewHttpRespond(ctx,
+			http.StatusBadRequest,
+			"unsupported join data")
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, floors)
-}
+	floors, err := handler.svc.FloorsWith(func() any {
+		if joinParams == "rooms" {
+			return domain.Room{}
+		}
 
-// floors godoc
-// @Schemes
-// @Summary 	 Floor List With Rooms
-// @Description  Get Floors List With Rooms.
-// @Tags 		 Floors
-// @Accept       json
-// @Produce      json
-// @Success 200 {array} domain.Floor "OK RESPOND"
-// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
-// @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/floors/rooms [GET]
-func (handler floorHandler) floorsWithRooms(ctx *gin.Context) {
-	floors, err := handler.svc.FloorsWith(domain.Room{})
+		return domain.Table{}
+	}())
+
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
@@ -185,8 +181,7 @@ func (handler floorHandler) destroy(ctx *gin.Context) {
 
 func NewFloorHandler(svc domain.IStoreService, router *gin.RouterGroup) {
 	handler := floorHandler{svc: svc, router: router}
-	router.GET("/floors/tables", handler.floorsWithTables)
-	router.GET("/floors/rooms", handler.floorsWithRooms)
+	router.GET("/floors/:join", handler.floorsWith)
 	router.GET("/floors", handler.fetch)
 	router.POST("/floors", handler.store)
 	router.PUT("/floors/:id", handler.update)

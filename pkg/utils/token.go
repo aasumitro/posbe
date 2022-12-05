@@ -65,3 +65,7 @@ func ValidateJWTToken(token string, publicKey string) (interface{}, error) {
 
 	return claims["sub"], nil
 }
+
+func BlacklistJWTToken(token string) {
+	// TODO
+}
