@@ -10,8 +10,7 @@ import (
 )
 
 type floorHandler struct {
-	svc    domain.IStoreService
-	router *gin.RouterGroup
+	svc domain.IStoreService
 }
 
 // floors godoc
@@ -180,7 +179,7 @@ func (handler floorHandler) destroy(ctx *gin.Context) {
 }
 
 func NewFloorHandler(svc domain.IStoreService, router *gin.RouterGroup) {
-	handler := floorHandler{svc: svc, router: router}
+	handler := floorHandler{svc: svc}
 	router.GET("/floors/:join", handler.floorsWith)
 	router.GET("/floors", handler.fetch)
 	router.POST("/floors", handler.store)

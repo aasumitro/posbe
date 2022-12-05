@@ -9,13 +9,23 @@ import (
 	"strings"
 )
 
-func HashPassword(password string) (string, error) {
+type IPassword interface {
+	HashPassword() (string, error)
+	ComparePasswords() (bool, error)
+}
+
+type Password struct {
+	Stored   string
+	Supplied string
+}
+
+func (p *Password) HashPassword() (string, error) {
 	salt := make([]byte, 32)
 	if _, err := rand.Read(salt); err != nil {
 		return "", err
 	}
 
-	shash, err := scrypt.Key([]byte(password), salt, 32768, 8, 1, 32)
+	shash, err := scrypt.Key([]byte(p.Supplied), salt, 32768, 8, 1, 32)
 	if err != nil {
 		return "", err
 	}
@@ -25,8 +35,8 @@ func HashPassword(password string) (string, error) {
 	return hashedPW, nil
 }
 
-func ComparePasswords(storedPassword string, suppliedPassword string) (bool, error) {
-	pwsalt := strings.Split(storedPassword, ".")
+func (p *Password) ComparePasswords() (bool, error) {
+	pwsalt := strings.Split(p.Stored, ".")
 	if len(pwsalt) < 2 {
 		return false, errors.ErrorPasswordNotProvideValidHash
 	}
@@ -36,7 +46,7 @@ func ComparePasswords(storedPassword string, suppliedPassword string) (bool, err
 		return false, errors.ErrorPasswordUnableToVerify
 	}
 
-	shash, err := scrypt.Key([]byte(suppliedPassword), salt, 32768, 8, 1, 32)
+	shash, err := scrypt.Key([]byte(p.Supplied), salt, 32768, 8, 1, 32)
 	if err != nil {
 		return false, errors.ErrorPasswordUnableToVerify
 	}

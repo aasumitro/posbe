@@ -2,10 +2,9 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/domain/mocks"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +19,7 @@ type authHandlerTestSuite struct {
 	suite.Suite
 	role  *domain.Role
 	user  *domain.User
-	login  *domain.LoginForm
+	login *domain.LoginForm
 }
 
 func (suite *authHandlerTestSuite) SetupSuite() {
@@ -50,9 +49,14 @@ func (suite *authHandlerTestSuite) SetupSuite() {
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldSuccess() {
 	accSvcMock := new(mocks.IAccountService)
+	jwtUtil := new(mocks.IJSONWebToken)
 	accSvcMock.
 		On("VerifyUserCredentials", mock.Anything, mock.Anything).
 		Return(suite.user, nil).
+		Once()
+	jwtUtil.
+		On("ClaimJWTToken").
+		Return("1234", nil).
 		Once()
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
@@ -61,11 +65,7 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldSuccess() {
 		"username": "lorem",
 		"password": "secret",
 	})
-	AuthHandler{svc: accSvcMock, config: &config.Config{
-		AppName: "test",
-		JWTLifetime: 1,
-		JWTSecretKey: "secret",
-	}}.login(ctx)
+	AuthHandler{svc: accSvcMock, jwt: jwtUtil}.login(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusCreated, writer.Code)
@@ -75,19 +75,12 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldSuccess() {
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorEntity() {
 	accSvcMock := new(mocks.IAccountService)
-	accSvcMock.
-		On("VerifyUserCredentials", mock.Anything, mock.Anything).
-		Return(suite.user, nil).
-		Once()
+	jwtUtil := new(mocks.IJSONWebToken)
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	utils.MockJsonRequest(ctx, "POST", "application/json", nil)
-	AuthHandler{svc: accSvcMock, config: &config.Config{
-		AppName: "test",
-		JWTLifetime: 1,
-		JWTSecretKey: "secret",
-	}}.login(ctx)
+	AuthHandler{svc: accSvcMock, jwt: jwtUtil}.login(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
@@ -97,6 +90,7 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorEntity() {
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorInternalWhenVerify() {
 	accSvcMock := new(mocks.IAccountService)
+	jwtUtil := new(mocks.IJSONWebToken)
 	accSvcMock.
 		On("VerifyUserCredentials", mock.Anything, mock.Anything).
 		Return(nil, &utils.ServiceError{
@@ -111,11 +105,7 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorInternalWhen
 		"username": "lorem",
 		"password": "secret",
 	})
-	AuthHandler{svc: accSvcMock, config: &config.Config{
-		AppName: "test",
-		JWTLifetime: 1,
-		JWTSecretKey: "secret",
-	}}.login(ctx)
+	AuthHandler{svc: accSvcMock, jwt: jwtUtil}.login(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
@@ -123,25 +113,42 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorInternalWhen
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
 }
 
-// TODO VALIDATE CLAIM JWT
+func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorClaimJWT() {
+	accSvcMock := new(mocks.IAccountService)
+	jwtUtil := new(mocks.IJSONWebToken)
+	accSvcMock.
+		On("VerifyUserCredentials", mock.Anything, mock.Anything).
+		Return(suite.user, nil).
+		Once()
+	jwtUtil.
+		On("ClaimJWTToken").
+		Return("", errors.New("TEST")).
+		Once()
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+		"username": "lorem",
+		"password": "secret",
+	})
+	AuthHandler{svc: accSvcMock, jwt: jwtUtil}.login(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
+	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
+}
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Logout() {
 	accSvcMock := new(mocks.IAccountService)
+	jwtUtil := new(mocks.IJSONWebToken)
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	utils.MockJsonRequest(ctx, "POST", "application/json", nil)
-	ctx.Request = &http.Request{Header: make(http.Header)}
-	AuthHandler{svc: accSvcMock, config: &config.Config{
-		AppName: "test",
-		JWTLifetime: 1,
-		JWTSecretKey: "secret",
-	}}.logout(ctx)
+	AuthHandler{svc: accSvcMock, jwt: jwtUtil}.logout(ctx)
 	var got utils.SuccessRespond
-	fmt.Println(got)
-	//assert.Equal(suite.T(), http.StatusOK, writer.Code)
-	//assert.Equal(suite.T(), http.StatusOK, got.Code)
-	//assert.Equal(suite.T(), http.StatusText(http.StatusOK), got.Status)
+	assert.NotNil(suite.T(), got)
 }
 
 func TestAuthHandlerService(t *testing.T) {

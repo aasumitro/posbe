@@ -91,7 +91,8 @@ func (service accountService) ShowUser(id int) (user *domain.User, errorData *ut
 func (service accountService) AddUser(data *domain.User) (user *domain.User, errorData *utils.ServiceError) {
 	password := data.Password
 	if password != "" {
-		pwd, err := utils.HashPassword(password)
+		u := utils.Password{Stored: "", Supplied: password}
+		pwd, err := u.HashPassword()
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -110,7 +111,8 @@ func (service accountService) AddUser(data *domain.User) (user *domain.User, err
 func (service accountService) EditUser(data *domain.User) (user *domain.User, errorData *utils.ServiceError) {
 	password := data.Password
 	if password != "" {
-		pwd, err := utils.HashPassword(password)
+		u := utils.Password{Stored: "", Supplied: password}
+		pwd, err := u.HashPassword()
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -155,7 +157,8 @@ func (service accountService) VerifyUserCredentials(username, password string) (
 		}
 	}
 
-	ok, err := utils.ComparePasswords(user.Password, password)
+	u := utils.Password{Stored: user.Password, Supplied: password}
+	ok, err := u.ComparePasswords()
 	if err != nil {
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,

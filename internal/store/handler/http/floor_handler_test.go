@@ -136,7 +136,6 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Store_ShouldSuccess() {
 		On("AddFloor", mock.Anything).
 		Return(suite.floor, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -151,12 +150,8 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Store_ShouldSuccess() {
 	assert.Equal(suite.T(), http.StatusText(http.StatusCreated), got.Status)
 }
 
-func (suite *floorHandlerTestSuite) TestFloorHandler_Store_ShouldError_BadRequest() {
+func (suite *floorHandlerTestSuite) TestFloorHandler_Store_ShouldError_UnprocessableEntity() {
 	svcMock := new(mocks.IStoreService)
-	svcMock.
-		On("AddFloor", mock.Anything).
-		Return(suite.floor, nil).
-		Once()
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -178,7 +173,6 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Store_ShouldError_Internal(
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -216,11 +210,21 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Update_ShouldSuccess() {
 
 func (suite *floorHandlerTestSuite) TestFloorHandler_Update_ShouldError_BadRequest() {
 	svcMock := new(mocks.IStoreService)
-	svcMock.
-		On("EditFloor", mock.Anything).
-		Return(suite.floor, nil).
-		Once()
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
+	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	floorHandler{svc: svcMock}.update(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+}
 
+func (suite *floorHandlerTestSuite) TestFloorHandler_Update_ShouldError_UnprocessableEntity() {
+	svcMock := new(mocks.IStoreService)
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -293,6 +297,21 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Destroy_ShouldError() {
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
+}
+
+func (suite *floorHandlerTestSuite) TestFloorHandler_Destroy_ShouldError_BadRequest() {
+	svcMock := new(mocks.IStoreService)
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
+	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	floorHandler{svc: svcMock}.destroy(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
 }
 
 func TestFloorHandler(t *testing.T) {

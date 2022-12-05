@@ -70,11 +70,9 @@ func (suite *userHandlerTestSuite) TestUserHandler_Fetch_ShouldSuccess() {
 		On("UserList").
 		Return(suite.users, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	userHandler{svc: accSvcMock}.fetch(ctx)
-
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
@@ -91,11 +89,9 @@ func (suite *userHandlerTestSuite) TestUserHandler_Fetch_ShouldError() {
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	userHandler{svc: accSvcMock}.fetch(ctx)
-
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
@@ -110,14 +106,12 @@ func (suite *userHandlerTestSuite) TestUserHandler_Show_ShouldSuccess() {
 		On("ShowUser", mock.Anything).
 		Return(suite.user, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
 	utils.MockJsonRequest(ctx, "GET", "application/json", nil)
 	userHandler{svc: accSvcMock}.show(ctx)
-
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
@@ -134,14 +128,12 @@ func (suite *userHandlerTestSuite) TestUserHandler_Show_ShouldError() {
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
 	utils.MockJsonRequest(ctx, "GET", "application/json", nil)
 	userHandler{svc: accSvcMock}.show(ctx)
-
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
@@ -150,13 +142,27 @@ func (suite *userHandlerTestSuite) TestUserHandler_Show_ShouldError() {
 	assert.Equal(suite.T(), "UNEXPECTED_ERROR", got.Data)
 }
 
+func (suite *userHandlerTestSuite) TestUserHandler_Show_ShouldError_BadRequest() {
+	accSvcMock := new(mocks.IAccountService)
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
+	utils.MockJsonRequest(ctx, "GET", "application/json", nil)
+	userHandler{svc: accSvcMock}.show(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+}
+
 func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldSuccess() {
 	accSvcMock := new(mocks.IAccountService)
 	accSvcMock.
 		On("AddUser", mock.Anything).
 		Return(suite.user, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -176,13 +182,8 @@ func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldSuccess() {
 	assert.Equal(suite.T(), http.StatusText(http.StatusCreated), got.Status)
 }
 
-func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldError_BadRequest() {
+func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldError_UnprocessableEntity() {
 	accSvcMock := new(mocks.IAccountService)
-	accSvcMock.
-		On("AddUser", mock.Anything).
-		Return(suite.user, nil).
-		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -190,7 +191,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldError_BadRequest(
 	userHandler{svc: accSvcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
@@ -205,7 +205,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldError_Internal() 
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -231,7 +230,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldSuccess() {
 		On("EditUser", mock.Anything).
 		Return(suite.user, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -247,7 +245,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldSuccess() {
 	userHandler{svc: accSvcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Equal(suite.T(), http.StatusOK, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusOK), got.Status)
@@ -255,11 +252,21 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldSuccess() {
 
 func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldError_BadRequest() {
 	accSvcMock := new(mocks.IAccountService)
-	accSvcMock.
-		On("EditUser", mock.Anything).
-		Return(suite.user, nil).
-		Once()
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
+	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	userHandler{svc: accSvcMock}.update(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+}
 
+func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldError_UnprocessableEntity() {
+	accSvcMock := new(mocks.IAccountService)
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -268,7 +275,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldError_BadRequest
 	userHandler{svc: accSvcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
@@ -283,7 +289,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldError_Internal()
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -299,7 +304,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldError_Internal()
 	userHandler{svc: accSvcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
@@ -311,7 +315,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Destroy_ShouldSuccess() {
 		On("DeleteUser", mock.Anything).
 		Return(nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -319,6 +322,21 @@ func (suite *userHandlerTestSuite) TestUserHandler_Destroy_ShouldSuccess() {
 	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
 	userHandler{svc: accSvcMock}.destroy(ctx)
 	assert.Equal(suite.T(), http.StatusNoContent, writer.Code)
+}
+
+func (suite *userHandlerTestSuite) TestUserHandler_Destroy_ShouldError_BadRequest() {
+	accSvcMock := new(mocks.IAccountService)
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
+	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	userHandler{svc: accSvcMock}.destroy(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
 }
 
 func (suite *userHandlerTestSuite) TestUserHandler_Destroy_ShouldError() {
@@ -330,7 +348,6 @@ func (suite *userHandlerTestSuite) TestUserHandler_Destroy_ShouldError() {
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}

@@ -11,8 +11,8 @@ import (
 )
 
 type AuthHandler struct {
-	svc    domain.IAccountService
-	config *config.Config
+	svc domain.IAccountService
+	jwt utils.IJSONWebToken
 }
 
 // login godoc
@@ -42,22 +42,18 @@ func (handler AuthHandler) login(ctx *gin.Context) {
 		return
 	}
 
-	if token, claimErr := utils.ClaimJWTToken(
-		handler.config.AppName,
-		handler.config.JWTLifetime,
-		data,
-		[]byte(handler.config.JWTSecretKey),
-	); claimErr != nil {
-		utils.NewHttpRespond(ctx, http.StatusInternalServerError, nil)
+	token, claimErr := handler.jwt.ClaimJWTToken()
+	if claimErr != nil {
+		utils.NewHttpRespond(ctx, http.StatusInternalServerError, claimErr.Error())
 		return
-	} else {
-		http.SetCookie(ctx.Writer, &http.Cookie{
-			Name:   "jwt",
-			Value:  token,
-			MaxAge: 0,
-			Path:   "/",
-		})
 	}
+
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name:   "jwt",
+		Value:  token,
+		MaxAge: 0,
+		Path:   "/",
+	})
 
 	utils.NewHttpRespond(ctx, http.StatusCreated, data)
 }
@@ -84,7 +80,13 @@ func (handler AuthHandler) logout(ctx *gin.Context) {
 }
 
 func NewAuthHandler(accountService domain.IAccountService, config *config.Config, router *gin.RouterGroup) {
-	handler := AuthHandler{svc: accountService, config: config}
+	handler := AuthHandler{svc: accountService, jwt: &utils.JSONWebToken{
+		Issuer:    config.AppName,
+		SecretKey: []byte(config.JWTSecretKey),
+		IssuedAt:  time.Now(),
+		ExpiredAt: time.Now().Add(time.Duration(config.JWTLifetime) * time.Hour),
+	}}
+
 	router.POST("/login", handler.login)
 	router.POST("/logout", handler.logout).
 		Use(middleware.Auth(config.JWTSecretKey))

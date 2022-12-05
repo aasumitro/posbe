@@ -8,8 +8,7 @@ import (
 )
 
 type storePrefHandler struct {
-	svc    domain.IStorePrefService
-	router *gin.RouterGroup
+	svc domain.IStorePrefService
 }
 
 // store godoc
@@ -66,7 +65,7 @@ func (handler storePrefHandler) update(ctx *gin.Context) {
 }
 
 func NewStorePrefHandler(svc domain.IStorePrefService, router *gin.RouterGroup) {
-	handler := storePrefHandler{svc: svc, router: router}
+	handler := storePrefHandler{svc: svc}
 	router.GET("/store/prefs", handler.fetch)
 	router.PUT("/store/prefs", handler.update)
 }
