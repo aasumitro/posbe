@@ -269,6 +269,86 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/login": {
+            "post": {
+                "description": "Generate Access Token (JWT).",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logged User In",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "CREATED_RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SuccessRespond"
+                        }
+                    },
+                    "400": {
+                        "description": "BAD_REQUEST_RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE_ENTITY_RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL_SERVER_ERROR_RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/logout": {
+            "post": {
+                "description": "Remove JWT Cookie",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logged User Out",
+                "responses": {
+                    "200": {
+                        "description": "CREATED_RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SuccessRespond"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/roles": {
             "get": {
                 "description": "Get Role List.",
@@ -1681,6 +1761,18 @@ const docTemplate = `{
                 }
             }
         },
+        "utils.SuccessRespond": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "utils.ValidationErrorRespond": {
             "type": "object",
             "properties": {
@@ -1692,14 +1784,6 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "Bearer": {
-            "description": "\"Type 'Bearer TOKEN' to correctly set the API Key\"",
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
         }
     }
 }`

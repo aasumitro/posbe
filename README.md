@@ -46,6 +46,12 @@ flowchart TB
     end
 ```
 
+### Authentication
+
+The important part here is in the Login function where we set that sacred JWT Token in a Cookie.
+
+so wee dont need Bearer token in our authorization header. 
+
 ### Create Mocks
 
 #### Required tools:

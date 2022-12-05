@@ -146,10 +146,34 @@ func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError 
 	return nil
 }
 
-//func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
-//	//TODO implement me
-//	panic("implement me")
-//}
+func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
+	user, err := service.userRepo.Find(service.ctx, domain.FindWithUsername, username)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	ok, err := utils.ComparePasswords(user.Password, password)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	if !ok {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusUnprocessableEntity,
+			Message: "Password Not Match",
+		}
+	}
+
+	user.Password = ""
+
+	return user, nil
+}
 
 func NewAccountService(
 	ctx context.Context,

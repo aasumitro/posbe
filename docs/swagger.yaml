@@ -150,6 +150,14 @@ definitions:
       status:
         type: string
     type: object
+  utils.SuccessRespond:
+    properties:
+      code:
+        type: integer
+      data: {}
+      status:
+        type: string
+    type: object
   utils.ValidationErrorRespond:
     properties:
       code:
@@ -330,6 +338,59 @@ paths:
       summary: Floor List With Join
       tags:
       - Floors
+  /v1/login:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Generate Access Token (JWT).
+      parameters:
+      - description: username
+        in: formData
+        name: username
+        required: true
+        type: string
+      - description: password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED_RESPOND
+          schema:
+            $ref: '#/definitions/utils.SuccessRespond'
+        "400":
+          description: BAD_REQUEST_RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE_ENTITY_RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL_SERVER_ERROR_RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Logged User In
+      tags:
+      - Auth
+  /v1/logout:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Remove JWT Cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED_RESPOND
+          schema:
+            $ref: '#/definitions/utils.SuccessRespond'
+      summary: Logged User Out
+      tags:
+      - Auth
   /v1/roles:
     get:
       consumes:
@@ -1132,10 +1193,4 @@ paths:
       summary: Update User Data
       tags:
       - Users
-securityDefinitions:
-  Bearer:
-    description: '"Type ''Bearer TOKEN'' to correctly set the API Key"'
-    in: header
-    name: Authorization
-    type: apiKey
 swagger: "2.0"
