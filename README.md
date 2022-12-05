@@ -31,9 +31,11 @@ flowchart TB
       subgraph STORE_MODULE
         store_module<--*en,*cfg-->store_http_handler
         store_http_handler<--*ctx,uRepo,rRepo-->store_service
+        store_http_handler<--*ctx,uRepo,rRepo-->store_pref_service
         store_service<--cfg.DBCon-->floor_repository
         store_service<--cfg.DBCon-->table_repository
         store_service<--cfg.DBCon-->room_repository
+        store_pref_service<--cfg.DBCon-->store_pref_repository
       end
       
       subgraph CATALOG_MODULE

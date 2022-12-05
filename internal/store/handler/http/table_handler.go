@@ -23,7 +23,7 @@ type tableHandler struct {
 // @Success 200 {array} domain.Table "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/roles [GET]
+// @Router /v1/tables [GET]
 func (handler tableHandler) fetch(ctx *gin.Context) {
 	tables, err := handler.svc.TableList()
 	if err != nil {

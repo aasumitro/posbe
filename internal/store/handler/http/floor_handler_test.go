@@ -35,7 +35,7 @@ func (suite *floorHandlerTestSuite) SetupSuite() {
 	}
 }
 
-func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithTable_ShouldSuccess() {
+func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithJoin_ShouldSuccess() {
 	svcMock := new(mocks.IStoreService)
 	svcMock.
 		On("FloorsWith", mock.Anything).
@@ -43,7 +43,9 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithTable_ShouldSucces
 		Once()
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
-	floorHandler{svc: svcMock}.floorsWithTables(ctx)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "join", Value: "tables"}}
+	floorHandler{svc: svcMock}.floorsWith(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
@@ -51,7 +53,26 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithTable_ShouldSucces
 	assert.Equal(suite.T(), http.StatusText(http.StatusOK), got.Status)
 }
 
-func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithTable_ShouldError() {
+func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithJoin_ShouldErrorUnBadRequest() {
+	svcMock := new(mocks.IStoreService)
+	svcMock.
+		On("FloorsWith", mock.Anything).
+		Return(suite.floors, nil).
+		Once()
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "join", Value: "yandatau"}}
+	floorHandler{svc: svcMock}.floorsWith(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+	assert.Equal(suite.T(), "unsupported join data", got.Data)
+}
+
+func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithJoin_ShouldErrorUnExpected() {
 	svcMock := new(mocks.IStoreService)
 	svcMock.
 		On("FloorsWith", mock.Anything).
@@ -62,7 +83,9 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_FetchWithTable_ShouldError(
 		Once()
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
-	floorHandler{svc: svcMock}.floorsWithTables(ctx)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "join", Value: "rooms"}}
+	floorHandler{svc: svcMock}.floorsWith(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)

@@ -1,7 +1,6 @@
 package utils_test
 
 import (
-	"fmt"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -24,12 +23,17 @@ func TestPasswordUtils(t *testing.T) {
 			want:    true,
 			wantErr: assert.NoError,
 		},
+		{
+			name:    "test hash make and verify",
+			args:    args{s: "12345"},
+			want:    true,
+			wantErr: assert.NoError,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pwd, err := utils.HashPassword(tt.args.s)
-			fmt.Println(pwd)
 			assert.Nil(t, err)
 			valid, err := utils.ComparePasswords(pwd, tt.args.s)
 			assert.Nil(t, err)

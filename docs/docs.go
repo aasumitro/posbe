@@ -110,82 +110,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/floors/rooms": {
-            "get": {
-                "description": "Get Floors List With Rooms.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Floors"
-                ],
-                "summary": "Floor List With Rooms",
-                "responses": {
-                    "200": {
-                        "description": "OK RESPOND",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Floor"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "UNAUTHORIZED RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorRespond"
-                        }
-                    },
-                    "500": {
-                        "description": "INTERNAL SERVER ERROR RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorRespond"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/floors/tables": {
-            "get": {
-                "description": "Get Floors List With Tables.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Floors"
-                ],
-                "summary": "Floor List With Tables",
-                "responses": {
-                    "200": {
-                        "description": "OK RESPOND",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Floor"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "UNAUTHORIZED RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorRespond"
-                        }
-                    },
-                    "500": {
-                        "description": "INTERNAL SERVER ERROR RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/utils.ErrorRespond"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/floors/{id}": {
             "put": {
                 "description": "Update Floor Data by ID.",
@@ -294,9 +218,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/roles": {
+        "/v1/floors/{join}": {
             "get": {
-                "description": "Get Table List.",
+                "description": "Get Floors List With Join.",
                 "consumes": [
                     "application/json"
                 ],
@@ -304,16 +228,67 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Tables"
+                    "Floors"
                 ],
-                "summary": "Table List",
+                "summary": "Floor List With Join",
+                "parameters": [
+                    {
+                        "enum": [
+                            "rooms",
+                            "tables"
+                        ],
+                        "type": "string",
+                        "description": "join with data, available join rooms, tables",
+                        "name": "join",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/domain.Table"
+                                "$ref": "#/definitions/domain.Floor"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/roles": {
+            "get": {
+                "description": "Get Role List.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Role List",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Role"
                             }
                         }
                     },
@@ -888,6 +863,42 @@ const docTemplate = `{
             }
         },
         "/v1/tables": {
+            "get": {
+                "description": "Get Table List.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Table List",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Table"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create new Table.",
                 "consumes": [
