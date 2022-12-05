@@ -48,7 +48,7 @@ flowchart TB
 
 ### Authentication
 
-The important part here is in the Login function where we set that sacred JWT Token in a Cookie. If everything has gone well after we've called our User Service to log our user we will give him back a cookie that he will later use to make request as we will see in Postman in just a bit.
+The important part here is in the Login function where we set that sacred JWT Token in a Cookie.
 
 so wee dont need Bearer token in our authorization header. 
 
