@@ -9,8 +9,7 @@ import (
 )
 
 type tableHandler struct {
-	svc    domain.IStoreService
-	router *gin.RouterGroup
+	svc domain.IStoreService
 }
 
 // tables godoc
@@ -156,7 +155,7 @@ func (handler tableHandler) destroy(ctx *gin.Context) {
 }
 
 func NewTableHandler(svc domain.IStoreService, router *gin.RouterGroup) {
-	handler := tableHandler{svc: svc, router: router}
+	handler := tableHandler{svc: svc}
 	router.GET("/tables", handler.fetch)
 	router.POST("/tables", handler.store)
 	router.PUT("/tables/:id", handler.update)

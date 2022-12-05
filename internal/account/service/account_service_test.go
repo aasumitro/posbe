@@ -51,6 +51,7 @@ func (suite *accountTestSuite) SetupSuite() {
 		Email:    "lorem@ipsum.id",
 		Phone:    "+628227111111",
 		Role:     *suite.role,
+		Password: "2ad1a22d5b3c9396d16243d2fe7f067976363715e322203a456278bb80b0b4a4.7ab4dcccfcd9d36efc68f1626d2fb80804a6508f9c3a7b44f430ba082b6870d2",
 	}
 
 	suite.users = []*domain.User{
@@ -423,8 +424,69 @@ func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldErrorWhenDele
 	roleRepoMock.AssertExpectations(suite.T())
 }
 
-func (suite *accountTestSuite) TestAccountService_T_K() {
-	// TODO
+func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldSuccess() {
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	accSvc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	userRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(suite.user, nil)
+	user, err := accSvc.VerifyUserCredentials(suite.user.Username, "secret")
+	require.Nil(suite.T(), err)
+	require.NotNil(suite.T(), user)
+	roleRepoMock.AssertExpectations(suite.T())
+}
+
+func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorFind() {
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	accSvc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	userRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, errors.New("UNEXPECTED"))
+	user, err := accSvc.VerifyUserCredentials(suite.user.Username, suite.user.Password)
+	require.NotNil(suite.T(), err)
+	require.Nil(suite.T(), user)
+	roleRepoMock.AssertExpectations(suite.T())
+}
+
+func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorComparePassword() {
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	pwdUtil := new(mocks.IPassword)
+	accSvc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	userRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(suite.user, nil)
+	pwdUtil.
+		On("ComparePasswords").
+		Return(false, errors.New("LOREM")).
+		Once()
+	user, err := accSvc.VerifyUserCredentials(suite.user.Username, suite.user.Password)
+	require.NotNil(suite.T(), err)
+	require.Nil(suite.T(), user)
+	roleRepoMock.AssertExpectations(suite.T())
+}
+
+func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorPassword() {
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	accSvc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	userRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(suite.user, nil)
+	user, err := accSvc.VerifyUserCredentials(suite.user.Username, suite.user.Password)
+	require.NotNil(suite.T(), err)
+	require.Nil(suite.T(), user)
+	roleRepoMock.AssertExpectations(suite.T())
 }
 
 func TestAccountService(t *testing.T) {

@@ -33,9 +33,11 @@ func TestPasswordUtils(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pwd, err := utils.HashPassword(tt.args.s)
+			u := utils.Password{Stored: "", Supplied: tt.args.s}
+			pwd, err := u.HashPassword()
+			u.Stored = pwd
 			assert.Nil(t, err)
-			valid, err := utils.ComparePasswords(pwd, tt.args.s)
+			valid, err := u.ComparePasswords()
 			assert.Nil(t, err)
 			assert.Equalf(t, tt.want, valid, "Hash(%v)", tt.args.s)
 		})

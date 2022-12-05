@@ -91,7 +91,8 @@ func (service accountService) ShowUser(id int) (user *domain.User, errorData *ut
 func (service accountService) AddUser(data *domain.User) (user *domain.User, errorData *utils.ServiceError) {
 	password := data.Password
 	if password != "" {
-		pwd, err := utils.HashPassword(password)
+		u := utils.Password{Stored: "", Supplied: password}
+		pwd, err := u.HashPassword()
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -110,7 +111,8 @@ func (service accountService) AddUser(data *domain.User) (user *domain.User, err
 func (service accountService) EditUser(data *domain.User) (user *domain.User, errorData *utils.ServiceError) {
 	password := data.Password
 	if password != "" {
-		pwd, err := utils.HashPassword(password)
+		u := utils.Password{Stored: "", Supplied: password}
+		pwd, err := u.HashPassword()
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -146,10 +148,35 @@ func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError 
 	return nil
 }
 
-//func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
-//	//TODO implement me
-//	panic("implement me")
-//}
+func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
+	user, err := service.userRepo.Find(service.ctx, domain.FindWithUsername, username)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	u := utils.Password{Stored: user.Password, Supplied: password}
+	ok, err := u.ComparePasswords()
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	if !ok {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusUnprocessableEntity,
+			Message: "Password Not Match",
+		}
+	}
+
+	user.Password = ""
+
+	return user, nil
+}
 
 func NewAccountService(
 	ctx context.Context,

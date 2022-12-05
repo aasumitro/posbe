@@ -55,13 +55,11 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Fetch_ShouldSuccess() {
 		On("TableList").
 		Return(suite.tables, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	tableHandler{svc: svcMock}.fetch(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Equal(suite.T(), http.StatusOK, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusOK), got.Status)
@@ -76,7 +74,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Fetch_ShouldError() {
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	tableHandler{svc: svcMock}.fetch(ctx)
@@ -94,7 +91,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldSuccess() {
 		On("AddTable", mock.Anything).
 		Return(suite.table, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -115,13 +111,8 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldSuccess() {
 	assert.Equal(suite.T(), http.StatusText(http.StatusCreated), got.Status)
 }
 
-func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldError_BadRequest() {
+func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldError_UnprocessableEntity() {
 	svcMock := new(mocks.IStoreService)
-	svcMock.
-		On("AddTable", mock.Anything).
-		Return(suite.table, nil).
-		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -129,7 +120,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldError_BadReques
 	tableHandler{svc: svcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
@@ -144,7 +134,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldError_Internal(
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -160,7 +149,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Store_ShouldError_Internal(
 	tableHandler{svc: svcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
@@ -172,7 +160,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldSuccess() {
 		On("EditTable", mock.Anything).
 		Return(suite.table, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -189,7 +176,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldSuccess() {
 	tableHandler{svc: svcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Equal(suite.T(), http.StatusOK, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusOK), got.Status)
@@ -197,11 +183,21 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldSuccess() {
 
 func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldError_BadRequest() {
 	svcMock := new(mocks.IStoreService)
-	svcMock.
-		On("EditTable", mock.Anything).
-		Return(suite.table, nil).
-		Once()
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "1asd"}}
+	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	tableHandler{svc: svcMock}.update(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+}
 
+func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldError_UnprocessableEntity() {
+	svcMock := new(mocks.IStoreService)
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -210,7 +206,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldError_BadReque
 	tableHandler{svc: svcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
@@ -225,7 +220,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldError_Internal
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -242,7 +236,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Update_ShouldError_Internal
 	tableHandler{svc: svcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
@@ -254,7 +247,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Destroy_ShouldSuccess() {
 		On("DeleteTable", mock.Anything).
 		Return(nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -273,7 +265,6 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Destroy_ShouldError() {
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -285,6 +276,21 @@ func (suite *tableHandlerTestSuite) TestTableHandler_Destroy_ShouldError() {
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
+}
+
+func (suite *tableHandlerTestSuite) TestTableHandler_Destroy_ShouldError_BadRequest() {
+	svcMock := new(mocks.IStoreService)
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
+	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	tableHandler{svc: svcMock}.destroy(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
 }
 
 func TestTableHandler(t *testing.T) {

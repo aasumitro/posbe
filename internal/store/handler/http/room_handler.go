@@ -9,8 +9,7 @@ import (
 )
 
 type roomHandler struct {
-	svc    domain.IStoreService
-	router *gin.RouterGroup
+	svc domain.IStoreService
 }
 
 // rooms godoc
@@ -156,7 +155,7 @@ func (handler roomHandler) destroy(ctx *gin.Context) {
 }
 
 func NewRoomHandler(svc domain.IStoreService, router *gin.RouterGroup) {
-	handler := roomHandler{svc: svc, router: router}
+	handler := roomHandler{svc: svc}
 	router.GET("/rooms", handler.fetch)
 	router.POST("/rooms", handler.store)
 	router.PUT("/rooms/:id", handler.update)

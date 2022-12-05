@@ -44,13 +44,11 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Fetch_ShouldSuccess() {
 		On("RoleList").
 		Return(suite.roles, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	roleHandler{svc: accSvcMock}.fetch(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Equal(suite.T(), http.StatusOK, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusOK), got.Status)
@@ -65,11 +63,9 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Fetch_ShouldError() {
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	roleHandler{svc: accSvcMock}.fetch(ctx)
-
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
@@ -84,7 +80,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldSuccess() {
 		On("AddRole", mock.Anything).
 		Return(suite.role, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -95,19 +90,17 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldSuccess() {
 	roleHandler{svc: accSvcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusCreated, writer.Code)
 	assert.Equal(suite.T(), http.StatusCreated, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusCreated), got.Status)
 }
 
-func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldError_BadRequest() {
+func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldError_UnprocessableEntity() {
 	accSvcMock := new(mocks.IAccountService)
 	accSvcMock.
 		On("AddRole", mock.Anything).
 		Return(suite.role, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -115,7 +108,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldError_BadRequest(
 	roleHandler{svc: accSvcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
@@ -130,7 +122,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldError_Internal() 
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -141,7 +132,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldError_Internal() 
 	roleHandler{svc: accSvcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
@@ -153,7 +143,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldSuccess() {
 		On("EditRole", mock.Anything).
 		Return(suite.role, nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -165,7 +154,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldSuccess() {
 	roleHandler{svc: accSvcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
 	assert.Equal(suite.T(), http.StatusOK, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusOK), got.Status)
@@ -173,11 +161,21 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldSuccess() {
 
 func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldError_BadRequest() {
 	accSvcMock := new(mocks.IAccountService)
-	accSvcMock.
-		On("EditRole", mock.Anything).
-		Return(suite.role, nil).
-		Once()
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "asd123"}}
+	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	roleHandler{svc: accSvcMock}.update(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
+}
 
+func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldError_UnprocessableEntity() {
+	accSvcMock := new(mocks.IAccountService)
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -186,7 +184,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldError_BadRequest
 	roleHandler{svc: accSvcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, writer.Code)
 	assert.Equal(suite.T(), http.StatusUnprocessableEntity, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusUnprocessableEntity), got.Status)
@@ -201,7 +198,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldError_Internal()
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -213,7 +209,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldError_Internal()
 	roleHandler{svc: accSvcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
-
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
@@ -225,7 +220,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Destroy_ShouldSuccess() {
 		On("DeleteRole", mock.Anything).
 		Return(nil).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -244,7 +238,6 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Destroy_ShouldError() {
 			Message: "UNEXPECTED_ERROR",
 		}).
 		Once()
-
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
@@ -256,6 +249,21 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Destroy_ShouldError() {
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
 	assert.Equal(suite.T(), http.StatusInternalServerError, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusInternalServerError), got.Status)
+}
+
+func (suite *roleHandlerTestSuite) TestRoleHandler_Destroy_ShouldError_BadRequest() {
+	accSvcMock := new(mocks.IAccountService)
+	writer := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(writer)
+	ctx.Request = &http.Request{Header: make(http.Header)}
+	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
+	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	roleHandler{svc: accSvcMock}.destroy(ctx)
+	var got utils.SuccessRespond
+	_ = json.Unmarshal(writer.Body.Bytes(), &got)
+	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
+	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
+	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
 }
 
 func TestRoleHandlerService(t *testing.T) {
