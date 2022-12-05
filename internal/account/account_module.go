@@ -16,10 +16,10 @@ func InitAccountModule(ctx context.Context, config *config.Config, router *gin.E
 	accountService := service.NewAccountService(ctx, roleRepository, userRepository)
 	routerGroup := router.Group("v1")
 	http.NewAuthHandler(accountService, config, routerGroup)
-	protectedRouter := routerGroup
-	protectedRouter.Use(middleware.Auth(config.JWTSecretKey))
-	protectedRouter.Use(middleware.ActivityObserver())
-	protectedRouter.Use(middleware.AcceptedRoles([]string{"*"}))
+	protectedRouter := routerGroup.
+		Use(middleware.Auth(config.JWTSecretKey)).
+		Use(middleware.ActivityObserver()).
+		Use(middleware.AcceptedRoles([]string{"*"}))
 	http.NewRoleHandler(accountService, protectedRouter)
 	http.NewUserHandler(accountService, protectedRouter)
 }

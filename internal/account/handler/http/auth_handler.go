@@ -1,13 +1,14 @@
 package http
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 type AuthHandler struct {
@@ -42,7 +43,7 @@ func (handler AuthHandler) login(ctx *gin.Context) {
 		return
 	}
 
-	token, claimErr := handler.jwt.ClaimJWTToken()
+	token, claimErr := handler.jwt.ClaimJWTToken(data)
 	if claimErr != nil {
 		utils.NewHttpRespond(ctx, http.StatusInternalServerError, claimErr.Error())
 		return
@@ -53,6 +54,8 @@ func (handler AuthHandler) login(ctx *gin.Context) {
 		Value:  token,
 		MaxAge: 0,
 		Path:   "/",
+		// Secure:   true,
+		HttpOnly: true,
 	})
 
 	utils.NewHttpRespond(ctx, http.StatusCreated, data)
@@ -88,6 +91,6 @@ func NewAuthHandler(accountService domain.IAccountService, config *config.Config
 	}}
 
 	router.POST("/login", handler.login)
-	router.POST("/logout", handler.logout).
-		Use(middleware.Auth(config.JWTSecretKey))
+	protectedRouter := router.Use(middleware.Auth(config.JWTSecretKey))
+	protectedRouter.POST("/logout", handler.logout)
 }

@@ -6,6 +6,7 @@ import (
 	repository "github.com/aasumitro/posbe/internal/store/repository/sql"
 	"github.com/aasumitro/posbe/internal/store/service"
 	"github.com/aasumitro/posbe/pkg/config"
+	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,8 +18,10 @@ func InitStoreModule(ctx context.Context, config *config.Config, router *gin.Eng
 	storeService := service.NewStoreService(ctx, floorRepo, tableRepo, roomRepo)
 	storePrefService := service.NewStorePrefService(ctx, storePrefRepo)
 	routerGroup := router.Group("v1")
-	protectedRouter := routerGroup
-	//protectedRoute.Use() // TODO ADD AUTH MIDDLEWARE
+	protectedRouter := routerGroup.
+		Use(middleware.Auth(config.JWTSecretKey)).
+		Use(middleware.ActivityObserver()).
+		Use(middleware.AcceptedRoles([]string{"*"}))
 	http.NewFloorHandler(storeService, protectedRouter)
 	http.NewTableHandler(storeService, protectedRouter)
 	http.NewRoomHandler(storeService, protectedRouter)

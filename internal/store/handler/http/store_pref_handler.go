@@ -64,7 +64,7 @@ func (handler storePrefHandler) update(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusOK, pref)
 }
 
-func NewStorePrefHandler(svc domain.IStorePrefService, router *gin.RouterGroup) {
+func NewStorePrefHandler(svc domain.IStorePrefService, router gin.IRoutes) {
 	handler := storePrefHandler{svc: svc}
 	router.GET("/store/prefs", handler.fetch)
 	router.PUT("/store/prefs", handler.update)

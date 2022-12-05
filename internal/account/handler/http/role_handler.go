@@ -138,7 +138,7 @@ func (handler roleHandler) destroy(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewRoleHandler(accountService domain.IAccountService, router *gin.RouterGroup) {
+func NewRoleHandler(accountService domain.IAccountService, router gin.IRoutes) {
 	handler := roleHandler{svc: accountService}
 	router.GET("/roles", handler.fetch)
 	router.POST("/roles", handler.store)

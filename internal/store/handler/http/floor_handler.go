@@ -178,7 +178,7 @@ func (handler floorHandler) destroy(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewFloorHandler(svc domain.IStoreService, router *gin.RouterGroup) {
+func NewFloorHandler(svc domain.IStoreService, router gin.IRoutes) {
 	handler := floorHandler{svc: svc}
 	router.GET("/floors/:join", handler.floorsWith)
 	router.GET("/floors", handler.fetch)

@@ -55,7 +55,7 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldSuccess() {
 		Return(suite.user, nil).
 		Once()
 	jwtUtil.
-		On("ClaimJWTToken").
+		On("ClaimJWTToken", mock.Anything).
 		Return("1234", nil).
 		Once()
 	writer := httptest.NewRecorder()
@@ -121,7 +121,7 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorClaimJWT() {
 		Return(suite.user, nil).
 		Once()
 	jwtUtil.
-		On("ClaimJWTToken").
+		On("ClaimJWTToken", mock.Anything).
 		Return("", errors.New("TEST")).
 		Once()
 	writer := httptest.NewRecorder()

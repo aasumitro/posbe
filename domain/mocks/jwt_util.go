@@ -10,7 +10,7 @@ type IJSONWebToken struct {
 }
 
 // ClaimJWTToken provides a mock function with given fields:
-func (_m *IJSONWebToken) ClaimJWTToken() (string, error) {
+func (_m *IJSONWebToken) ClaimJWTToken(payload interface{}) (string, error) {
 	ret := _m.Called()
 
 	var r0 string

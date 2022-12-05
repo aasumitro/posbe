@@ -46,11 +46,10 @@ func TestJSONWebToken_ClaimJWTToken(t *testing.T) {
 			j := &utils.JSONWebToken{
 				Issuer:    tt.fields.Issuer,
 				SecretKey: tt.fields.SecretKey,
-				Payload:   tt.fields.Payload,
 				IssuedAt:  tt.fields.IssuedAt,
 				ExpiredAt: tt.fields.ExpiredAt,
 			}
-			got, err := j.ClaimJWTToken()
+			got, err := j.ClaimJWTToken(tt.fields.Payload)
 			if !tt.wantErr(t, err, "ClaimJWTToken()") {
 				return
 			}
