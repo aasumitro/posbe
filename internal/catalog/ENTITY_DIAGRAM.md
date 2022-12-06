@@ -2,7 +2,6 @@
 
 ```mermaid
 erDiagram
-    CATEGORIES ||--|{ SUBCATEGORIES: has_many
     CATEGORIES {
         int id
         string name
@@ -36,33 +35,42 @@ erDiagram
         string description 
         int price
     }
+   
+    PRODUCTS_SUBCATEGORY {
+        int product_id
+        int subcategory_id
+    }
     
-    PRODUCTS ||--|{ ADDONS: has_many
-    PRODUCTS ||--|{ VARIANTS: has_many
-    PRODUCTS ||--|| UNITS : has_one
-    PRODUCTS ||--|| CATEGORIES : has_one
     PRODUCTS {
         int id  
         int unit_id
         int category_id
+        string pic
+        json gallery
+        string name
+        string description
+        int price
     }
+    
+    CATEGORIES ||--|{ SUBCATEGORIES: has_many
+    PRODUCTS }|--|{ PRODUCTS_SUBCATEGORY: many_to_many
+    SUBCATEGORIES }|--|{ PRODUCTS_SUBCATEGORY: many_to_many
+    PRODUCTS ||--|{ ADDONS: one_to_many
+    PRODUCTS ||--|{ VARIANTS: one_to_many
+    PRODUCTS }|--|| UNITS : one_to_many
+    PRODUCTS }|--|| CATEGORIES : one_to_many
 ```
 #### ADDONS:
-1. Beverage
-   1. EXTRA MILK
-   2. EXTRA SUGAR
-   3. EXTRA ...
+e.g:
+1. EXTRA MILK
+2. EXTRA SUGAR
+3. EXTRA ...
 
 #### VARIANTS: 
-1. Beverage:
-   1. Tall
-   2. Grande
-   3. Venti
-
-2. Foods:
-   1. asd
-   2. asd
-   3. asd
+e.g:
+1. Tall
+2. Grande
+3. Venti
 
 #### CATEGORY
 1. Beverage
@@ -92,6 +100,3 @@ erDiagram
    3. Dairy
    4. Starchy food
    5. Fruit and vegetables
- 
-
-

@@ -19,7 +19,7 @@ type userHandler struct {
 // @Tags 		 Users
 // @Accept       json
 // @Produce      json
-// @Success 200 {array} domain.User "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]domain.User} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/users [GET]
@@ -41,7 +41,7 @@ func (handler userHandler) fetch(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int  true  "User ID"
-// @Success 200 {object} domain.User "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.User} "OK RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -78,7 +78,7 @@ func (handler userHandler) show(ctx *gin.Context) {
 // @Param email 	formData string false "email address"
 // @Param phone 	formData string false "phone number"
 // @Param password 	formData string true "password"
-// @Success 201 {object} domain.User "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=domain.User} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -113,7 +113,7 @@ func (handler userHandler) store(ctx *gin.Context) {
 // @Param email 	formData string false "email address"
 // @Param phone 	formData string false "phone number"
 // @Param password 	formData string false "password"
-// @Success 200 {object} domain.User "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.User} "OK RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"

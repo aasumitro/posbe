@@ -48,5 +48,7 @@ func NewHttpRouter(router *gin.Engine) {
 	router.NoRoute(handler.notFound)
 	router.GET("/", handler.home)
 	router.GET("/ping", handler.ping)
-	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/docs/*any",
+		ginSwagger.WrapHandler(swaggerFiles.Handler,
+			ginSwagger.DefaultModelsExpandDepth(4)))
 }

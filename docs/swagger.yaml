@@ -229,9 +229,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.Category'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Category'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -259,7 +264,12 @@ paths:
         "201":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Category'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Category'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -327,7 +337,12 @@ paths:
         "200":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Category'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Category'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:
@@ -358,9 +373,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.Floor'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Floor'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -388,7 +408,12 @@ paths:
         "201":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Floor'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Floor'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -456,7 +481,12 @@ paths:
         "200":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Floor'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Floor'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:
@@ -496,9 +526,12 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.Floor'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Floor'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -532,7 +565,12 @@ paths:
         "201":
           description: CREATED_RESPOND
           schema:
-            $ref: '#/definitions/utils.SuccessRespond'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                Data:
+                  $ref: '#/definitions/domain.User'
+              type: object
         "400":
           description: BAD_REQUEST_RESPOND
           schema:
@@ -574,9 +612,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.Role'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Role'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -609,7 +652,12 @@ paths:
         "201":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Role'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Role'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -682,7 +730,12 @@ paths:
         "200":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Role'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Role'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:
@@ -713,9 +766,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.Room'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Room'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -778,7 +836,12 @@ paths:
         "201":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Room'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Room'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -881,7 +944,12 @@ paths:
         "200":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Room'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Room'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:
@@ -912,9 +980,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.StoreSetting'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.StoreSetting'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -947,7 +1020,12 @@ paths:
         "200":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.StoreSetting'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.StoreSetting'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -974,9 +1052,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.Subcategory'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Subcategory'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -1009,7 +1092,12 @@ paths:
         "201":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Subcategory'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Subcategory'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -1082,7 +1170,12 @@ paths:
         "200":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Subcategory'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Subcategory'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:
@@ -1113,9 +1206,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.Table'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Table'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -1178,7 +1276,12 @@ paths:
         "201":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Table'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Table'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -1281,7 +1384,12 @@ paths:
         "200":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Table'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Table'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:
@@ -1312,9 +1420,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.Unit'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Unit'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -1352,7 +1465,12 @@ paths:
         "201":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Unit'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Unit'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -1430,7 +1548,12 @@ paths:
         "200":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.Unit'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Unit'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:
@@ -1461,9 +1584,14 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            items:
-              $ref: '#/definitions/domain.User'
-            type: array
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.User'
+                  type: array
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -1514,7 +1642,12 @@ paths:
         "201":
           description: CREATED RESPOND
           schema:
-            $ref: '#/definitions/domain.User'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.User'
+              type: object
         "401":
           description: UNAUTHORIZED RESPOND
           schema:
@@ -1577,7 +1710,12 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            $ref: '#/definitions/domain.User'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.User'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:
@@ -1633,7 +1771,12 @@ paths:
         "200":
           description: OK RESPOND
           schema:
-            $ref: '#/definitions/domain.User'
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.User'
+              type: object
         "400":
           description: BAD REQUEST RESPOND
           schema:

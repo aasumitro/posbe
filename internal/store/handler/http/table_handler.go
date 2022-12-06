@@ -19,7 +19,7 @@ type tableHandler struct {
 // @Tags 		 Tables
 // @Accept       json
 // @Produce      json
-// @Success 200 {array} domain.Table "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]domain.Table} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/tables [GET]
@@ -48,7 +48,7 @@ func (handler tableHandler) fetch(ctx *gin.Context) {
 // @Param h_size 	formData string true "height"
 // @Param capacity 	formData string true "capacity"
 // @Param type 		formData string true "type"
-// @Success 201 {object} domain.Table "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=domain.Table} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -87,7 +87,7 @@ func (handler tableHandler) store(ctx *gin.Context) {
 // @Param h_size 	formData string true "height"
 // @Param capacity 	formData string true "capacity"
 // @Param type 		formData string true "type"
-// @Success 200 {object} domain.Table "CREATED RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.Table} "CREATED RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"

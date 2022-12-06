@@ -19,7 +19,7 @@ type roomHandler struct {
 // @Tags 		 Rooms
 // @Accept       json
 // @Produce      json
-// @Success 200 {array} domain.Room "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]domain.Room} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/rooms [GET]
@@ -48,7 +48,7 @@ func (handler roomHandler) fetch(ctx *gin.Context) {
 // @Param h_size 	formData string true "height"
 // @Param capacity 	formData string true "capacity"
 // @Param price 	formData string true "price"
-// @Success 201 {object} domain.Room "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=domain.Room} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -87,7 +87,7 @@ func (handler roomHandler) store(ctx *gin.Context) {
 // @Param h_size 	formData string true "height"
 // @Param capacity 	formData string true "capacity"
 // @Param price 	formData string true "price"
-// @Success 200 {object} domain.Room "CREATED RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.Room} "CREATED RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"

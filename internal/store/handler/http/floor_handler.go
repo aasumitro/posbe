@@ -21,7 +21,7 @@ type floorHandler struct {
 // @Accept       json
 // @Produce      json
 // @Param 	join path string true "join with data, available join rooms, tables" Enums(rooms, tables)
-// @Success 200 {array} domain.Floor "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.Floor} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/floors/{join} [GET]
@@ -57,7 +57,7 @@ func (handler floorHandler) floorsWith(ctx *gin.Context) {
 // @Tags 		 Floors
 // @Accept       json
 // @Produce      json
-// @Success 200 {array} domain.Floor "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]domain.Floor} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/floors [GET]
@@ -79,7 +79,7 @@ func (handler floorHandler) fetch(ctx *gin.Context) {
 // @Accept       mpfd
 // @Produce      json
 // @Param name 	formData string true "name"
-// @Success 201 {object} domain.Floor "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=domain.Floor} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -111,7 +111,7 @@ func (handler floorHandler) store(ctx *gin.Context) {
 // @Produce      json
 // @Param id   			path     int  	true "floor id"
 // @Param name 			formData string true "name"
-// @Success 200 {object} domain.Floor "CREATED RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.Floor} "CREATED RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"

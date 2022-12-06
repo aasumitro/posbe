@@ -4,7 +4,7 @@ if test -f "$FILE"; then
   echo "Validate dependencies . . ."
   go mod tidy -compat=1.19
   echo "Re-generate Swagger File (api-spec docs) . . ."
-  swag init -g ./cmd/api/main.go --parseDependency --parseInternal --parseDepth 1
+  swag init --parseDependency --parseInternal --parseDepth 4 -g ./cmd/api/main.go
   echo "Trying to run the linter & tests . . ."
   staticcheck ./...
   go vet ./...

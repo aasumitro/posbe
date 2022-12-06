@@ -19,7 +19,7 @@ type subcategoryHandler struct {
 // @Tags 		 Subcategories
 // @Accept       json
 // @Produce      json
-// @Success 200 {array} domain.Subcategory "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]domain.Subcategory} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/subcategories [GET]
@@ -42,7 +42,7 @@ func (handler subcategoryHandler) fetch(ctx *gin.Context) {
 // @Produce      json
 // @Param name 			formData string true "name"
 // @Param category_id 	formData string true "category_id"
-// @Success 201 {object} domain.Subcategory "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=domain.Subcategory} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -73,7 +73,7 @@ func (handler subcategoryHandler) store(ctx *gin.Context) {
 // @Param id   			path     int  	true "subcategory id"
 // @Param category_id 	formData string true "category_id"
 // @Param name 			formData string true "name"
-// @Success 200 {object} domain.Subcategory "CREATED RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.Subcategory} "CREATED RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
