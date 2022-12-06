@@ -154,7 +154,7 @@ func (handler roomHandler) destroy(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewRoomHandler(svc domain.IStoreService, router *gin.RouterGroup) {
+func NewRoomHandler(svc domain.IStoreService, router gin.IRoutes) {
 	handler := roomHandler{svc: svc}
 	router.GET("/rooms", handler.fetch)
 	router.POST("/rooms", handler.store)

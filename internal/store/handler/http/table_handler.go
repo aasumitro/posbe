@@ -154,7 +154,7 @@ func (handler tableHandler) destroy(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewTableHandler(svc domain.IStoreService, router *gin.RouterGroup) {
+func NewTableHandler(svc domain.IStoreService, router gin.IRoutes) {
 	handler := tableHandler{svc: svc}
 	router.GET("/tables", handler.fetch)
 	router.POST("/tables", handler.store)

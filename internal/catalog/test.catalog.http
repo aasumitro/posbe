@@ -1,0 +1,99 @@
+### CATALOG MODULE HTTP TEST
+===
+
+===
+### Units END-Point
+===
+### GET - fetch list of units
+GET http://localhost:8000/v1/units
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new unit
+POST http://localhost:8000/v1/units
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem",
+  "magnitude": "ipsum",
+  "symbol": "ipsum"
+}
+
+### PUT - Update specified unit data
+PUT http://localhost:8000/v1/units/5
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem",
+  "magnitude": "ipsum",
+  "symbol": "ipsum"
+}
+
+### DELETE - Destroy specified unit data
+DELETE http://localhost:8000/v1/units/5
+Authorization: Bearer "TOKEN_HERE"
+
+===
+### Categories END-Point
+===
+### GET - fetch list of categories
+GET http://localhost:8000/v1/categories
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new category
+POST http://localhost:8000/v1/categories
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem"
+}
+
+### PUT - Update specified category data
+PUT http://localhost:8000/v1/categories/5
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem"
+}
+
+### DELETE - Destroy specified category data
+DELETE http://localhost:8000/v1/categories/5
+Authorization: Bearer "TOKEN_HERE"
+
+===
+### Subcategories END-Point
+===
+### GET - fetch list of Subcategories
+GET http://localhost:8000/v1/subcategories
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new subcategy
+POST http://localhost:8000/v1/subcategories
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem",
+  "category_id": 1
+}
+
+### PUT - Update specified subcategory data
+PUT http://localhost:8000/v1/subcategories/6
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem",
+  "category_id": 1
+}
+
+### DELETE - Destroy specified subcategy data
+DELETE http://localhost:8000/v1/subcategories/6
+Authorization: Bearer "TOKEN_HERE"
+

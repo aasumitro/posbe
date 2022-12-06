@@ -178,7 +178,7 @@ func (handler userHandler) destroy(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewUserHandler(accountService domain.IAccountService, router *gin.RouterGroup) {
+func NewUserHandler(accountService domain.IAccountService, router gin.IRoutes) {
 	handler := userHandler{svc: accountService}
 	router.GET("/users", handler.fetch)
 	router.GET("/users/:id", handler.show)

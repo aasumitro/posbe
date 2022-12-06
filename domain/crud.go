@@ -22,6 +22,6 @@ type ICRUDRepository[T any] interface {
 }
 
 type ICRUDAddOnRepository[T any] interface {
-	ICRUDRepository[T]
 	AllWhere(ctx context.Context, key FindWith, val any) (data []*T, err error)
+	ICRUDRepository[T]
 }
