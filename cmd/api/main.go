@@ -22,7 +22,6 @@ import (
 // @license.name  MIT
 // @license.url   https://github.com/aasumitro/posbe/blob/main/LICENSE
 
-
 var (
 	appConfig *config.Config
 	appEngine *gin.Engine

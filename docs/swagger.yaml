@@ -1,4 +1,17 @@
 definitions:
+  domain.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      subcategories:
+        items:
+          $ref: '#/definitions/domain.Subcategory'
+        type: array
+    required:
+    - name
+    type: object
   domain.Floor:
     properties:
       created_at:
@@ -76,6 +89,18 @@ definitions:
     additionalProperties:
       type: string
     type: object
+  domain.Subcategory:
+    properties:
+      category_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - category_id
+    - name
+    type: object
   domain.Table:
     properties:
       capacity:
@@ -108,6 +133,24 @@ definitions:
     - w_size
     - x_pos
     - y_pos
+    type: object
+  domain.Unit:
+    properties:
+      id:
+        type: integer
+      magnitude:
+        description: 'e.g: mass [length, time]'
+        type: string
+      name:
+        description: 'e.g: kilogram [metre, second]'
+        type: string
+      symbol:
+        description: 'e.g: kg [m, s]'
+        type: string
+    required:
+    - magnitude
+    - name
+    - symbol
     type: object
   domain.User:
     properties:
@@ -175,6 +218,135 @@ info:
     name: MIT
     url: https://github.com/aasumitro/posbe/blob/main/LICENSE
 paths:
+  /v1/categories:
+    get:
+      consumes:
+      - application/json
+      description: Get Categories List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Category'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Categories List
+      tags:
+      - Categories
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new Category.
+      parameters:
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Category'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store Category Data
+      tags:
+      - Categories
+  /v1/categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Category Data by ID.
+      parameters:
+      - description: category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Delete Category Data
+      tags:
+      - Categories
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Category Data by ID.
+      parameters:
+      - description: category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Category'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Category Data
+      tags:
+      - Categories
   /v1/floors:
     get:
       consumes:
@@ -791,6 +963,145 @@ paths:
       summary: Update Floor Data
       tags:
       - Store
+  /v1/subcategories:
+    get:
+      consumes:
+      - application/json
+      description: Get Subcategories List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Subcategory'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Subcategories List
+      tags:
+      - Subcategories
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new Subcategory.
+      parameters:
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: category_id
+        in: formData
+        name: category_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Subcategory'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store Subcategory Data
+      tags:
+      - Subcategories
+  /v1/subcategories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Subcategory Data by ID.
+      parameters:
+      - description: subcategory id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Delete Subcategory Data
+      tags:
+      - Subcategories
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Subcategory Data by ID.
+      parameters:
+      - description: subcategory id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: category_id
+        in: formData
+        name: category_id
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Subcategory'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Subcategory Data
+      tags:
+      - Subcategories
   /v1/tables:
     get:
       consumes:
@@ -990,6 +1301,155 @@ paths:
       summary: Update Table Data
       tags:
       - Tables
+  /v1/units:
+    get:
+      consumes:
+      - application/json
+      description: Get Units List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            items:
+              $ref: '#/definitions/domain.Unit'
+            type: array
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Units List
+      tags:
+      - Units
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new Unit.
+      parameters:
+      - description: magnitude
+        in: formData
+        name: magnitude
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: symbol
+        in: formData
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Unit'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store Unit Data
+      tags:
+      - Units
+  /v1/units/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Unit Data by ID.
+      parameters:
+      - description: unit id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Delete Unit Data
+      tags:
+      - Units
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update Unit Data by ID.
+      parameters:
+      - description: unit id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: magnitude
+        in: formData
+        name: magnitude
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: symbol
+        in: formData
+        name: symbol
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            $ref: '#/definitions/domain.Unit'
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update Unit Data
+      tags:
+      - Units
   /v1/users:
     get:
       consumes:

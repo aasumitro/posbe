@@ -85,15 +85,15 @@ more info read the [docs](https://pkg.go.dev/github.com/stretchr/testify/mock).
 
   - set version (dirty state) (version: -1 before last migrate)
     ```bash
-     migrate -database ${POSTGRESQL_URL} -path db/migrations force ${VERSION} 
+     migrate -database ${PG_DSN} -path db/migrations force ${VERSION} 
     ```
   - up
     ```bash
-    migrate -database ${POSTGRESQL_URL} -path db/migrations up
+    migrate -database ${PG_DSN} -path db/migrations up
     ```
   - down
     ```bash
-    migrate -database ${POSTGRESQL_URL} -path db/migrations down
+    migrate -database ${PG_DSN} -path db/migrations down
     ```
     
 more info read the [docs](https://pkg.go.dev/github.com/golang-migrate/migrate/v4).

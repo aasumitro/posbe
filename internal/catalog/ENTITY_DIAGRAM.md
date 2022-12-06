@@ -16,7 +16,9 @@ erDiagram
     
     UNITS { 
         int id
+        string magnitude
         string name
+        string symbol
     }
     
     ADDONS {

@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS units (
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    magnitude VARCHAR(50),
+    name VARCHAR(50),
+    symbol VARCHAR(50)
+);
