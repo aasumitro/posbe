@@ -25,7 +25,7 @@ type AuthHandler struct {
 // @Produce json
 // @Param username formData string true "username"
 // @Param password formData string true "password"
-// @Success 201 {object} utils.SuccessRespond "CREATED_RESPOND"
+// @Success 201 {object} utils.SuccessRespond{Data=domain.User} "CREATED_RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD_REQUEST_RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE_ENTITY_RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL_SERVER_ERROR_RESPOND"
@@ -49,6 +49,9 @@ func (handler AuthHandler) login(ctx *gin.Context) {
 		return
 	}
 
+	// TODO: ENCRYPT COOKIE AND RETURN THE PUB KEY TO USER
+	// USE PUB KEY TO GET PRIVATE KEY, USE PUB & PRIVATE KEY
+	// COMBINATION TO CHECK USER SESSION IN AUTH MIDDLEWARE
 	http.SetCookie(ctx.Writer, &http.Cookie{
 		Name:   "jwt",
 		Value:  token,

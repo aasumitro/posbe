@@ -19,7 +19,7 @@ type unitHandler struct {
 // @Tags 		 Units
 // @Accept       json
 // @Produce      json
-// @Success 200 {array} domain.Unit "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]domain.Unit} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/units [GET]
@@ -43,7 +43,7 @@ func (handler unitHandler) fetch(ctx *gin.Context) {
 // @Param magnitude 	formData string true "magnitude"
 // @Param name 			formData string true "name"
 // @Param symbol 		formData string true "symbol"
-// @Success 201 {object} domain.Unit "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=domain.Unit} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -75,7 +75,7 @@ func (handler unitHandler) store(ctx *gin.Context) {
 // @Param magnitude 	formData string true "magnitude"
 // @Param name 			formData string true "name"
 // @Param symbol 		formData string true "symbol"
-// @Success 200 {object} domain.Unit "CREATED RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.Unit} "CREATED RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"

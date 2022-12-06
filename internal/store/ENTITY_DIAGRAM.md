@@ -2,8 +2,6 @@
 
 ```mermaid
 erDiagram
-    FLOORS ||--|{ ROOMS : has_many
-    FLOORS ||--|{ TABLES : has_many
     FLOORS {
         int id
         string name
@@ -29,4 +27,7 @@ erDiagram
         int long
         int wide
     }  
+    
+    FLOORS ||--|{ ROOMS : one_to_many
+    FLOORS ||--|{ TABLES : one_to_many
 ```

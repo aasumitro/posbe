@@ -19,7 +19,7 @@ type roleHandler struct {
 // @Tags 		 Roles
 // @Accept       json
 // @Produce      json
-// @Success 200 {array} domain.Role "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]domain.Role} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/roles [GET]
@@ -42,7 +42,7 @@ func (handler roleHandler) fetch(ctx *gin.Context) {
 // @Produce      json
 // @Param name 			formData string true "name"
 // @Param description 	formData string true "description"
-// @Success 201 {object} domain.Role "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=domain.Role} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -73,7 +73,7 @@ func (handler roleHandler) store(ctx *gin.Context) {
 // @Param id   			path     int  	true "role id"
 // @Param name 			formData string true "name"
 // @Param description 	formData string true "description"
-// @Success 200 {object} domain.Role "CREATED RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=domain.Role} "CREATED RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"

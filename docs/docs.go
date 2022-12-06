@@ -41,10 +41,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Category"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Category"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -86,7 +98,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Category"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Category"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -143,7 +167,19 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Category"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Category"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -235,10 +271,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Floor"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Floor"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -280,7 +328,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Floor"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Floor"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -337,7 +397,19 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Floor"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Floor"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -442,10 +514,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Floor"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Floor"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -496,7 +577,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED_RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/utils.SuccessRespond"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Data": {
+                                            "$ref": "#/definitions/domain.User"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -560,10 +653,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Role"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Role"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -612,7 +717,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Role"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Role"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -676,7 +793,19 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Role"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Role"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -768,10 +897,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Room"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Room"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -862,7 +1003,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Room"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Room"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -968,7 +1121,19 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Room"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Room"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1060,10 +1225,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.StoreSetting"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.StoreSetting"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1112,7 +1289,19 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.StoreSetting"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.StoreSetting"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1153,10 +1342,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Subcategory"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Subcategory"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1205,7 +1406,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Subcategory"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Subcategory"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1269,7 +1482,19 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Subcategory"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Subcategory"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1361,10 +1586,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Table"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Table"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1455,7 +1692,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Table"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Table"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1561,7 +1810,19 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Table"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Table"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1653,10 +1914,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Unit"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Unit"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1712,7 +1985,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Unit"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Unit"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1783,7 +2068,19 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.Unit"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Unit"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1875,10 +2172,22 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.User"
-                            }
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.User"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -1953,7 +2262,19 @@ const docTemplate = `{
                     "201": {
                         "description": "CREATED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.User"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.User"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "401": {
@@ -2003,7 +2324,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.User"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.User"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -2087,7 +2420,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/domain.User"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.User"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
