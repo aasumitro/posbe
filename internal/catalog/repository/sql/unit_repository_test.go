@@ -135,7 +135,7 @@ func (suite *unitRepositoryTestSuite) TestRepository_Updated_ExpectSuccess() {
 	data := suite.mock.
 		NewRows([]string{"id", "magnitude", "name", "symbol"}).
 		AddRow(1, "test", "test", "test")
-	query := "UPDATE units SET magnitude = $1, name = $2, symbol = $3 WHERE id = $3 RETURNING *"
+	query := "UPDATE units SET magnitude = $1, name = $2, symbol = $3 WHERE id = $4 RETURNING *"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).
 		WithArgs(unit.Magnitude, unit.Name, unit.Symbol, unit.ID).
@@ -151,7 +151,7 @@ func (suite *unitRepositoryTestSuite) TestRepository_Updated_ExpectError() {
 	data := suite.mock.
 		NewRows([]string{"id", "magnitude", "name", "symbol"}).
 		AddRow(1, nil, nil, nil)
-	query := "UPDATE units SET magnitude = $1, name = $2, symbol = $3 WHERE id = $3 RETURNING *"
+	query := "UPDATE units SET magnitude = $1, name = $2, symbol = $3 WHERE id = $4 RETURNING *"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).
 		WithArgs(unit.Magnitude, unit.Name, unit.Symbol, unit.ID).

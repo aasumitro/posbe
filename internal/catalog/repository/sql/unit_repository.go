@@ -65,7 +65,7 @@ func (repo UnitSQLRepository) Create(ctx context.Context, params *domain.Unit) (
 }
 
 func (repo UnitSQLRepository) Update(ctx context.Context, params *domain.Unit) (data *domain.Unit, err error) {
-	q := "UPDATE units SET magnitude = $1, name = $2, symbol = $3 WHERE id = $3 RETURNING *"
+	q := "UPDATE units SET magnitude = $1, name = $2, symbol = $3 WHERE id = $4 RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q, params.Magnitude, params.Name, params.Symbol, params.ID)
 
 	data = &domain.Unit{}
