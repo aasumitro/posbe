@@ -14,8 +14,9 @@ func InitCatalogModule(ctx context.Context, config *config.Config, router *gin.E
 	unitRepository := repository.NewUnitSQLRepository(config.GetDbConn())
 	categoryRepository := repository.NewCategorySQLRepository(config.GetDbConn())
 	subcategoryRepository := repository.NewSubcategorySQLRepository(config.GetDbConn())
+	addonRepository := repository.NewAddonSQLRepository(config.GetDbConn())
 	catalogCommonService := service.NewCatalogCommonService(ctx, unitRepository,
-		categoryRepository, subcategoryRepository)
+		categoryRepository, subcategoryRepository, addonRepository)
 	routerGroup := router.Group("v1")
 	protectedRouter := routerGroup.
 		Use(middleware.Auth(config.JWTSecretKey)).
@@ -24,4 +25,5 @@ func InitCatalogModule(ctx context.Context, config *config.Config, router *gin.E
 	http.NewUnitHandler(catalogCommonService, protectedRouter)
 	http.NewCategoryHandler(catalogCommonService, protectedRouter)
 	http.NewSubcategoryHandler(catalogCommonService, protectedRouter)
+	http.NewAddonHandler(catalogCommonService, protectedRouter)
 }

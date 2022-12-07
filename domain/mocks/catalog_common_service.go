@@ -14,6 +14,31 @@ type ICatalogCommonService struct {
 	mock.Mock
 }
 
+// AddAddon provides a mock function with given fields: data
+func (_m *ICatalogCommonService) AddAddon(data *domain.Addon) (*domain.Addon, *utils.ServiceError) {
+	ret := _m.Called(data)
+
+	var r0 *domain.Addon
+	if rf, ok := ret.Get(0).(func(*domain.Addon) *domain.Addon); ok {
+		r0 = rf(data)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Addon)
+		}
+	}
+
+	var r1 *utils.ServiceError
+	if rf, ok := ret.Get(1).(func(*domain.Addon) *utils.ServiceError); ok {
+		r1 = rf(data)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*utils.ServiceError)
+		}
+	}
+
+	return r0, r1
+}
+
 // AddCategory provides a mock function with given fields: data
 func (_m *ICatalogCommonService) AddCategory(data *domain.Category) (*domain.Category, *utils.ServiceError) {
 	ret := _m.Called(data)
@@ -89,6 +114,31 @@ func (_m *ICatalogCommonService) AddUnit(data *domain.Unit) (*domain.Unit, *util
 	return r0, r1
 }
 
+// AddonList provides a mock function with given fields:
+func (_m *ICatalogCommonService) AddonList() ([]*domain.Addon, *utils.ServiceError) {
+	ret := _m.Called()
+
+	var r0 []*domain.Addon
+	if rf, ok := ret.Get(0).(func() []*domain.Addon); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*domain.Addon)
+		}
+	}
+
+	var r1 *utils.ServiceError
+	if rf, ok := ret.Get(1).(func() *utils.ServiceError); ok {
+		r1 = rf()
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*utils.ServiceError)
+		}
+	}
+
+	return r0, r1
+}
+
 // CategoryList provides a mock function with given fields:
 func (_m *ICatalogCommonService) CategoryList() ([]*domain.Category, *utils.ServiceError) {
 	ret := _m.Called()
@@ -112,6 +162,22 @@ func (_m *ICatalogCommonService) CategoryList() ([]*domain.Category, *utils.Serv
 	}
 
 	return r0, r1
+}
+
+// DeleteAddon provides a mock function with given fields: data
+func (_m *ICatalogCommonService) DeleteAddon(data *domain.Addon) *utils.ServiceError {
+	ret := _m.Called(data)
+
+	var r0 *utils.ServiceError
+	if rf, ok := ret.Get(0).(func(*domain.Addon) *utils.ServiceError); ok {
+		r0 = rf(data)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*utils.ServiceError)
+		}
+	}
+
+	return r0
 }
 
 // DeleteCategory provides a mock function with given fields: data
@@ -160,6 +226,31 @@ func (_m *ICatalogCommonService) DeleteUnit(data *domain.Unit) *utils.ServiceErr
 	}
 
 	return r0
+}
+
+// EditAddon provides a mock function with given fields: data
+func (_m *ICatalogCommonService) EditAddon(data *domain.Addon) (*domain.Addon, *utils.ServiceError) {
+	ret := _m.Called(data)
+
+	var r0 *domain.Addon
+	if rf, ok := ret.Get(0).(func(*domain.Addon) *domain.Addon); ok {
+		r0 = rf(data)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Addon)
+		}
+	}
+
+	var r1 *utils.ServiceError
+	if rf, ok := ret.Get(1).(func(*domain.Addon) *utils.ServiceError); ok {
+		r1 = rf(data)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*utils.ServiceError)
+		}
+	}
+
+	return r0, r1
 }
 
 // EditCategory provides a mock function with given fields: data

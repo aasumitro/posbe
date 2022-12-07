@@ -24,6 +24,264 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/addons": {
+            "get": {
+                "description": "Get Addons List.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Addons"
+                ],
+                "summary": "Addons List",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Addon"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new addon.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Addons"
+                ],
+                "summary": "Store addon Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "price",
+                        "name": "price",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Addon"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/addons/{id}": {
+            "put": {
+                "description": "Update addon Data by ID.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Addons"
+                ],
+                "summary": "Update addon Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "addon id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "description",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "price",
+                        "name": "price",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "CREATED RESPOND",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Addon"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete addon Data by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Addons"
+                ],
+                "summary": "Delete addon Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "NO CONTENT RESPOND"
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/categories": {
             "get": {
                 "description": "Get Categories List.",
@@ -2509,6 +2767,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.Addon": {
+            "type": "object",
+            "required": [
+                "description",
+                "name",
+                "price"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
         "domain.Category": {
             "type": "object",
             "required": [

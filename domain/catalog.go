@@ -22,6 +22,13 @@ type (
 		Symbol    string `json:"symbol" form:"symbol" binding:"required"`       // e.g: kg [m, s]
 	}
 
+	Addon struct {
+		ID          int     `json:"id"`
+		Name        string  `json:"name" form:"name" binding:"required"`
+		Description string  `json:"description" form:"description"  binding:"required"`
+		Price       float32 `json:"price" form:"price" binding:"required"`
+	}
+
 	ICatalogCommonService interface {
 		UnitList() (units []*Unit, errData *utils.ServiceError)
 		AddUnit(data *Unit) (units *Unit, errData *utils.ServiceError)
@@ -37,6 +44,11 @@ type (
 		AddSubcategory(data *Subcategory) (units *Subcategory, errData *utils.ServiceError)
 		EditSubcategory(data *Subcategory) (units *Subcategory, errData *utils.ServiceError)
 		DeleteSubcategory(data *Subcategory) *utils.ServiceError
+
+		AddonList() (units []*Addon, errData *utils.ServiceError)
+		AddAddon(data *Addon) (units *Addon, errData *utils.ServiceError)
+		EditAddon(data *Addon) (units *Addon, errData *utils.ServiceError)
+		DeleteAddon(data *Addon) *utils.ServiceError
 	}
 
 	ICatalogProductService interface {
