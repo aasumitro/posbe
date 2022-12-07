@@ -12,6 +12,7 @@ type catalogCommonService struct {
 	unitRepo        domain.ICRUDRepository[domain.Unit]
 	categoryRepo    domain.ICRUDRepository[domain.Category]
 	subcategoryRepo domain.ICRUDRepository[domain.Subcategory]
+	addonRepo       domain.ICRUDRepository[domain.Addon]
 }
 
 func (service catalogCommonService) UnitList() (units []*domain.Unit, errData *utils.ServiceError) {
@@ -128,16 +129,56 @@ func (service catalogCommonService) DeleteSubcategory(data *domain.Subcategory) 
 	return nil
 }
 
+func (service catalogCommonService) AddonList() (units []*domain.Addon, errData *utils.ServiceError) {
+	data, err := service.addonRepo.All(service.ctx)
+
+	return utils.ValidateDataRows[domain.Addon](data, err)
+}
+
+func (service catalogCommonService) AddAddon(data *domain.Addon) (units *domain.Addon, errData *utils.ServiceError) {
+	data, err := service.addonRepo.Create(service.ctx, data)
+
+	return utils.ValidateDataRow[domain.Addon](data, err)
+}
+
+func (service catalogCommonService) EditAddon(data *domain.Addon) (units *domain.Addon, errData *utils.ServiceError) {
+	data, err := service.addonRepo.Update(service.ctx, data)
+
+	return utils.ValidateDataRow[domain.Addon](data, err)
+}
+
+func (service catalogCommonService) DeleteAddon(data *domain.Addon) *utils.ServiceError {
+	data, err := service.addonRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	if err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	err = service.addonRepo.Delete(service.ctx, data)
+	if err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	return nil
+}
+
 func NewCatalogCommonService(
 	ctx context.Context,
 	unitRepo domain.ICRUDRepository[domain.Unit],
 	categoryRepo domain.ICRUDRepository[domain.Category],
 	subcategoryRepo domain.ICRUDRepository[domain.Subcategory],
+	addonRepo domain.ICRUDRepository[domain.Addon],
 ) domain.ICatalogCommonService {
 	return &catalogCommonService{
 		ctx:             ctx,
 		unitRepo:        unitRepo,
 		categoryRepo:    categoryRepo,
 		subcategoryRepo: subcategoryRepo,
+		addonRepo:       addonRepo,
 	}
 }

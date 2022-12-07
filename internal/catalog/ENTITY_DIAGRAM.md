@@ -22,7 +22,6 @@ erDiagram
     
     ADDONS {
         int id
-        int product_id
         string name
         string description 
         int price
@@ -31,33 +30,29 @@ erDiagram
     VARIANTS {
         int id
         int product_id
+        int unit_id
         string name
         string description 
         int price
-    }
-   
-    PRODUCTS_SUBCATEGORY {
-        int product_id
-        int subcategory_id
+        float unit_size
     }
     
     PRODUCTS {
         int id  
-        int unit_id
         int category_id
-        string pic
+        int subcategory_id
+        string sku
+        string image
         json gallery
         string name
         string description
         int price
     }
-    
+ 
     CATEGORIES ||--|{ SUBCATEGORIES: has_many
-    PRODUCTS }|--|{ PRODUCTS_SUBCATEGORY: many_to_many
-    SUBCATEGORIES }|--|{ PRODUCTS_SUBCATEGORY: many_to_many
-    PRODUCTS ||--|{ ADDONS: one_to_many
+    PRODUCTS }|--|| SUBCATEGORIES: has_many
     PRODUCTS ||--|{ VARIANTS: one_to_many
-    PRODUCTS }|--|| UNITS : one_to_many
+    VARIANTS }|--|| UNITS : one_to_many
     PRODUCTS }|--|| CATEGORIES : one_to_many
 ```
 #### ADDONS:

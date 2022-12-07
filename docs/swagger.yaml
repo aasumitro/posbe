@@ -1,4 +1,19 @@
 definitions:
+  domain.Addon:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    required:
+    - description
+    - name
+    - price
+    type: object
   domain.Category:
     properties:
       id:
@@ -218,6 +233,170 @@ info:
     name: MIT
     url: https://github.com/aasumitro/posbe/blob/main/LICENSE
 paths:
+  /v1/addons:
+    get:
+      consumes:
+      - application/json
+      description: Get Addons List.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK RESPOND
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Addon'
+                  type: array
+              type: object
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Addons List
+      tags:
+      - Addons
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new addon.
+      parameters:
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: price
+        in: formData
+        name: price
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Addon'
+              type: object
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store addon Data
+      tags:
+      - Addons
+  /v1/addons/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete addon Data by ID.
+      parameters:
+      - description: category id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Delete addon Data
+      tags:
+      - Addons
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update addon Data by ID.
+      parameters:
+      - description: addon id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: description
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: price
+        in: formData
+        name: price
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Addon'
+              type: object
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update addon Data
+      tags:
+      - Addons
   /v1/categories:
     get:
       consumes:

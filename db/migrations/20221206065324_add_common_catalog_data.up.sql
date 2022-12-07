@@ -7,4 +7,6 @@ VALUES (1, 'meat'), (1, 'seafood'), (2, 'coffee'), (2, 'juice');
 INSERT INTO units (magnitude, name, symbol)
 VALUES ('mass', 'gram', 'g'),
        ('mass', 'milligram', 'mg'),
-       ('mass', 'kilogram', 'kg');
+       ('mass', 'kilogram', 'kg'),
+       ('mass', 'milliliter', 'ml'),
+       ('mass', 'liter', 'l');

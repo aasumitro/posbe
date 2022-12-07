@@ -2,17 +2,15 @@
 
 FILE=.env
 if test -f "$FILE"; then
-  echo "Everything is OK"
-  echo "Validate dependencies . . ."
-  go mod tidy -compat=1.19
-  echo "Re-generate Swagger File (api-spec docs) . . ."
-  swag init --parseDependency --parseInternal --parseDepth 4 -g ./cmd/api/main.go
-  echo "Trying to run the linter & tests . . ."
-  staticcheck ./...
-  go vet ./...
-  go test ./... -v
-  echo "Trying to run the server . . ."
-  go run ./cmd/api/main.go
+  set="abcdefghijklmonpqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  rand=""
+  for i in $(seq 1 64); do
+      char=${set:$RANDOM % ${#set}:1}
+      rand+=$char
+  done
+  echo $rand
+
+#  TODO UPDATE .ENV JWT_SECRET_KEY
 else
   echo "==========================================================="
   echo "|  $FILE (environment) file does not exist.                |"
