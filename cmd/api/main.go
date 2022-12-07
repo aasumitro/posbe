@@ -65,10 +65,10 @@ func initEngine() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	accessLogFile, _ := os.Create("./tmp/access.log")
+	accessLogFile, _ := os.Create("./temps/access.log")
 	gin.DefaultWriter = io.MultiWriter(accessLogFile, os.Stdout)
 
-	errorLogFile, _ := os.Create("./tmp/errors.log")
+	errorLogFile, _ := os.Create("./temps/errors.log")
 	gin.DefaultErrorWriter = io.MultiWriter(errorLogFile, os.Stdout)
 
 	appEngine = gin.Default()
