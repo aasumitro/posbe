@@ -97,3 +97,36 @@ Content-Type: application/json
 DELETE http://localhost:8000/v1/subcategories/6
 Authorization: Bearer "TOKEN_HERE"
 
+===
+### Addon END-Point
+===
+### GET - fetch list of addons
+GET http://localhost:8000/v1/addons
+Authorization: Bearer "TOKEN_HERE"
+accept: application/json
+
+### POST - store new addon
+POST http://localhost:8000/v1/addons
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem",
+  "description": "ipsum",
+  "price": 1
+}
+
+### PUT - Update specified addons data
+PUT http://localhost:8000/v1/addons/5
+Authorization: Bearer "TOKEN_HERE"
+Content-Type: application/json
+
+{
+  "name": "lorem",
+  "description": "ipsum",
+  "price": 1
+}
+
+### DELETE - Destroy specified addons data
+DELETE http://localhost:8000/v1/addons/5
+Authorization: Bearer "TOKEN_HERE"
