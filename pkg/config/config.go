@@ -14,7 +14,9 @@ type Config struct {
 	DBDriver       string `mapstructure:"DB_DRIVER"`
 	DBDsnUrl       string `mapstructure:"DB_DSN_URL"`
 	JWTSecretKey   string `mapstructure:"JWT_SECRET_KEY"`
-	JWTLifetime    int `mapstructure:"JWT_LIFETIME"`
+	JWTLifetime    int    `mapstructure:"JWT_LIFETIME"`
+	CacheDriver    string `mapstructure:"CACHE_DRIVER"`
+	CacheDsnUrl    string `mapstructure:"CACHE_DSN_URL"`
 }
 
 func LoadConfig() (cfg *Config, err error) {

@@ -1,0 +1,1 @@
+### Errors Localization for Frontend

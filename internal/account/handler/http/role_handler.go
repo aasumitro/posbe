@@ -24,11 +24,25 @@ type roleHandler struct {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/roles [GET]
 func (handler roleHandler) fetch(ctx *gin.Context) {
+	//helper := utils.RedisCache{Ctx: ctx, RdpConn: redisClient}
+	//roles, err := helper.CacheFirstData(&utils.CacheDataSupplied{
+	//	Key: cacheKey,
+	//	Ttl: time.Hour * 1,
+	//	CbF: func() (data any, err *utils.ServiceError) {
+	//		return handler.svc.RoleList()
+	//	},
+	//})
 	roles, err := handler.svc.RoleList()
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
+
+	//if data, ok := roles.(string); ok {
+	//	var r []domain.Role
+	//	_ = json.Unmarshal([]byte(data), &r)
+	//	roles = r
+	//}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, roles)
 }

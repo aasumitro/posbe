@@ -37,8 +37,6 @@ func init() {
 }
 
 func main() {
-	// Init database connection
-	appConfig.InitDbConn()
 	// Load registered modules
 	loadModules()
 	// start engine
@@ -58,6 +56,12 @@ func initConfig() {
 	}
 
 	appConfig = cfg
+
+	// Init database connection
+	appConfig.InitDbConn()
+
+	// Init cache connection
+	appConfig.InitRedisConn()
 }
 
 func initEngine() {
