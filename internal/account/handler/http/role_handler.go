@@ -1,16 +1,23 @@
 package http
 
 import (
+	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type roleHandler struct {
-	svc domain.IAccountService
+	svc   domain.IAccountService
+	cache *redis.Client
 }
+
+var roleCacheKey = "roles"
 
 // roles godoc
 // @Schemes
@@ -24,10 +31,24 @@ type roleHandler struct {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/roles [GET]
 func (handler roleHandler) fetch(ctx *gin.Context) {
-	roles, err := handler.svc.RoleList()
+	helper := utils.RedisCache{Ctx: ctx, RdpConn: handler.cache}
+	roles, err := helper.CacheFirstData(&utils.CacheDataSupplied{
+		Key: roleCacheKey,
+		Ttl: time.Hour * 1,
+		CbF: func() (data any, err *utils.ServiceError) {
+			return handler.svc.RoleList()
+		},
+	})
+
 	if err != nil {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
+	}
+
+	if data, ok := roles.(string); ok {
+		var r []domain.Role
+		_ = json.Unmarshal([]byte(data), &r)
+		roles = r
 	}
 
 	utils.NewHttpRespond(ctx, http.StatusOK, roles)
@@ -59,6 +80,8 @@ func (handler roleHandler) store(ctx *gin.Context) {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
+
+	handler.cache.Del(ctx, roleCacheKey)
 
 	utils.NewHttpRespond(ctx, http.StatusCreated, role)
 }
@@ -102,6 +125,8 @@ func (handler roleHandler) update(ctx *gin.Context) {
 		return
 	}
 
+	handler.cache.Del(ctx, roleCacheKey)
+
 	utils.NewHttpRespond(ctx, http.StatusOK, role)
 }
 
@@ -135,13 +160,17 @@ func (handler roleHandler) destroy(ctx *gin.Context) {
 		return
 	}
 
+	handler.cache.Del(ctx, roleCacheKey)
+
 	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewRoleHandler(accountService domain.IAccountService, router gin.IRoutes) {
-	handler := roleHandler{svc: accountService}
+func NewRoleHandler(accountService domain.IAccountService, router gin.IRoutes, cache *redis.Client) {
+	handler := roleHandler{svc: accountService, cache: cache}
 	router.GET("/roles", handler.fetch)
-	router.POST("/roles", handler.store)
-	router.PUT("/roles/:id", handler.update)
-	router.DELETE("/roles/:id", handler.destroy)
+	protectedRoute := router.Use(middleware.
+		AcceptedRoles([]string{"admin"}))
+	protectedRoute.POST("/roles", handler.store)
+	protectedRoute.PUT("/roles/:id", handler.update)
+	protectedRoute.DELETE("/roles/:id", handler.destroy)
 }

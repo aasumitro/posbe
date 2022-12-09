@@ -20,7 +20,6 @@ func InitCatalogModule(ctx context.Context, config *config.Config, router *gin.E
 	routerGroup := router.Group("v1")
 	protectedRouter := routerGroup.
 		Use(middleware.Auth(config.JWTSecretKey)).
-		Use(middleware.ActivityObserver()).
 		Use(middleware.AcceptedRoles([]string{"*"}))
 	http.NewUnitHandler(catalogCommonService, protectedRouter)
 	http.NewCategoryHandler(catalogCommonService, protectedRouter)

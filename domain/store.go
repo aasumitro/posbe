@@ -56,7 +56,7 @@ type (
 		UpdatedAt sql.NullInt64
 	}
 
-	StoreSetting map[string]string
+	StoreSetting map[string]interface{}
 
 	IStoreService interface {
 		FloorList() (floors []*Floor, errData *utils.ServiceError)

@@ -5,7 +5,9 @@ import (
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/domain/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/alicebob/miniredis/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -46,7 +48,10 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Fetch_ShouldSuccess() {
 		Once()
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
-	roleHandler{svc: accSvcMock}.fetch(ctx)
+	redisConn := redis.NewClient(&redis.Options{
+		Addr: miniredis.RunT(suite.T()).Addr(),
+	})
+	roleHandler{svc: accSvcMock, cache: redisConn}.fetch(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
@@ -65,7 +70,10 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Fetch_ShouldError() {
 		Once()
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
-	roleHandler{svc: accSvcMock}.fetch(ctx)
+	redisConn := redis.NewClient(&redis.Options{
+		Addr: miniredis.RunT(suite.T()).Addr(),
+	})
+	roleHandler{svc: accSvcMock, cache: redisConn}.fetch(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusInternalServerError, writer.Code)
@@ -87,7 +95,10 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Store_ShouldSuccess() {
 		"name":        "lorem",
 		"description": "lorem ipsum",
 	})
-	roleHandler{svc: accSvcMock}.store(ctx)
+	redisConn := redis.NewClient(&redis.Options{
+		Addr: miniredis.RunT(suite.T()).Addr(),
+	})
+	roleHandler{svc: accSvcMock, cache: redisConn}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusCreated, writer.Code)
@@ -151,7 +162,10 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Update_ShouldSuccess() {
 		"name":        "lorem",
 		"description": "lorem ipsum",
 	})
-	roleHandler{svc: accSvcMock}.update(ctx)
+	redisConn := redis.NewClient(&redis.Options{
+		Addr: miniredis.RunT(suite.T()).Addr(),
+	})
+	roleHandler{svc: accSvcMock, cache: redisConn}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusOK, writer.Code)
@@ -225,7 +239,10 @@ func (suite *roleHandlerTestSuite) TestRoleHandler_Destroy_ShouldSuccess() {
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
 	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
-	roleHandler{svc: accSvcMock}.destroy(ctx)
+	redisConn := redis.NewClient(&redis.Options{
+		Addr: miniredis.RunT(suite.T()).Addr(),
+	})
+	roleHandler{svc: accSvcMock, cache: redisConn}.destroy(ctx)
 	assert.Equal(suite.T(), http.StatusNoContent, writer.Code)
 }
 

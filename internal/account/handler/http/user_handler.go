@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -182,7 +183,9 @@ func NewUserHandler(accountService domain.IAccountService, router gin.IRoutes) {
 	handler := userHandler{svc: accountService}
 	router.GET("/users", handler.fetch)
 	router.GET("/users/:id", handler.show)
-	router.POST("/users", handler.store)
-	router.PUT("/users/:id", handler.update)
-	router.DELETE("/users/:id", handler.destroy)
+	protectedRoute := router.Use(middleware.
+		AcceptedRoles([]string{"admin"}))
+	protectedRoute.POST("/users", handler.store)
+	protectedRoute.PUT("/users/:id", handler.update)
+	protectedRoute.DELETE("/users/:id", handler.destroy)
 }
