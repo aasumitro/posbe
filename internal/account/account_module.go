@@ -35,14 +35,14 @@ func InitAccountModule(ctx context.Context, router *gin.Engine) {
 
 func shouldCacheData(ctx context.Context) {
 	// run this at first booting
-	if err := config.RedisCache.
+	if err := config.RedisPool.
 		Get(ctx, "roles").
 		Err(); err != nil && err == redis.Nil {
 		if roles, err := roleRepository.All(ctx); err == nil {
 			// encode given data
 			jsonData, _ := json.Marshal(roles)
 			// store data to redis
-			config.RedisCache.Set(ctx,
+			config.RedisPool.Set(ctx,
 				"roles", jsonData, 0)
 		}
 	}

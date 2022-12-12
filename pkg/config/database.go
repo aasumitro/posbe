@@ -8,15 +8,20 @@ import (
 )
 
 func (cfg Config) InitDbConn() {
-	log.Println("Trying to open database connection . . . .")
+	log.Println("Trying to open database connection pool . . . .")
 
 	dbOnce.Do(func() {
-		conn, err := sql.Open("postgres", cfg.DBDsnUrl)
+		conn, err := sql.Open(cfg.DBDriver, cfg.DBDsnUrl)
 		if err != nil {
 			panic(fmt.Sprintf("DATABASE_ERROR: %s", err.Error()))
 		}
 
-		Db = conn
-		log.Printf("Database connected with %s driver . . . .", cfg.DBDriver)
+		DbPool = conn
+
+		if err := DbPool.Ping(); err != nil {
+			panic(fmt.Sprintf("DATABASE_ERROR: %s", err.Error()))
+		}
+
+		log.Printf("Database connection pool created with %s driver . . . .", cfg.DBDriver)
 	})
 }

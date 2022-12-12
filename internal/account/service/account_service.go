@@ -23,7 +23,7 @@ var (
 )
 
 func (service accountService) RoleList() (roles []*domain.Role, errorData *utils.ServiceError) {
-	helper := utils.RedisCache{Ctx: service.ctx, RdpConn: config.RedisCache}
+	helper := utils.RedisCache{Ctx: service.ctx, RdpConn: config.RedisPool}
 	data, err := helper.CacheFirstData(&utils.CacheDataSupplied{
 		Key: roleCacheKey,
 		Ttl: time.Hour * 1,
@@ -48,7 +48,7 @@ func (service accountService) RoleList() (roles []*domain.Role, errorData *utils
 func (service accountService) AddRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
 	data, err := service.roleRepo.Create(service.ctx, data)
 
-	config.RedisCache.Del(service.ctx, roleCacheKey)
+	config.RedisPool.Del(service.ctx, roleCacheKey)
 
 	return utils.ValidateDataRow[domain.Role](data, err)
 }
@@ -56,7 +56,7 @@ func (service accountService) AddRole(data *domain.Role) (role *domain.Role, err
 func (service accountService) EditRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
 	data, err := service.roleRepo.Update(service.ctx, data)
 
-	config.RedisCache.Del(service.ctx, roleCacheKey)
+	config.RedisPool.Del(service.ctx, roleCacheKey)
 
 	return utils.ValidateDataRow[domain.Role](data, err)
 }
@@ -85,7 +85,7 @@ func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError 
 		}
 	}
 
-	config.RedisCache.Del(service.ctx, roleCacheKey)
+	config.RedisPool.Del(service.ctx, roleCacheKey)
 
 	return nil
 }

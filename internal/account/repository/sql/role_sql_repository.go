@@ -85,5 +85,5 @@ func (repo RoleSQLRepository) Delete(ctx context.Context, params *domain.Role) e
 }
 
 func NewRoleSQlRepository() domain.ICRUDRepository[domain.Role] {
-	return &RoleSQLRepository{Db: config.Db}
+	return &RoleSQLRepository{Db: config.DbPool}
 }

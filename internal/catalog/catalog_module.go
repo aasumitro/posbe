@@ -11,10 +11,10 @@ import (
 )
 
 func InitCatalogModule(ctx context.Context, router *gin.Engine) {
-	unitRepository := repository.NewUnitSQLRepository(config.Db)
-	categoryRepository := repository.NewCategorySQLRepository(config.Db)
-	subcategoryRepository := repository.NewSubcategorySQLRepository(config.Db)
-	addonRepository := repository.NewAddonSQLRepository(config.Db)
+	unitRepository := repository.NewUnitSQLRepository(config.DbPool)
+	categoryRepository := repository.NewCategorySQLRepository(config.DbPool)
+	subcategoryRepository := repository.NewSubcategorySQLRepository(config.DbPool)
+	addonRepository := repository.NewAddonSQLRepository(config.DbPool)
 	catalogCommonService := service.NewCatalogCommonService(ctx, unitRepository,
 		categoryRepository, subcategoryRepository, addonRepository)
 	routerGroup := router.Group("v1")

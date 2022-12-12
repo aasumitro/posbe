@@ -24,7 +24,7 @@ func (suite *userRepositoryTestSuite) SetupSuite() {
 		err error
 	)
 
-	config.Db, suite.mock, err = sqlmock.New(
+	config.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)

@@ -8,19 +8,19 @@ import (
 )
 
 func (cfg Config) InitRedisConn() {
-	log.Println("Trying to open redis connection . . . .")
+	log.Println("Trying to open redis connection pool . . . .")
 
 	redisCacheOnce.Do(func() {
-		RedisCache = redis.NewClient(&redis.Options{
+		RedisPool = redis.NewClient(&redis.Options{
 			Addr:     cfg.CacheDsnUrl,
 			Password: "", // no password set
 			DB:       0,  // use default DB
 		})
 
-		if err := RedisCache.Ping(context.Background()).Err(); err != nil {
+		if err := RedisPool.Ping(context.Background()).Err(); err != nil {
 			panic(fmt.Sprintf("REDIS_ERROR: %s", err.Error()))
 		}
 
-		log.Printf("Cache connected with %s driver . . . .", cfg.CacheDriver)
+		log.Print("Redis connection pool created . . . .")
 	})
 }

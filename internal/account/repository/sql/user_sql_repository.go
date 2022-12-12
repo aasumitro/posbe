@@ -122,5 +122,5 @@ func scanData(row *sql.Row) (data *domain.User, err error) {
 }
 
 func NewUserSQlRepository() domain.ICRUDRepository[domain.User] {
-	return &UserSQLRepository{Db: config.Db}
+	return &UserSQLRepository{Db: config.DbPool}
 }

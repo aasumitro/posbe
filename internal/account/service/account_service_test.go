@@ -76,13 +76,13 @@ func (suite *accountTestSuite) SetupSuite() {
 		Message: "UNEXPECTED",
 	}
 
-	config.RedisCache = redis.NewClient(&redis.Options{
+	config.RedisPool = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
 }
 
 func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnModel() {
-	config.RedisCache = redis.NewClient(&redis.Options{
+	config.RedisPool = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
 	cacheMock := new(mocks.Cache)
@@ -105,7 +105,7 @@ func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnM
 }
 
 func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnString() {
-	config.RedisCache = redis.NewClient(&redis.Options{
+	config.RedisPool = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
 	cacheMock := new(mocks.Cache)
@@ -117,7 +117,7 @@ func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnS
 		On("All", mock.Anything).
 		Return(nil, nil).Once()
 	dataJson, _ := json.Marshal(suite.roles)
-	config.RedisCache.Set(context.TODO(), "roles", dataJson, 1)
+	config.RedisPool.Set(context.TODO(), "roles", dataJson, 1)
 	cacheMock.On("CacheFirstData", &utils.CacheDataSupplied{
 		Key: "roles",
 		Ttl: time.Hour * 1,

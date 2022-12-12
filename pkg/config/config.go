@@ -14,9 +14,9 @@ var (
 	dbOnce         sync.Once
 	redisCacheOnce sync.Once
 
-	Cfg        *Config
-	Db         *sql.DB
-	RedisCache *redis.Client
+	Cfg       *Config
+	DbPool    *sql.DB
+	RedisPool *redis.Client
 )
 
 type Config struct {
