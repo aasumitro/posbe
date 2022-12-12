@@ -11,27 +11,11 @@ import (
 	"time"
 )
 
-// TODO
-// ADD DATA CACHE
-// 1. SEARCH FROM CACHE
-// 2. DATA IS NOT CACHED
-// 3. GET FROM STORAGE
-// 4. STORE TO CACHE
-// 5. RETURN DATA
-
-// TODO WRAP IN-MEMORY & IN-STORAGE DB;
-// getDataFromCacheRepo(ctx, func() {
-//    return getDataFromStorageRepo()
-//})
-// if data not found on memory
-// then load data from storage
-// store data from storage to memory
-// then return data to user
-
 type accountService struct {
 	ctx      context.Context
 	roleRepo domain.ICRUDRepository[domain.Role]
 	userRepo domain.ICRUDRepository[domain.User]
+	pwd      utils.IPassword
 }
 
 var (
@@ -123,6 +107,9 @@ func (service accountService) AddUser(data *domain.User) (user *domain.User, err
 	if password != "" {
 		u := utils.Password{Stored: "", Supplied: password}
 		pwd, err := u.HashPassword()
+		if service.pwd != nil {
+			pwd, err = service.pwd.HashPassword()
+		}
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -143,6 +130,9 @@ func (service accountService) EditUser(data *domain.User) (user *domain.User, er
 	if password != "" {
 		u := utils.Password{Stored: "", Supplied: password}
 		pwd, err := u.HashPassword()
+		if service.pwd != nil {
+			pwd, err = service.pwd.HashPassword()
+		}
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -189,6 +179,9 @@ func (service accountService) VerifyUserCredentials(username, password string) (
 
 	u := utils.Password{Stored: user.Password, Supplied: password}
 	ok, err := u.ComparePasswords()
+	if service.pwd != nil {
+		ok, err = service.pwd.ComparePasswords()
+	}
 	if err != nil {
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
@@ -217,5 +210,20 @@ func NewAccountService(
 		ctx:      ctx,
 		roleRepo: roleRepo,
 		userRepo: userRepo,
+	}
+}
+
+// NewAccountServiceTest for testing purpose
+func NewAccountServiceTest(
+	ctx context.Context,
+	roleRepo domain.ICRUDRepository[domain.Role],
+	userRepo domain.ICRUDRepository[domain.User],
+	pwd utils.IPassword,
+) domain.IAccountService {
+	return &accountService{
+		ctx:      ctx,
+		roleRepo: roleRepo,
+		userRepo: userRepo,
+		pwd:      pwd,
 	}
 }

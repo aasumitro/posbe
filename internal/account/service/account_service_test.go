@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/domain/mocks"
 	"github.com/aasumitro/posbe/internal/account/service"
@@ -346,7 +345,6 @@ func (suite *accountTestSuite) TestAccountService_ShowUser_ShouldError() {
 	roleRepoMock.AssertExpectations(suite.T())
 }
 
-// TODO: Create Password Coverage
 func (suite *accountTestSuite) TestAccountService_AddUser_ShouldSuccess() {
 	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
 	userRepoMock := new(mocks.ICRUDRepository[domain.User])
@@ -364,25 +362,20 @@ func (suite *accountTestSuite) TestAccountService_AddUser_ShouldSuccess() {
 }
 
 func (suite *accountTestSuite) TestAccountService_AddUser_ShouldError_Password() {
-	//roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	//userRepoMock := new(mocks.ICRUDRepository[domain.User])
-	//accSvc := service.NewAccountService(context.TODO(),
-	//	roleRepoMock, userRepoMock)
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
 	pwdMock := new(mocks.IPassword)
 	pwdMock.
 		On("HashPassword").
-		Return(nil, errors.New("UNEXPECTED")).
+		Return("", errors.New("UNEXPECTED")).
 		Once()
-	//userRepoMock.
-	//	On("Create", mock.Anything, mock.Anything).
-	//	Once().
-	//	Return(nil, errors.New("UNEXPECTED"))
-	fmt.Println(pwdMock.HashPassword())
-	//data, err := accSvc.AddUser(suite.users[1])
-	//require.Nil(suite.T(), data)
-	//require.NotNil(suite.T(), err)
-	//require.Equal(suite.T(), err, suite.svcErr)
-	//pwdMock.AssertExpectations(suite.T())
+	accSvc := service.NewAccountServiceTest(context.TODO(),
+		roleRepoMock, userRepoMock, pwdMock)
+	data, err := accSvc.AddUser(suite.users[1])
+	require.Nil(suite.T(), data)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, suite.svcErr)
+	userRepoMock.AssertExpectations(suite.T())
 }
 
 func (suite *accountTestSuite) TestAccountService_AddUser_ShouldError() {
@@ -417,6 +410,23 @@ func (suite *accountTestSuite) TestAccountService_EditUser_ShouldSuccess() {
 	roleRepoMock.AssertExpectations(suite.T())
 }
 
+func (suite *accountTestSuite) TestAccountService_EditUser_ShouldError_Password() {
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	pwdMock := new(mocks.IPassword)
+	pwdMock.
+		On("HashPassword").
+		Return("", errors.New("UNEXPECTED")).
+		Once()
+	accSvc := service.NewAccountServiceTest(context.TODO(),
+		roleRepoMock, userRepoMock, pwdMock)
+	data, err := accSvc.EditUser(suite.users[1])
+	require.Nil(suite.T(), data)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, suite.svcErr)
+	userRepoMock.AssertExpectations(suite.T())
+}
+
 func (suite *accountTestSuite) TestAccountService_EditUser_ShouldError() {
 	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
 	userRepoMock := new(mocks.ICRUDRepository[domain.User])
@@ -432,8 +442,6 @@ func (suite *accountTestSuite) TestAccountService_EditUser_ShouldError() {
 	require.Equal(suite.T(), err, suite.svcErr)
 	roleRepoMock.AssertExpectations(suite.T())
 }
-
-// END TODO
 
 func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldSuccess() {
 	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
@@ -521,8 +529,8 @@ func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldEr
 	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
 	userRepoMock := new(mocks.ICRUDRepository[domain.User])
 	pwdUtil := new(mocks.IPassword)
-	accSvc := service.NewAccountService(context.TODO(),
-		roleRepoMock, userRepoMock)
+	accSvc := service.NewAccountServiceTest(context.TODO(),
+		roleRepoMock, userRepoMock, pwdUtil)
 	userRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().

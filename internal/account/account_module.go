@@ -21,7 +21,8 @@ var (
 func InitAccountModule(ctx context.Context, router *gin.Engine) {
 	userRepository = repository.NewUserSQlRepository()
 	roleRepository = repository.NewRoleSQlRepository()
-	accountService := service.NewAccountService(ctx, roleRepository, userRepository)
+	accountService := service.NewAccountService(ctx,
+		roleRepository, userRepository)
 	shouldCacheData(ctx)
 	routerGroup := router.Group("v1")
 	http.NewAuthHandler(accountService, routerGroup)

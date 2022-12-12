@@ -133,7 +133,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_FindBY_ExpectedSuccess(
 		q += "r.id as role_id, r.name as role_name, r.description FROM users as u "
 		q += "JOIN roles as r ON r.id = u.role_id WHERE "
 		q += tt.args
-		q += "LIMIT 1"
+		q += " LIMIT 1"
 		expectedQuery := regexp.QuoteMeta(q)
 		suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
 		res, err := suite.userRepo.Find(context.TODO(), tt.key, tt.value)
