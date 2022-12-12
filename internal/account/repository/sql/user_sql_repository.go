@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type UserSQLRepository struct {
@@ -63,7 +64,7 @@ func (repo UserSQLRepository) Find(ctx context.Context, key domain.FindWith, val
 		q += "u.phone = $1"
 	}
 
-	q += "LIMIT 1"
+	q += " LIMIT 1"
 
 	row := repo.Db.QueryRowContext(ctx, q, val)
 	return scanData(row)
@@ -120,6 +121,6 @@ func scanData(row *sql.Row) (data *domain.User, err error) {
 	}, nil
 }
 
-func NewUserSQlRepository(db *sql.DB) domain.ICRUDRepository[domain.User] {
-	return &UserSQLRepository{Db: db}
+func NewUserSQlRepository() domain.ICRUDRepository[domain.User] {
+	return &UserSQLRepository{Db: config.Db}
 }

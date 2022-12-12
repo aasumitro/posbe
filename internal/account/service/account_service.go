@@ -2,10 +2,13 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"net/http"
+	"time"
 )
 
 // TODO
@@ -31,20 +34,45 @@ type accountService struct {
 	userRepo domain.ICRUDRepository[domain.User]
 }
 
-func (service accountService) RoleList() (roles []*domain.Role, errorData *utils.ServiceError) {
-	data, err := service.roleRepo.All(service.ctx)
+var (
+	roleCacheKey = "roles"
+)
 
-	return utils.ValidateDataRows[domain.Role](data, err)
+func (service accountService) RoleList() (roles []*domain.Role, errorData *utils.ServiceError) {
+	helper := utils.RedisCache{Ctx: service.ctx, RdpConn: config.RedisCache}
+	data, err := helper.CacheFirstData(&utils.CacheDataSupplied{
+		Key: roleCacheKey,
+		Ttl: time.Hour * 1,
+		CbF: func() (data any, err error) {
+			return service.roleRepo.All(service.ctx)
+		},
+	})
+
+	if data, ok := data.([]*domain.Role); ok {
+		roles = data
+	}
+
+	if data, ok := data.(string); ok {
+		var r []*domain.Role
+		_ = json.Unmarshal([]byte(data), &r)
+		roles = r
+	}
+
+	return utils.ValidateDataRows[domain.Role](roles, err)
 }
 
 func (service accountService) AddRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
 	data, err := service.roleRepo.Create(service.ctx, data)
+
+	config.RedisCache.Del(service.ctx, roleCacheKey)
 
 	return utils.ValidateDataRow[domain.Role](data, err)
 }
 
 func (service accountService) EditRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
 	data, err := service.roleRepo.Update(service.ctx, data)
+
+	config.RedisCache.Del(service.ctx, roleCacheKey)
 
 	return utils.ValidateDataRow[domain.Role](data, err)
 }
@@ -72,6 +100,8 @@ func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError 
 			Message: err.Error(),
 		}
 	}
+
+	config.RedisCache.Del(service.ctx, roleCacheKey)
 
 	return nil
 }

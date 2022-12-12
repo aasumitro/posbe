@@ -101,8 +101,7 @@ definitions:
     - y_pos
     type: object
   domain.StoreSetting:
-    additionalProperties:
-      type: string
+    additionalProperties: true
     type: object
   domain.Subcategory:
     properties:

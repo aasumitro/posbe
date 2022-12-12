@@ -2,23 +2,27 @@ package service_test
 
 import (
 	"context"
-	"database/sql"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/domain/mocks"
 	"github.com/aasumitro/posbe/internal/account/service"
+	"github.com/aasumitro/posbe/pkg/config"
 	svcErr "github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/alicebob/miniredis/v2"
+	"github.com/go-redis/redis/v9"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"testing"
+	"time"
 )
 
 type accountTestSuite struct {
 	suite.Suite
-	Db     *sql.DB
 	role   *domain.Role
 	roles  []*domain.Role
 	user   *domain.User
@@ -72,23 +76,60 @@ func (suite *accountTestSuite) SetupSuite() {
 		Code:    500,
 		Message: "UNEXPECTED",
 	}
+
+	config.RedisCache = redis.NewClient(&redis.Options{
+		Addr: miniredis.RunT(suite.T()).Addr(),
+	})
 }
 
-func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess() {
+func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnModel() {
+	config.RedisCache = redis.NewClient(&redis.Options{
+		Addr: miniredis.RunT(suite.T()).Addr(),
+	})
+	cacheMock := new(mocks.Cache)
 	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
 	userRepoMock := new(mocks.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
+
 	roleRepoMock.
 		On("All", mock.Anything).
-		Once().
-		Return(suite.roles, nil)
+		Return(suite.roles, nil).Once()
+	cacheMock.On("CacheFirstData", mock.Anything).
+		Return(suite.roles, nil).Once()
 
 	data, err := accSvc.RoleList()
 	require.Nil(suite.T(), err)
 	require.NotNil(suite.T(), data)
 	require.Equal(suite.T(), data, suite.roles)
 	roleRepoMock.AssertExpectations(suite.T())
+}
+
+func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnString() {
+	config.RedisCache = redis.NewClient(&redis.Options{
+		Addr: miniredis.RunT(suite.T()).Addr(),
+	})
+	cacheMock := new(mocks.Cache)
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	accSvc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	roleRepoMock.
+		On("All", mock.Anything).
+		Return(nil, nil).Once()
+	dataJson, _ := json.Marshal(suite.roles)
+	config.RedisCache.Set(context.TODO(), "roles", dataJson, 1)
+	cacheMock.On("CacheFirstData", &utils.CacheDataSupplied{
+		Key: "roles",
+		Ttl: time.Hour * 1,
+		CbF: nil,
+	}).Return(dataJson, nil).Once()
+	data, err := accSvc.RoleList()
+	suite.T().Log(data)
+	suite.T().Log(err)
+	require.Nil(suite.T(), err)
+	require.NotNil(suite.T(), data)
+	require.Equal(suite.T(), data, suite.roles)
 }
 
 func (suite *accountTestSuite) TestAccountService_RoleList_ShouldError() {
@@ -320,6 +361,28 @@ func (suite *accountTestSuite) TestAccountService_AddUser_ShouldSuccess() {
 	require.NotNil(suite.T(), data)
 	require.Equal(suite.T(), data, suite.users[1])
 	roleRepoMock.AssertExpectations(suite.T())
+}
+
+func (suite *accountTestSuite) TestAccountService_AddUser_ShouldError_Password() {
+	//roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	//userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	//accSvc := service.NewAccountService(context.TODO(),
+	//	roleRepoMock, userRepoMock)
+	pwdMock := new(mocks.IPassword)
+	pwdMock.
+		On("HashPassword").
+		Return(nil, errors.New("UNEXPECTED")).
+		Once()
+	//userRepoMock.
+	//	On("Create", mock.Anything, mock.Anything).
+	//	Once().
+	//	Return(nil, errors.New("UNEXPECTED"))
+	fmt.Println(pwdMock.HashPassword())
+	//data, err := accSvc.AddUser(suite.users[1])
+	//require.Nil(suite.T(), data)
+	//require.NotNil(suite.T(), err)
+	//require.Equal(suite.T(), err, suite.svcErr)
+	//pwdMock.AssertExpectations(suite.T())
 }
 
 func (suite *accountTestSuite) TestAccountService_AddUser_ShouldError() {

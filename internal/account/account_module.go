@@ -18,30 +18,30 @@ var (
 	roleRepository domain.ICRUDRepository[domain.Role]
 )
 
-func InitAccountModule(ctx context.Context, config *config.Config, router *gin.Engine) {
-	userRepository = repository.NewUserSQlRepository(config.GetDbConn())
-	roleRepository = repository.NewRoleSQlRepository(config.GetDbConn())
+func InitAccountModule(ctx context.Context, router *gin.Engine) {
+	userRepository = repository.NewUserSQlRepository()
+	roleRepository = repository.NewRoleSQlRepository()
 	accountService := service.NewAccountService(ctx, roleRepository, userRepository)
-	shouldCacheData(ctx, config)
+	shouldCacheData(ctx)
 	routerGroup := router.Group("v1")
-	http.NewAuthHandler(accountService, config, routerGroup)
+	http.NewAuthHandler(accountService, routerGroup)
 	protectedRouter := routerGroup.
-		Use(middleware.Auth(config.JWTSecretKey)).
+		Use(middleware.Auth()).
 		Use(middleware.ActivityObserver())
-	http.NewRoleHandler(accountService, protectedRouter, config.GetRedisConnection())
+	http.NewRoleHandler(accountService, protectedRouter)
 	http.NewUserHandler(accountService, protectedRouter)
 }
 
-func shouldCacheData(ctx context.Context, config *config.Config) {
+func shouldCacheData(ctx context.Context) {
 	// run this at first booting
-	if err := config.GetRedisConnection().
+	if err := config.RedisCache.
 		Get(ctx, "roles").
 		Err(); err != nil && err == redis.Nil {
 		if roles, err := roleRepository.All(ctx); err == nil {
 			// encode given data
 			jsonData, _ := json.Marshal(roles)
 			// store data to redis
-			config.GetRedisConnection().Set(ctx,
+			config.RedisCache.Set(ctx,
 				"roles", jsonData, 0)
 		}
 	}
