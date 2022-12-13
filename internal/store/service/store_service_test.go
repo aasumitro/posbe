@@ -197,7 +197,19 @@ func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorWhenFind() 
 	require.Equal(suite.T(), err, suite.svcErr)
 	floorRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorWhenFindNotFound() {
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteFloor(suite.floor)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	floorRepoMock.AssertExpectations(suite.T())
+}
 func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorHasTables() {
 	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
 	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
@@ -370,7 +382,21 @@ func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenFind() 
 	require.Equal(suite.T(), err, suite.svcErr)
 	tableRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenFindNotFound() {
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
+	svc := service.NewStoreService(context.TODO(),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		tableRepoMock,
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
+	tableRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteTable(suite.table)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	tableRepoMock.AssertExpectations(suite.T())
+}
 func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenDelete() {
 	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
@@ -528,7 +554,21 @@ func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenFind() {
 	require.Equal(suite.T(), err, suite.svcErr)
 	roomRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenFindNotFound() {
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
+	svc := service.NewStoreService(context.TODO(),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
+		roomRepoMock)
+	roomRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteRoom(suite.room)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	roomRepoMock.AssertExpectations(suite.T())
+}
 func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenDelete() {
 	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),

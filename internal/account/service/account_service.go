@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/pkg/config"
@@ -64,6 +65,13 @@ func (service accountService) EditRole(data *domain.Role) (role *domain.Role, er
 func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError {
 	role, err := service.roleRepo.Find(service.ctx, domain.FindWithId, data.ID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -151,6 +159,13 @@ func (service accountService) EditUser(data *domain.User) (user *domain.User, er
 func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError {
 	user, err := service.userRepo.Find(service.ctx, domain.FindWithId, data.ID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -171,6 +186,13 @@ func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError 
 func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
 	user, err := service.userRepo.Find(service.ctx, domain.FindWithUsername, username)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),

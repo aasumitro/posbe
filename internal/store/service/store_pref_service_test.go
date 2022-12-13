@@ -92,7 +92,19 @@ func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldErrorWhe
 	})
 	repo.AssertExpectations(suite.T())
 }
-
+func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldErrorWhenFindNotFound() {
+	repo := new(mocks.IStorePrefRepository)
+	svc := service.NewStorePrefService(context.TODO(), repo)
+	repo.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	data, err := svc.UpdatePrefs("test", "test")
+	require.Nil(suite.T(), data)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	repo.AssertExpectations(suite.T())
+}
 func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldErrorWhenDelete() {
 	repo := new(mocks.IStorePrefRepository)
 	svc := service.NewStorePrefService(context.TODO(), repo)

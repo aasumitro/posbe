@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
@@ -37,6 +38,13 @@ func (service storeService) EditFloor(data *domain.Floor) (floor *domain.Floor, 
 func (service storeService) DeleteFloor(data *domain.Floor) *utils.ServiceError {
 	floor, err := service.floorRepo.Find(service.ctx, domain.FindWithId, data.ID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -82,6 +90,13 @@ func (service storeService) EditTable(data *domain.Table) (table *domain.Table, 
 func (service storeService) DeleteTable(data *domain.Table) *utils.ServiceError {
 	table, err := service.tableRepo.Find(service.ctx, domain.FindWithId, data.ID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -120,6 +135,13 @@ func (service storeService) EditRoom(data *domain.Room) (room *domain.Room, errD
 func (service storeService) DeleteRoom(data *domain.Room) *utils.ServiceError {
 	room, err := service.roomRepo.Find(service.ctx, domain.FindWithId, data.ID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),

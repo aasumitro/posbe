@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"github.com/aasumitro/posbe/domain"
@@ -228,7 +229,20 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldSuccess() {
 	require.Nil(suite.T(), err)
 	roleRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *accountTestSuite) TestService_DeleteRole_ShouldErrorWhenFindNotFound() {
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	svc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	roleRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteRole(suite.role)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	roleRepoMock.AssertExpectations(suite.T())
+}
 func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorInternal() {
 	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
 	userRepoMock := new(mocks.ICRUDRepository[domain.User])
@@ -460,7 +474,20 @@ func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldSuccess() {
 	require.Nil(suite.T(), err)
 	roleRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *accountTestSuite) TestService_DeleteUser_ShouldErrorWhenFindNotFound() {
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	svc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	userRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteUser(suite.user)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	userRepoMock.AssertExpectations(suite.T())
+}
 func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldErrorWhenFind() {
 	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
 	userRepoMock := new(mocks.ICRUDRepository[domain.User])
@@ -524,7 +551,23 @@ func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldEr
 	require.Nil(suite.T(), user)
 	roleRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorWhenFindNotFound() {
+	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	svc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	userRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	user, err := svc.VerifyUserCredentials(suite.user.Username, suite.user.Password)
+	require.NotNil(suite.T(), err)
+	require.Nil(suite.T(), user)
+	roleRepoMock.AssertExpectations(suite.T())
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	userRepoMock.AssertExpectations(suite.T())
+}
 func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorComparePassword() {
 	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
 	userRepoMock := new(mocks.ICRUDRepository[domain.User])

@@ -62,7 +62,7 @@ func (handler userHandler) show(ctx *gin.Context) {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
-
+	user.Password = ""
 	utils.NewHttpRespond(ctx, http.StatusOK, user)
 }
 
@@ -96,7 +96,7 @@ func (handler userHandler) store(ctx *gin.Context) {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
-
+	user.Password = ""
 	utils.NewHttpRespond(ctx, http.StatusCreated, user)
 }
 
@@ -142,7 +142,7 @@ func (handler userHandler) update(ctx *gin.Context) {
 		utils.NewHttpRespond(ctx, err.Code, err.Message)
 		return
 	}
-
+	user.Password = ""
 	utils.NewHttpRespond(ctx, http.StatusOK, user)
 }
 
