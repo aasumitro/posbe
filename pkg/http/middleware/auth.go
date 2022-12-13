@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -8,11 +9,11 @@ import (
 )
 
 // Auth expected tobe logged in
-func Auth(jwtSignature string) gin.HandlerFunc {
+func Auth() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		tokenCookie, err := context.Request.Cookie("jwt")
 		if err != nil {
-			context.AbortWithStatusJSON(http.StatusUnauthorized, err)
+			context.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return
 		}
 
@@ -20,16 +21,15 @@ func Auth(jwtSignature string) gin.HandlerFunc {
 			tokenCookie.Value,
 			&utils.JWTClaim{},
 			func(token *jwt.Token) (interface{}, error) {
-				return []byte(jwtSignature), nil
+				return []byte(config.Cfg.JWTSecretKey), nil
 			},
-		); err != nil &&!token.Valid {
-			utils.NewHttpRespond(context, http.StatusUnauthorized, "TOKEN_NOT_VALID")
+		); err != nil && !token.Valid {
+			context.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return
 		} else {
 			claims, ok := token.Claims.(*utils.JWTClaim)
 			if !ok {
-				utils.NewHttpRespond(context, http.StatusUnauthorized, "TOKEN_NOT_VALID")
-				context.Abort()
+				context.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 				return
 			}
 			context.Set("payload", claims.Payload)

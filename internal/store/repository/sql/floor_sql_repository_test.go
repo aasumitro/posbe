@@ -2,11 +2,11 @@ package sql_test
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/store/repository/sql"
+	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"regexp"
@@ -22,16 +22,15 @@ type floorRepositoryTestSuite struct {
 
 func (suite *floorRepositoryTestSuite) SetupSuite() {
 	var (
-		db  *sql.DB
 		err error
 	)
 
-	db, suite.mock, err = sqlmock.New(
+	config.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
 
-	suite.floorRepo = repoSql.NewFloorSQLRepository(db)
+	suite.floorRepo = repoSql.NewFloorSQLRepository()
 }
 
 func (suite *floorRepositoryTestSuite) AfterTest(_, _ string) {
@@ -95,7 +94,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Find_ExpectedSuccess(
 		AddRow(1, "test", 1, 1, "13123", "123123")
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
 	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
-	q += "floors.created_at, floors.updated_at"
+	q += "floors.created_at, floors.updated_at "
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
 	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
@@ -113,7 +112,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Find_ExpectedError() 
 		AddRow(nil, nil)
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
 	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
-	q += "floors.created_at, floors.updated_at"
+	q += "floors.created_at, floors.updated_at "
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
 	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"

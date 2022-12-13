@@ -9,8 +9,8 @@ import (
 	"github.com/aasumitro/posbe/internal/store"
 	"github.com/aasumitro/posbe/internal/transaction"
 	"github.com/aasumitro/posbe/pkg/config"
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"io"
 	"log"
 	"os"
@@ -23,7 +23,6 @@ import (
 // @license.url   https://github.com/aasumitro/posbe/blob/main/LICENSE
 
 var (
-	appConfig *config.Config
 	appEngine *gin.Engine
 	ctx       = context.Background()
 )
@@ -36,61 +35,58 @@ func init() {
 	initSwaggerInfo()
 }
 
-func main() {
-	// Load registered modules
-	loadModules()
-	// start engine
-	log.Fatal(appEngine.Run(appConfig.AppUrl))
-}
-
 func initConfig() {
-	cfg, err := config.LoadConfig()
-
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; ignore error if desired
-			log.Fatal(".env file not found!, please copy .env.example and paste as .env")
-		}
-
-		log.Fatal(err.Error())
-	}
-
-	appConfig = cfg
+	// Load app environment
+	config.LoadConfig()
 
 	// Init database connection
-	appConfig.InitDbConn()
+	config.Cfg.InitDbConn()
 
 	// Init cache connection
-	appConfig.InitRedisConn()
+	config.Cfg.InitRedisConn()
+
+	if !config.Cfg.AppDebug {
+		config.Cfg.InitCrashReporting()
+		gin.SetMode(gin.ReleaseMode)
+	}
 }
 
 func initEngine() {
-	if !appConfig.AppDebug {
-		gin.SetMode(gin.ReleaseMode)
+	if config.Cfg.AppDebug {
+		accessLogFile, _ := os.Create("./temps/access.log")
+		gin.DefaultWriter = io.MultiWriter(accessLogFile, os.Stdout)
+
+		errorLogFile, _ := os.Create("./temps/errors.log")
+		gin.DefaultErrorWriter = io.MultiWriter(errorLogFile, os.Stdout)
 	}
 
-	accessLogFile, _ := os.Create("./temps/access.log")
-	gin.DefaultWriter = io.MultiWriter(accessLogFile, os.Stdout)
-
-	errorLogFile, _ := os.Create("./temps/errors.log")
-	gin.DefaultErrorWriter = io.MultiWriter(errorLogFile, os.Stdout)
-
 	appEngine = gin.Default()
+
+	if !config.Cfg.AppDebug {
+		appEngine.Use(sentrygin.New(sentrygin.Options{}))
+	}
 }
 
 func initSwaggerInfo() {
 	docs.SwaggerInfo.BasePath = appEngine.BasePath()
-	docs.SwaggerInfo.Title = appConfig.AppName
-	docs.SwaggerInfo.Description = appConfig.AppDescription
-	docs.SwaggerInfo.Version = appConfig.AppVersion
-	docs.SwaggerInfo.Host = appConfig.AppUrl
+	docs.SwaggerInfo.Title = config.Cfg.AppName
+	docs.SwaggerInfo.Description = config.Cfg.AppDescription
+	docs.SwaggerInfo.Version = config.Cfg.AppVersion
+	docs.SwaggerInfo.Host = config.Cfg.AppUrl
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+}
+
+func main() {
+	// Load registered modules
+	loadModules()
+	// start engine
+	log.Fatal(appEngine.Run(config.Cfg.AppUrl))
 }
 
 func loadModules() {
 	_default.InitDefaultModule(appEngine)
-	account.InitAccountModule(ctx, appConfig, appEngine)
-	store.InitStoreModule(ctx, appConfig, appEngine)
-	catalog.InitCatalogModule(ctx, appConfig, appEngine)
-	transaction.InitTransactionModule(ctx, appConfig, appEngine)
+	account.InitAccountModule(ctx, appEngine)
+	store.InitStoreModule(ctx, appEngine)
+	catalog.InitCatalogModule(ctx, appEngine)
+	transaction.InitTransactionModule(ctx, appEngine)
 }

@@ -2,11 +2,11 @@ package sql_test
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/account/repository/sql"
+	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"regexp"
@@ -21,16 +21,15 @@ type userRepositoryTestSuite struct {
 
 func (suite *userRepositoryTestSuite) SetupSuite() {
 	var (
-		db  *sql.DB
 		err error
 	)
 
-	db, suite.mock, err = sqlmock.New(
+	config.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
 
-	suite.userRepo = repoSql.NewUserSQlRepository(db)
+	suite.userRepo = repoSql.NewUserSQlRepository()
 }
 
 func (suite *userRepositoryTestSuite) AfterTest(_, _ string) {
@@ -134,7 +133,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_FindBY_ExpectedSuccess(
 		q += "r.id as role_id, r.name as role_name, r.description FROM users as u "
 		q += "JOIN roles as r ON r.id = u.role_id WHERE "
 		q += tt.args
-		q += "LIMIT 1"
+		q += " LIMIT 1"
 		expectedQuery := regexp.QuoteMeta(q)
 		suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
 		res, err := suite.userRepo.Find(context.TODO(), tt.key, tt.value)

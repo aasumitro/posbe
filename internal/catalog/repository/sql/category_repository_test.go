@@ -2,11 +2,11 @@ package sql_test
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/catalog/repository/sql"
+	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"regexp"
@@ -21,16 +21,15 @@ type categoryRepositoryTestSuite struct {
 
 func (suite *categoryRepositoryTestSuite) SetupSuite() {
 	var (
-		db  *sql.DB
 		err error
 	)
 
-	db, suite.mock, err = sqlmock.New(
+	config.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
 
-	suite.repo = repoSql.NewCategorySQLRepository(db)
+	suite.repo = repoSql.NewCategorySQLRepository()
 }
 
 func (suite *categoryRepositoryTestSuite) AfterTest(_, _ string) {
