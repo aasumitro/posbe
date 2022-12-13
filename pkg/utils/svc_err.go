@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql"
 	"net/http"
 )
 
@@ -25,9 +26,17 @@ func checkError(err error) *ServiceError {
 	var errData *ServiceError = nil
 
 	if err != nil {
-		errData = &ServiceError{
-			Code:    http.StatusInternalServerError,
-			Message: err.Error(),
+		switch err {
+		case sql.ErrNoRows:
+			errData = &ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		default:
+			errData = &ServiceError{
+				Code:    http.StatusInternalServerError,
+				Message: err.Error(),
+			}
 		}
 	}
 

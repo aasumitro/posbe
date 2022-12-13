@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type CategorySQLRepository struct {
@@ -85,6 +86,6 @@ func (repo CategorySQLRepository) Delete(ctx context.Context, params *domain.Cat
 	return err
 }
 
-func NewCategorySQLRepository(db *sql.DB) domain.ICRUDRepository[domain.Category] {
-	return &CategorySQLRepository{Db: db}
+func NewCategorySQLRepository() domain.ICRUDRepository[domain.Category] {
+	return &CategorySQLRepository{Db: config.DbPool}
 }

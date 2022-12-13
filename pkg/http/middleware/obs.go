@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ActivityObserver expected tobe needed role
+// ActivityObserver TODO OBSERVE USER ACTIVITY
 func ActivityObserver() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		payload := context.MustGet("payload")

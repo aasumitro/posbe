@@ -85,15 +85,15 @@ func (handler AuthHandler) logout(ctx *gin.Context) {
 	utils.NewHttpRespond(ctx, http.StatusOK, "LOGGED_OUT")
 }
 
-func NewAuthHandler(accountService domain.IAccountService, config *config.Config, router *gin.RouterGroup) {
+func NewAuthHandler(accountService domain.IAccountService, router *gin.RouterGroup) {
 	handler := AuthHandler{svc: accountService, jwt: &utils.JSONWebToken{
-		Issuer:    config.AppName,
-		SecretKey: []byte(config.JWTSecretKey),
+		Issuer:    config.Cfg.AppName,
+		SecretKey: []byte(config.Cfg.JWTSecretKey),
 		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(time.Duration(config.JWTLifetime) * time.Hour),
+		ExpiredAt: time.Now().Add(time.Duration(config.Cfg.JWTLifetime) * time.Hour),
 	}}
 
 	router.POST("/login", handler.login)
-	protectedRouter := router.Use(middleware.Auth(config.JWTSecretKey))
+	protectedRouter := router.Use(middleware.Auth())
 	protectedRouter.POST("/logout", handler.logout)
 }

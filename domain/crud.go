@@ -21,6 +21,8 @@ type ICRUDRepository[T any] interface {
 	Delete(ctx context.Context, params *T) error
 }
 
+// ICRUDAddOnRepository
+// TODO: rename
 type ICRUDAddOnRepository[T any] interface {
 	AllWhere(ctx context.Context, key FindWith, val any) (data []*T, err error)
 	ICRUDRepository[T]

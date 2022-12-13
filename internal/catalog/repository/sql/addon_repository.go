@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type AddonSQLRepository struct {
@@ -34,7 +35,7 @@ func (repo AddonSQLRepository) All(ctx context.Context) (data []*domain.Addon, e
 	return data, nil
 }
 
-func (repo AddonSQLRepository) Find(ctx context.Context, key domain.FindWith, val any) (data *domain.Addon, err error) {
+func (repo AddonSQLRepository) Find(ctx context.Context, _ domain.FindWith, val any) (data *domain.Addon, err error) {
 	q := "SELECT * FROM addons WHERE id = $1 LIMIT 1"
 	row := repo.Db.QueryRowContext(ctx, q, val)
 
@@ -85,6 +86,6 @@ func (repo AddonSQLRepository) Delete(ctx context.Context, params *domain.Addon)
 	return err
 }
 
-func NewAddonSQLRepository(db *sql.DB) domain.ICRUDRepository[domain.Addon] {
-	return &AddonSQLRepository{Db: db}
+func NewAddonSQLRepository() domain.ICRUDRepository[domain.Addon] {
+	return &AddonSQLRepository{Db: config.DbPool}
 }

@@ -2,49 +2,61 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"net/http"
+	"time"
 )
-
-// TODO
-// ADD DATA CACHE
-// 1. SEARCH FROM CACHE
-// 2. DATA IS NOT CACHED
-// 3. GET FROM STORAGE
-// 4. STORE TO CACHE
-// 5. RETURN DATA
-
-// TODO WRAP IN-MEMORY & IN-STORAGE DB;
-// getDataFromCacheRepo(ctx, func() {
-//    return getDataFromStorageRepo()
-//})
-// if data not found on memory
-// then load data from storage
-// store data from storage to memory
-// then return data to user
 
 type accountService struct {
 	ctx      context.Context
 	roleRepo domain.ICRUDRepository[domain.Role]
 	userRepo domain.ICRUDRepository[domain.User]
+	pwd      utils.IPassword
 }
 
-func (service accountService) RoleList() (roles []*domain.Role, errorData *utils.ServiceError) {
-	data, err := service.roleRepo.All(service.ctx)
+var (
+	roleCacheKey = "roles"
+)
 
-	return utils.ValidateDataRows[domain.Role](data, err)
+func (service accountService) RoleList() (roles []*domain.Role, errorData *utils.ServiceError) {
+	helper := utils.RedisCache{Ctx: service.ctx, RdpConn: config.RedisPool}
+	data, err := helper.CacheFirstData(&utils.CacheDataSupplied{
+		Key: roleCacheKey,
+		Ttl: time.Hour * 1,
+		CbF: func() (data any, err error) {
+			return service.roleRepo.All(service.ctx)
+		},
+	})
+
+	if data, ok := data.([]*domain.Role); ok {
+		roles = data
+	}
+
+	if data, ok := data.(string); ok {
+		var r []*domain.Role
+		_ = json.Unmarshal([]byte(data), &r)
+		roles = r
+	}
+
+	return utils.ValidateDataRows[domain.Role](roles, err)
 }
 
 func (service accountService) AddRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
 	data, err := service.roleRepo.Create(service.ctx, data)
+
+	config.RedisPool.Del(service.ctx, roleCacheKey)
 
 	return utils.ValidateDataRow[domain.Role](data, err)
 }
 
 func (service accountService) EditRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
 	data, err := service.roleRepo.Update(service.ctx, data)
+
+	config.RedisPool.Del(service.ctx, roleCacheKey)
 
 	return utils.ValidateDataRow[domain.Role](data, err)
 }
@@ -73,6 +85,8 @@ func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError 
 		}
 	}
 
+	config.RedisPool.Del(service.ctx, roleCacheKey)
+
 	return nil
 }
 
@@ -93,6 +107,9 @@ func (service accountService) AddUser(data *domain.User) (user *domain.User, err
 	if password != "" {
 		u := utils.Password{Stored: "", Supplied: password}
 		pwd, err := u.HashPassword()
+		if service.pwd != nil {
+			pwd, err = service.pwd.HashPassword()
+		}
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -113,6 +130,9 @@ func (service accountService) EditUser(data *domain.User) (user *domain.User, er
 	if password != "" {
 		u := utils.Password{Stored: "", Supplied: password}
 		pwd, err := u.HashPassword()
+		if service.pwd != nil {
+			pwd, err = service.pwd.HashPassword()
+		}
 		if err != nil {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusInternalServerError,
@@ -159,6 +179,9 @@ func (service accountService) VerifyUserCredentials(username, password string) (
 
 	u := utils.Password{Stored: user.Password, Supplied: password}
 	ok, err := u.ComparePasswords()
+	if service.pwd != nil {
+		ok, err = service.pwd.ComparePasswords()
+	}
 	if err != nil {
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
@@ -187,5 +210,20 @@ func NewAccountService(
 		ctx:      ctx,
 		roleRepo: roleRepo,
 		userRepo: userRepo,
+	}
+}
+
+// NewAccountServiceTest for testing purpose
+func NewAccountServiceTest(
+	ctx context.Context,
+	roleRepo domain.ICRUDRepository[domain.Role],
+	userRepo domain.ICRUDRepository[domain.User],
+	pwd utils.IPassword,
+) domain.IAccountService {
+	return &accountService{
+		ctx:      ctx,
+		roleRepo: roleRepo,
+		userRepo: userRepo,
+		pwd:      pwd,
 	}
 }

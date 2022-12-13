@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 	"time"
 )
 
@@ -139,6 +140,6 @@ func (repo TableSQLRepository) Delete(ctx context.Context, params *domain.Table)
 	return err
 }
 
-func NewTableSQLRepository(db *sql.DB) domain.ICRUDAddOnRepository[domain.Table] {
-	return &TableSQLRepository{Db: db}
+func NewTableSQLRepository() domain.ICRUDAddOnRepository[domain.Table] {
+	return &TableSQLRepository{Db: config.DbPool}
 }

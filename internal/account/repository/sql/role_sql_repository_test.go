@@ -2,11 +2,11 @@ package sql_test
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/account/repository/sql"
+	"github.com/aasumitro/posbe/pkg/config"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -26,16 +26,15 @@ type roleRepositoryTestSuite struct {
 // SetupSuite could be used once to load the database with data.
 func (suite *roleRepositoryTestSuite) SetupSuite() {
 	var (
-		db  *sql.DB
 		err error
 	)
 
-	db, suite.mock, err = sqlmock.New(
+	config.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
 
-	suite.roleRepo = repoSql.NewRoleSQlRepository(db)
+	suite.roleRepo = repoSql.NewRoleSQlRepository()
 }
 
 func (suite *roleRepositoryTestSuite) AfterTest(_, _ string) {

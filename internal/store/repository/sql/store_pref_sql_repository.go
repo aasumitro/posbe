@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 	"time"
 )
 
@@ -70,6 +71,6 @@ func (repo StorePrefSQLRepository) Update(ctx context.Context, key, value string
 	}, err
 }
 
-func NewStorePrefSQLRepository(db *sql.DB) domain.IStorePrefRepository {
-	return &StorePrefSQLRepository{Db: db}
+func NewStorePrefSQLRepository() domain.IStorePrefRepository {
+	return &StorePrefSQLRepository{Db: config.DbPool}
 }

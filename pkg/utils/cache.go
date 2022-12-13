@@ -8,12 +8,12 @@ import (
 )
 
 type (
-	FNCache func() (data any, err *ServiceError)
+	FNCache func() (data any, err error)
 
 	// Cache Interface
 	// maybe not just for redis
 	Cache interface {
-		CacheFirstData(i *CacheDataSupplied) (data any, err *ServiceError)
+		CacheFirstData(i *CacheDataSupplied) (data any, err error)
 	}
 
 	RedisCache struct {
@@ -28,7 +28,7 @@ type (
 	}
 )
 
-func (cache *RedisCache) CacheFirstData(i *CacheDataSupplied) (data any, err *ServiceError) {
+func (cache *RedisCache) CacheFirstData(i *CacheDataSupplied) (data any, err error) {
 	// load data from redis
 	valueCache, errCache := cache.RdpConn.Get(cache.Ctx, i.Key).Result()
 	// if error, load data from repository

@@ -1,30 +1,26 @@
 package config
 
 import (
+	"context"
+	"fmt"
 	"github.com/go-redis/redis/v9"
 	"log"
 )
 
-var redisCache *redis.Client
-
 func (cfg Config) InitRedisConn() {
-	log.Println("Trying to open redis connection . . . .")
+	log.Println("Trying to open redis connection pool . . . .")
 
-	if cfg.CacheDriver == "redis" {
-		redisCache = redis.NewClient(&redis.Options{
+	redisCacheOnce.Do(func() {
+		RedisPool = redis.NewClient(&redis.Options{
 			Addr:     cfg.CacheDsnUrl,
 			Password: "", // no password set
 			DB:       0,  // use default DB
 		})
-	}
 
-	log.Printf("Cache connected with %s driver . . . .", cfg.CacheDriver)
-}
+		if err := RedisPool.Ping(context.Background()).Err(); err != nil {
+			panic(fmt.Sprintf("REDIS_ERROR: %s", err.Error()))
+		}
 
-func (cfg Config) GetRedisConnection() *redis.Client {
-	if cfg.CacheDriver == "redis" {
-		return redisCache
-	}
-
-	return nil
+		log.Print("Redis connection pool created . . . .")
+	})
 }
