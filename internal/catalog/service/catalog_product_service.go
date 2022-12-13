@@ -10,7 +10,7 @@ import (
 
 type catalogProductService struct {
 	ctx                context.Context
-	productRepo        domain.ICRUDAddOnRepository[domain.Product]
+	productRepo        domain.ICRUDWithSearchRepository[domain.Product]
 	productVariantRepo domain.ICRUDRepository[domain.ProductVariant]
 }
 
@@ -55,7 +55,7 @@ func (service catalogProductService) DeleteProductVariant(data *domain.ProductVa
 
 func NewCatalogProductService(
 	ctx context.Context,
-	productRepo domain.ICRUDAddOnRepository[domain.Product],
+	productRepo domain.ICRUDWithSearchRepository[domain.Product],
 	productVariantRepo domain.ICRUDRepository[domain.ProductVariant],
 ) domain.ICatalogProductService {
 	return &catalogProductService{

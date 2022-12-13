@@ -34,7 +34,7 @@ func (suite *catalogProductService) SetupSuite() {
 func (suite *catalogProductService) TestService_AddVariant_ShouldSuccess() {
 	repoMock := new(mocks.ICRUDRepository[domain.ProductVariant])
 	svc := service.NewCatalogProductService(context.TODO(),
-		new(mocks.ICRUDAddOnRepository[domain.Product]), repoMock)
+		new(mocks.ICRUDWithSearchRepository[domain.Product]), repoMock)
 	repoMock.On("Create", mock.Anything, mock.Anything).
 		Return(suite.variant, nil).Once()
 	data, err := svc.AddProductVariant(suite.variant)
@@ -46,7 +46,7 @@ func (suite *catalogProductService) TestService_AddVariant_ShouldSuccess() {
 func (suite *catalogProductService) TestService_AddVariant_ShouldError() {
 	repoMock := new(mocks.ICRUDRepository[domain.ProductVariant])
 	svc := service.NewCatalogProductService(context.TODO(),
-		new(mocks.ICRUDAddOnRepository[domain.Product]), repoMock)
+		new(mocks.ICRUDWithSearchRepository[domain.Product]), repoMock)
 	repoMock.On("Create", mock.Anything, mock.Anything).
 		Return(nil, errors.New("UNEXPECTED")).Once()
 	data, err := svc.AddProductVariant(suite.variant)
@@ -59,7 +59,7 @@ func (suite *catalogProductService) TestService_AddVariant_ShouldError() {
 func (suite *catalogProductService) TestService_EditVariant_ShouldSuccess() {
 	repoMock := new(mocks.ICRUDRepository[domain.ProductVariant])
 	svc := service.NewCatalogProductService(context.TODO(),
-		new(mocks.ICRUDAddOnRepository[domain.Product]), repoMock)
+		new(mocks.ICRUDWithSearchRepository[domain.Product]), repoMock)
 	repoMock.On("Update", mock.Anything, mock.Anything).
 		Return(suite.variant, nil).Once()
 	data, err := svc.EditProductVariant(suite.variant)
@@ -71,7 +71,7 @@ func (suite *catalogProductService) TestService_EditVariant_ShouldSuccess() {
 func (suite *catalogProductService) TestService_EditVariant_ShouldError() {
 	repoMock := new(mocks.ICRUDRepository[domain.ProductVariant])
 	svc := service.NewCatalogProductService(context.TODO(),
-		new(mocks.ICRUDAddOnRepository[domain.Product]), repoMock)
+		new(mocks.ICRUDWithSearchRepository[domain.Product]), repoMock)
 	repoMock.On("Update", mock.Anything, mock.Anything).
 		Return(nil, errors.New("UNEXPECTED")).Once()
 	data, err := svc.EditProductVariant(suite.variant)
@@ -84,7 +84,7 @@ func (suite *catalogProductService) TestService_EditVariant_ShouldError() {
 func (suite *catalogProductService) TestService_DeleteVariant_ShouldSuccess() {
 	repoMock := new(mocks.ICRUDRepository[domain.ProductVariant])
 	svc := service.NewCatalogProductService(context.TODO(),
-		new(mocks.ICRUDAddOnRepository[domain.Product]), repoMock)
+		new(mocks.ICRUDWithSearchRepository[domain.Product]), repoMock)
 	repoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Return(suite.variant, nil).Once()
@@ -98,7 +98,7 @@ func (suite *catalogProductService) TestService_DeleteVariant_ShouldSuccess() {
 func (suite *catalogProductService) TestService_DeleteVariant_ShouldErrorWhenFind() {
 	repoMock := new(mocks.ICRUDRepository[domain.ProductVariant])
 	svc := service.NewCatalogProductService(context.TODO(),
-		new(mocks.ICRUDAddOnRepository[domain.Product]), repoMock)
+		new(mocks.ICRUDWithSearchRepository[domain.Product]), repoMock)
 	repoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -111,7 +111,7 @@ func (suite *catalogProductService) TestService_DeleteVariant_ShouldErrorWhenFin
 func (suite *catalogProductService) TestService_DeleteVariant_ShouldErrorWhenFindNotFound() {
 	repoMock := new(mocks.ICRUDRepository[domain.ProductVariant])
 	svc := service.NewCatalogProductService(context.TODO(),
-		new(mocks.ICRUDAddOnRepository[domain.Product]), repoMock)
+		new(mocks.ICRUDWithSearchRepository[domain.Product]), repoMock)
 	repoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -124,7 +124,7 @@ func (suite *catalogProductService) TestService_DeleteVariant_ShouldErrorWhenFin
 func (suite *catalogProductService) TestService_DeleteVariant_ShouldErrorWhenDelete() {
 	repoMock := new(mocks.ICRUDRepository[domain.ProductVariant])
 	svc := service.NewCatalogProductService(context.TODO(),
-		new(mocks.ICRUDAddOnRepository[domain.Product]), repoMock)
+		new(mocks.ICRUDWithSearchRepository[domain.Product]), repoMock)
 	repoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Return(suite.variant, nil).Once()

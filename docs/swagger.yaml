@@ -52,6 +52,34 @@ definitions:
     required:
     - name
     type: object
+  domain.ProductVariant:
+    properties:
+      description:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: integer
+      type:
+        type: string
+      unit:
+        $ref: '#/definitions/domain.Unit'
+      unit_id:
+        type: integer
+      unit_size:
+        type: number
+    required:
+    - name
+    - price
+    - product_id
+    - type
+    - unit_id
+    - unit_size
+    type: object
   domain.Role:
     properties:
       description:
@@ -196,6 +224,14 @@ definitions:
         type: integer
       valid:
         description: Valid is true if Int64 is not NULL
+        type: boolean
+    type: object
+  sql.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
         type: boolean
     type: object
   utils.ErrorRespond:
@@ -779,6 +815,189 @@ paths:
       summary: Logged User Out
       tags:
       - Auth
+  /v1/products/variants:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create new variant Data.
+      parameters:
+      - description: product_id
+        in: formData
+        name: product_id
+        required: true
+        type: string
+      - description: unit_id
+        in: formData
+        name: unit_id
+        required: true
+        type: string
+      - description: unit_size
+        in: formData
+        name: unit_size
+        required: true
+        type: string
+      - description: type
+        enum:
+        - none
+        - size
+        in: formData
+        name: type
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: description
+        in: formData
+        name: description
+        type: string
+      - description: price
+        in: formData
+        name: price
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: CREATED RESPOND
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.ProductVariant'
+              type: object
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Store variant Data
+      tags:
+      - Product Variants
+  /v1/products/variants/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete variant Data by ID.
+      parameters:
+      - description: variant id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: NO CONTENT RESPOND
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Delete variant Data
+      tags:
+      - Product Variants
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update variant Data by ID.
+      parameters:
+      - description: variant id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: product_id
+        in: formData
+        name: product_id
+        required: true
+        type: string
+      - description: unit_id
+        in: formData
+        name: unit_id
+        required: true
+        type: string
+      - description: unit_size
+        in: formData
+        name: unit_size
+        required: true
+        type: string
+      - description: type
+        enum:
+        - none
+        - size
+        in: formData
+        name: type
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: description
+        in: formData
+        name: description
+        type: string
+      - description: price
+        in: formData
+        name: price
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: CREATED RESPOND
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessRespond'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.ProductVariant'
+              type: object
+        "400":
+          description: BAD REQUEST RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "401":
+          description: UNAUTHORIZED RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+        "422":
+          description: UNPROCESSABLE ENTITY RESPOND
+          schema:
+            $ref: '#/definitions/utils.ValidationErrorRespond'
+        "500":
+          description: INTERNAL SERVER ERROR RESPOND
+          schema:
+            $ref: '#/definitions/utils.ErrorRespond'
+      summary: Update variant Data
+      tags:
+      - Product Variants
   /v1/roles:
     get:
       consumes:
