@@ -2,3 +2,4 @@
 /vendor
 .env
 /mocks
+.DS_Store
