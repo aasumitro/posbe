@@ -5,16 +5,15 @@ import (
 	"github.com/aasumitro/posbe/internal/catalog/handler/http"
 	repository "github.com/aasumitro/posbe/internal/catalog/repository/sql"
 	"github.com/aasumitro/posbe/internal/catalog/service"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func InitCatalogModule(ctx context.Context, router *gin.Engine) {
-	unitRepository := repository.NewUnitSQLRepository(config.DbPool)
-	categoryRepository := repository.NewCategorySQLRepository(config.DbPool)
-	subcategoryRepository := repository.NewSubcategorySQLRepository(config.DbPool)
-	addonRepository := repository.NewAddonSQLRepository(config.DbPool)
+	unitRepository := repository.NewUnitSQLRepository()
+	categoryRepository := repository.NewCategorySQLRepository()
+	subcategoryRepository := repository.NewSubcategorySQLRepository()
+	addonRepository := repository.NewAddonSQLRepository()
 	catalogCommonService := service.NewCatalogCommonService(ctx, unitRepository,
 		categoryRepository, subcategoryRepository, addonRepository)
 	routerGroup := router.Group("v1")

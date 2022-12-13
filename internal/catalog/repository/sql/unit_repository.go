@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type UnitSQLRepository struct {
@@ -85,6 +86,6 @@ func (repo UnitSQLRepository) Delete(ctx context.Context, params *domain.Unit) e
 	return err
 }
 
-func NewUnitSQLRepository(db *sql.DB) domain.ICRUDRepository[domain.Unit] {
-	return &UnitSQLRepository{Db: db}
+func NewUnitSQLRepository() domain.ICRUDRepository[domain.Unit] {
+	return &UnitSQLRepository{Db: config.DbPool}
 }

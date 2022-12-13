@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/config"
 	"time"
 )
 
@@ -44,7 +45,7 @@ func (repo FloorSQLRepository) All(ctx context.Context) (floors []*domain.Floor,
 func (repo FloorSQLRepository) Find(ctx context.Context, _ domain.FindWith, val any) (floor *domain.Floor, err error) {
 	q := "SELECT floors.id, floors.name, COUNT(tables.floor_id) "
 	q += "as total_tables, COUNT(rooms.floor_id) as total_rooms, "
-	q += "floors.created_at, floors.updated_at"
+	q += "floors.created_at, floors.updated_at "
 	q += "FROM floors LEFT OUTER JOIN tables ON tables.floor_id = floors.id "
 	q += "LEFT OUTER JOIN rooms ON rooms.floor_id = floors.id "
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
@@ -98,6 +99,6 @@ func (repo FloorSQLRepository) Delete(ctx context.Context, params *domain.Floor)
 	return err
 }
 
-func NewFloorSQLRepository(db *sql.DB) domain.ICRUDRepository[domain.Floor] {
-	return &FloorSQLRepository{Db: db}
+func NewFloorSQLRepository() domain.ICRUDRepository[domain.Floor] {
+	return &FloorSQLRepository{Db: config.DbPool}
 }

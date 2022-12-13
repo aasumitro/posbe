@@ -23,10 +23,10 @@ var (
 )
 
 func InitStoreModule(ctx context.Context, router *gin.Engine) {
-	floorRepo = repository.NewFloorSQLRepository(config.DbPool)
-	tableRepo = repository.NewTableSQLRepository(config.DbPool)
-	roomRepo = repository.NewRoomSQLRepository(config.DbPool)
-	storePrefRepo = repository.NewStorePrefSQLRepository(config.DbPool)
+	floorRepo = repository.NewFloorSQLRepository()
+	tableRepo = repository.NewTableSQLRepository()
+	roomRepo = repository.NewRoomSQLRepository()
+	storePrefRepo = repository.NewStorePrefSQLRepository()
 	storeService := service.NewStoreService(ctx, floorRepo, tableRepo, roomRepo)
 	storePrefService := service.NewStorePrefService(ctx, storePrefRepo)
 	shouldCacheData(ctx)

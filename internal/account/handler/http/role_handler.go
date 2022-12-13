@@ -5,14 +5,12 @@ import (
 	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v9"
 	"net/http"
 	"strconv"
 )
 
 type roleHandler struct {
-	svc   domain.IAccountService
-	cache *redis.Client
+	svc domain.IAccountService
 }
 
 // roles godoc
