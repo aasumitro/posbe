@@ -85,5 +85,12 @@ type (
 		AddProductVariant(data *ProductVariant) (variant *ProductVariant, errData *utils.ServiceError)
 		EditProductVariant(data *ProductVariant) (variant *ProductVariant, errData *utils.ServiceError)
 		DeleteProductVariant(data *ProductVariant) *utils.ServiceError
+
+		ProductSearch(keys []FindWith, values []any) (products []*Product, errData *utils.ServiceError)
+		ProductList() (products []*Product, errData *utils.ServiceError)
+		ProductDetail(id int) (product *Product, errData *utils.ServiceError)
+		AddProduct(data *Product) (product *Product, errData *utils.ServiceError)
+		EditProduct(data *Product) (product *Product, errData *utils.ServiceError)
+		DeleteProduct(data *Product) *utils.ServiceError
 	}
 )
