@@ -35,17 +35,17 @@ type variantHandler struct {
 func (handler variantHandler) store(ctx *gin.Context) {
 	var form domain.ProductVariant
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	data, err := handler.svc.AddProductVariant(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, data)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, data)
 }
 
 // product_variants godoc
@@ -73,7 +73,7 @@ func (handler variantHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -81,18 +81,18 @@ func (handler variantHandler) update(ctx *gin.Context) {
 
 	var form domain.ProductVariant
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	form.ID = id
 	data, err := handler.svc.EditProductVariant(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, data)
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
 }
 
 // product_variants godoc
@@ -112,7 +112,7 @@ func (handler variantHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -121,11 +121,11 @@ func (handler variantHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteProductVariant(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewProductVariantHandler(svc domain.ICatalogProductService, router gin.IRoutes) {

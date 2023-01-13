@@ -27,7 +27,7 @@ func (service catalogProductService) ProductList() (products []*domain.Product, 
 }
 
 func (service catalogProductService) ProductDetail(id int) (product *domain.Product, errData *utils.ServiceError) {
-	data, err := service.productRepo.Find(service.ctx, domain.FindWithId, id)
+	data, err := service.productRepo.Find(service.ctx, domain.FindWithID, id)
 
 	return utils.ValidateDataRow[domain.Product](data, err)
 }
@@ -53,7 +53,7 @@ func (service catalogProductService) EditProduct(data *domain.Product) (product 
 }
 
 func (service catalogProductService) DeleteProduct(data *domain.Product) *utils.ServiceError {
-	data, err := service.productRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	data, err := service.productRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{
@@ -92,7 +92,7 @@ func (service catalogProductService) EditProductVariant(data *domain.ProductVari
 }
 
 func (service catalogProductService) DeleteProductVariant(data *domain.ProductVariant) *utils.ServiceError {
-	data, err := service.productVariantRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	data, err := service.productVariantRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{

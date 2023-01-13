@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"github.com/getsentry/sentry-go"
@@ -9,7 +9,7 @@ func (cfg Config) InitCrashReporting() {
 	log.Println("Trying to initialize crash reporting handler . . . .")
 
 	if err := sentry.Init(sentry.ClientOptions{
-		Dsn:              cfg.CrashReportDsnUrl,
+		Dsn:              cfg.CrashReportDsnURL,
 		EnableTracing:    true,
 		TracesSampleRate: 1.0,
 	}); err != nil {

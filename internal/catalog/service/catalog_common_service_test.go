@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
 	"github.com/aasumitro/posbe/internal/catalog/service"
+	"github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -33,8 +33,8 @@ func (suite *catalogCommonService) SetupSuite() {
 	suite.units = []*domain.Unit{suite.unit, {ID: 2, Magnitude: "test 2", Name: "test 2", Symbol: "test 2"}}
 	suite.category = &domain.Category{ID: 1, Name: "test"}
 	suite.categories = []*domain.Category{suite.category, {ID: 1, Name: "test 2"}}
-	suite.subcategory = &domain.Subcategory{ID: 1, CategoryId: 1, Name: "test"}
-	suite.subcategories = []*domain.Subcategory{suite.subcategory, {ID: 2, CategoryId: 1, Name: "test 2"}}
+	suite.subcategory = &domain.Subcategory{ID: 1, CategoryID: 1, Name: "test"}
+	suite.subcategories = []*domain.Subcategory{suite.subcategory, {ID: 2, CategoryID: 1, Name: "test 2"}}
 
 	suite.addon = &domain.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
 	suite.addons = []*domain.Addon{suite.addon, {ID: 2, Name: "test 2", Description: "test 2", Price: 2}}

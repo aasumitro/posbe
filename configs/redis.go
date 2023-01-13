@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"context"
@@ -12,7 +12,7 @@ func (cfg Config) InitRedisConn() {
 
 	redisCacheOnce.Do(func() {
 		RedisPool = redis.NewClient(&redis.Options{
-			Addr:     cfg.CacheDsnUrl,
+			Addr:     cfg.CacheDsnURL,
 			Password: "", // no password set
 			DB:       0,  // use default DB
 		})

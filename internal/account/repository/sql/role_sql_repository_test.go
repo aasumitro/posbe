@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/account/repository/sql"
-	"github.com/aasumitro/posbe/pkg/config"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -29,12 +29,12 @@ func (suite *roleRepositoryTestSuite) SetupSuite() {
 		err error
 	)
 
-	config.DbPool, suite.mock, err = sqlmock.New(
+	configs.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
 
-	suite.roleRepo = repoSql.NewRoleSQlRepository()
+	suite.roleRepo = repoSql.NewRoleSQLRepository()
 }
 
 func (suite *roleRepositoryTestSuite) AfterTest(_, _ string) {
@@ -92,7 +92,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Find_ExpectedSuccess() 
 	q += "WHERE roles.id = $1 GROUP BY roles.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(role)
-	res, err := suite.roleRepo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.roleRepo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -107,7 +107,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Find_ExpectedError() {
 	q += "WHERE roles.id = $1 GROUP BY roles.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(role)
-	res, err := suite.roleRepo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.roleRepo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }

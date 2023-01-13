@@ -23,7 +23,7 @@ func ValidateDataRows[T any](data []*T, err error) (valueData []*T, errData *Ser
 }
 
 func checkError(err error) *ServiceError {
-	var errData *ServiceError = nil
+	var errData *ServiceError
 
 	if err != nil {
 		switch err {

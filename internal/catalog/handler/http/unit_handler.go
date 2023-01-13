@@ -26,11 +26,11 @@ type unitHandler struct {
 func (handler unitHandler) fetch(ctx *gin.Context) {
 	data, err := handler.svc.UnitList()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, data)
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
 }
 
 // units godoc
@@ -51,17 +51,17 @@ func (handler unitHandler) fetch(ctx *gin.Context) {
 func (handler unitHandler) store(ctx *gin.Context) {
 	var form domain.Unit
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	data, err := handler.svc.AddUnit(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, data)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, data)
 }
 
 // units godoc
@@ -85,7 +85,7 @@ func (handler unitHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -93,18 +93,18 @@ func (handler unitHandler) update(ctx *gin.Context) {
 
 	var form domain.Unit
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	form.ID = id
 	data, err := handler.svc.EditUnit(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, data)
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
 }
 
 // units godoc
@@ -124,7 +124,7 @@ func (handler unitHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -133,11 +133,11 @@ func (handler unitHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteUnit(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewUnitHandler(svc domain.ICatalogCommonService, router gin.IRoutes) {

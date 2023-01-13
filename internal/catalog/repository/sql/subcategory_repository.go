@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type SubcategorySQLRepository struct {
@@ -24,7 +24,7 @@ func (repo SubcategorySQLRepository) All(ctx context.Context) (data []*domain.Su
 
 		if err := rows.Scan(
 			&subcategories.ID,
-			&subcategories.CategoryId,
+			&subcategories.CategoryID,
 			&subcategories.Name,
 		); err != nil {
 			return nil, err
@@ -43,7 +43,7 @@ func (repo SubcategorySQLRepository) Find(ctx context.Context, _ domain.FindWith
 	data = &domain.Subcategory{}
 	if err := row.Scan(
 		&data.ID,
-		&data.CategoryId,
+		&data.CategoryID,
 		&data.Name,
 	); err != nil {
 		return nil, err
@@ -54,12 +54,12 @@ func (repo SubcategorySQLRepository) Find(ctx context.Context, _ domain.FindWith
 
 func (repo SubcategorySQLRepository) Create(ctx context.Context, params *domain.Subcategory) (data *domain.Subcategory, err error) {
 	q := "INSERT INTO subcategories (category_id, name) VALUES ($1, $2) RETURNING *"
-	row := repo.Db.QueryRowContext(ctx, q, params.CategoryId, params.Name)
+	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.Name)
 
 	data = &domain.Subcategory{}
 	if err := row.Scan(
 		&data.ID,
-		&data.CategoryId,
+		&data.CategoryID,
 		&data.Name,
 	); err != nil {
 		return nil, err
@@ -70,12 +70,12 @@ func (repo SubcategorySQLRepository) Create(ctx context.Context, params *domain.
 
 func (repo SubcategorySQLRepository) Update(ctx context.Context, params *domain.Subcategory) (data *domain.Subcategory, err error) {
 	q := "UPDATE subcategories SET category_id = $1, name = $2 WHERE id = $3 RETURNING *"
-	row := repo.Db.QueryRowContext(ctx, q, params.CategoryId, params.Name, params.ID)
+	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.Name, params.ID)
 
 	data = &domain.Subcategory{}
 	if err := row.Scan(
 		&data.ID,
-		&data.CategoryId,
+		&data.CategoryID,
 		&data.Name,
 	); err != nil {
 		return nil, err
@@ -91,5 +91,5 @@ func (repo SubcategorySQLRepository) Delete(ctx context.Context, params *domain.
 }
 
 func NewSubcategorySQLRepository() domain.ICRUDRepository[domain.Subcategory] {
-	return &SubcategorySQLRepository{Db: config.DbPool}
+	return &SubcategorySQLRepository{Db: configs.DbPool}
 }

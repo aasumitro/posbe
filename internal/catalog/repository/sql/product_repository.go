@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type ProductSQLRepository struct {
@@ -52,7 +52,7 @@ func (repo ProductSQLRepository) Search(ctx context.Context, keys []domain.FindW
 		var product domain.Product
 
 		if err := rows.Scan(
-			&product.ID, &product.CategoryId, &product.SubcategoryId,
+			&product.ID, &product.CategoryID, &product.SubcategoryID,
 			&product.Sku, &product.Image, &product.Gallery, &product.Name,
 			&product.Description, &product.Price,
 		); err != nil {
@@ -77,7 +77,7 @@ func (repo ProductSQLRepository) All(ctx context.Context) (data []*domain.Produc
 		var product domain.Product
 
 		if err := rows.Scan(
-			&product.ID, &product.CategoryId, &product.SubcategoryId,
+			&product.ID, &product.CategoryID, &product.SubcategoryID,
 			&product.Sku, &product.Image, &product.Gallery, &product.Name,
 			&product.Description, &product.Price,
 		); err != nil {
@@ -96,7 +96,7 @@ func (repo ProductSQLRepository) Find(ctx context.Context, _ domain.FindWith, va
 
 	data = &domain.Product{}
 	if err := row.Scan(
-		&data.ID, &data.CategoryId, &data.SubcategoryId,
+		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
 		&data.Description, &data.Price,
 	); err != nil {
@@ -110,13 +110,13 @@ func (repo ProductSQLRepository) Create(ctx context.Context, params *domain.Prod
 	q := "INSERT INTO products "
 	q += "(category_id, subcategory_id, sku, image, gallery, name, description, price) "
 	q += "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
-	row := repo.Db.QueryRowContext(ctx, q, params.CategoryId, params.SubcategoryId,
+	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.SubcategoryID,
 		params.Sku, params.Image, params.Gallery, params.Name,
 		params.Description, params.Price)
 
 	data = &domain.Product{}
 	if err := row.Scan(
-		&data.ID, &data.CategoryId, &data.SubcategoryId,
+		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
 		&data.Description, &data.Price,
 	); err != nil {
@@ -129,13 +129,13 @@ func (repo ProductSQLRepository) Create(ctx context.Context, params *domain.Prod
 func (repo ProductSQLRepository) Update(ctx context.Context, params *domain.Product) (data *domain.Product, err error) {
 	q := "UPDATE products SET category_id = $1, subcategory_id = $2, sku = $3, image = $4, "
 	q += "gallery = $5, name = $6, description = $7, price = $8 WHERE id = $9 RETURNING *"
-	row := repo.Db.QueryRowContext(ctx, q, params.CategoryId, params.SubcategoryId,
+	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.SubcategoryID,
 		params.Sku, params.Image, params.Gallery, params.Name,
 		params.Description, params.Price, params.ID)
 
 	data = &domain.Product{}
 	if err := row.Scan(
-		&data.ID, &data.CategoryId, &data.SubcategoryId,
+		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
 		&data.Description, &data.Price,
 	); err != nil {
@@ -152,5 +152,5 @@ func (repo ProductSQLRepository) Delete(ctx context.Context, params *domain.Prod
 }
 
 func NewProductSQLRepository() domain.ICRUDWithSearchRepository[domain.Product] {
-	return &ProductSQLRepository{Db: config.DbPool}
+	return &ProductSQLRepository{Db: configs.DbPool}
 }

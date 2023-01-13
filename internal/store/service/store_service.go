@@ -36,7 +36,7 @@ func (service storeService) EditFloor(data *domain.Floor) (floor *domain.Floor, 
 }
 
 func (service storeService) DeleteFloor(data *domain.Floor) *utils.ServiceError {
-	floor, err := service.floorRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	floor, err := service.floorRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{
@@ -88,7 +88,7 @@ func (service storeService) EditTable(data *domain.Table) (table *domain.Table, 
 }
 
 func (service storeService) DeleteTable(data *domain.Table) *utils.ServiceError {
-	table, err := service.tableRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	table, err := service.tableRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{
@@ -133,7 +133,7 @@ func (service storeService) EditRoom(data *domain.Room) (room *domain.Room, errD
 }
 
 func (service storeService) DeleteRoom(data *domain.Room) *utils.ServiceError {
-	room, err := service.roomRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	room, err := service.roomRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{
@@ -169,14 +169,14 @@ func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *
 	}
 
 	sName := reflect.TypeOf(s).Name()
-	var fa []*domain.Floor = nil
+	var fa []*domain.Floor
 	for _, floor := range data {
 		if sName == "Table" && floor.TotalTables >= 1 {
 			f := floor
 
 			if tables, err := service.tableRepo.AllWhere(
 				service.ctx,
-				domain.FindWithRelationId,
+				domain.FindWithRelationID,
 				floor.ID,
 			); err != nil {
 				f.Tables = nil
@@ -192,7 +192,7 @@ func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *
 
 			if rooms, err := service.roomRepo.AllWhere(
 				service.ctx,
-				domain.FindWithRelationId,
+				domain.FindWithRelationID,
 				floor.ID,
 			); err != nil {
 				f.Rooms = nil

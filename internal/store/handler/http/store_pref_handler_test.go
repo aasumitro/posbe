@@ -3,7 +3,7 @@ package http
 import (
 	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
+	"github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -68,7 +68,7 @@ func (suite *storePrefHandlerTestSuite) TestStorePref_Update_ShouldSuccess() {
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"key":   "lorem",
 		"value": "lorem",
 	})
@@ -91,7 +91,7 @@ func (suite *storePrefHandlerTestSuite) TestStorePref_Update_ShouldBadRequest() 
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	storePrefHandler{svc: svcMock}.update(ctx)
 	var got utils.ErrorRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -112,7 +112,7 @@ func (suite *storePrefHandlerTestSuite) TestStorePref_Update_ShouldInternalError
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"key":   "lorem",
 		"value": "lorem",
 	})

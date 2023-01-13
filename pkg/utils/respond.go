@@ -26,7 +26,7 @@ type ValidationErrorRespond struct {
 	Data   interface{} `json:"data"`
 }
 
-func NewHttpRespond(context *gin.Context, code int, data interface{}) {
+func NewHTTPRespond(context *gin.Context, code int, data interface{}) {
 	if code == http.StatusOK || code == http.StatusCreated {
 		context.JSON(code, SuccessRespond{
 			Code:   code,

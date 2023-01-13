@@ -26,11 +26,11 @@ type tableHandler struct {
 func (handler tableHandler) fetch(ctx *gin.Context) {
 	tables, err := handler.svc.TableList()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, tables)
+	utils.NewHTTPRespond(ctx, http.StatusOK, tables)
 }
 
 // tables godoc
@@ -56,7 +56,7 @@ func (handler tableHandler) fetch(ctx *gin.Context) {
 func (handler tableHandler) store(ctx *gin.Context) {
 	var form domain.Table
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
 			err.Error())
 		return
@@ -64,11 +64,11 @@ func (handler tableHandler) store(ctx *gin.Context) {
 
 	table, err := handler.svc.AddTable(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, table)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, table)
 }
 
 // tables godoc
@@ -97,7 +97,7 @@ func (handler tableHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -105,7 +105,7 @@ func (handler tableHandler) update(ctx *gin.Context) {
 
 	var form domain.Table
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
 			err.Error())
 		return
@@ -114,11 +114,11 @@ func (handler tableHandler) update(ctx *gin.Context) {
 	form.ID = id
 	table, err := handler.svc.EditTable(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, table)
+	utils.NewHTTPRespond(ctx, http.StatusOK, table)
 }
 
 // tables godoc
@@ -138,7 +138,7 @@ func (handler tableHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -147,11 +147,11 @@ func (handler tableHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteTable(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewTableHandler(svc domain.IStoreService, router gin.IRoutes) {

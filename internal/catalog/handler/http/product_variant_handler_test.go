@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
+	"github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -22,10 +22,10 @@ type productVariantHandlerTestSuite struct {
 }
 
 func (suite *productVariantHandlerTestSuite) SetupSuite() {
-	suite.row = &domain.ProductVariant{ID: 1, ProductID: 1, UnitId: 1, UnitSize: 12, Type: "color", Name: "test", Description: sql.NullString{String: "test"}, Price: 12}
+	suite.row = &domain.ProductVariant{ID: 1, ProductID: 1, UnitID: 1, UnitSize: 12, Type: "color", Name: "test", Description: sql.NullString{String: "test"}, Price: 12}
 	suite.rows = []*domain.ProductVariant{
 		suite.row, {
-			ID: 2, ProductID: 1, UnitId: 1, UnitSize: 12, Type: "color", Name: "test 2", Description: sql.NullString{String: "test 2"}, Price: 12,
+			ID: 2, ProductID: 1, UnitID: 1, UnitSize: 12, Type: "color", Name: "test 2", Description: sql.NullString{String: "test 2"}, Price: 12,
 		},
 	}
 }
@@ -39,7 +39,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Store_ShouldSuccess() {
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"product_id": 1,
 		"unit_id":    1,
 		"unit_size":  1,
@@ -63,7 +63,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Store_ShouldError_Unpro
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", nil)
+	utils.MockJSONRequest(ctx, "POST", "application/json", nil)
 	variantHandler{svc: svc}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -82,7 +82,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Store_ShouldError_Inter
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"product_id": 1,
 		"unit_id":    1,
 		"unit_size":  1,
@@ -108,7 +108,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Update_ShouldSuccess() 
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"product_id": 1,
 		"unit_id":    1,
 		"unit_size":  1,
@@ -129,14 +129,13 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Update_ShouldError_BadR
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd123"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	variantHandler{svc: svc}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
 	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
-
 }
 func (suite *productVariantHandlerTestSuite) TestHandler_Update_ShouldError_UnprocessableEntity() {
 	svc := new(mocks.ICatalogProductService)
@@ -144,7 +143,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Update_ShouldError_Unpr
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	variantHandler{svc: svc}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -163,7 +162,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Update_ShouldError_Inte
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"product_id": 1,
 		"unit_id":    1,
 		"unit_size":  1,
@@ -189,7 +188,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Destroy_ShouldSuccess()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	variantHandler{svc: svc}.destroy(ctx)
 	assert.Equal(suite.T(), http.StatusNoContent, writer.Code)
 }
@@ -204,7 +203,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Destroy_ShouldErrorInte
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	variantHandler{svc: svc}.destroy(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -218,7 +217,7 @@ func (suite *productVariantHandlerTestSuite) TestHandler_Destroy_ShouldErrorBadR
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	variantHandler{svc: svc}.destroy(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)

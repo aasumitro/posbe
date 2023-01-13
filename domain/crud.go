@@ -5,8 +5,8 @@ import "context"
 type FindWith int64
 
 const (
-	FindWithId FindWith = iota
-	FindWithRelationId
+	FindWithID FindWith = iota
+	FindWithRelationID
 	FindWithName
 	// for user data
 	FindWithUsername

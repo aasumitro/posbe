@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 	"time"
 )
 
@@ -100,5 +100,5 @@ func (repo FloorSQLRepository) Delete(ctx context.Context, params *domain.Floor)
 }
 
 func NewFloorSQLRepository() domain.ICRUDRepository[domain.Floor] {
-	return &FloorSQLRepository{Db: config.DbPool}
+	return &FloorSQLRepository{Db: configs.DbPool}
 }

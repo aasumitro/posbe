@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type ProductVariantSQLRepository struct {
@@ -21,7 +21,7 @@ func (repo ProductVariantSQLRepository) Find(ctx context.Context, _ domain.FindW
 
 	data = &domain.ProductVariant{}
 	if err := row.Scan(
-		&data.ID, &data.ProductID, &data.UnitId,
+		&data.ID, &data.ProductID, &data.UnitID,
 		&data.UnitSize, &data.Type, &data.Name,
 		&data.Description, &data.Price,
 	); err != nil {
@@ -33,11 +33,11 @@ func (repo ProductVariantSQLRepository) Find(ctx context.Context, _ domain.FindW
 
 func (repo ProductVariantSQLRepository) Create(ctx context.Context, params *domain.ProductVariant) (data *domain.ProductVariant, err error) {
 	q := "INSERT INTO product_variants (product_id, unit_id, unit_size, type, name, description, price) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *"
-	row := repo.Db.QueryRowContext(ctx, q, params.ProductID, params.UnitId, params.UnitSize, params.Type, params.Name, params.Description, params.Price)
+	row := repo.Db.QueryRowContext(ctx, q, params.ProductID, params.UnitID, params.UnitSize, params.Type, params.Name, params.Description, params.Price)
 
 	data = &domain.ProductVariant{}
 	if err := row.Scan(
-		&data.ID, &data.ProductID, &data.UnitId,
+		&data.ID, &data.ProductID, &data.UnitID,
 		&data.UnitSize, &data.Type, &data.Name,
 		&data.Description, &data.Price,
 	); err != nil {
@@ -49,11 +49,11 @@ func (repo ProductVariantSQLRepository) Create(ctx context.Context, params *doma
 
 func (repo ProductVariantSQLRepository) Update(ctx context.Context, params *domain.ProductVariant) (data *domain.ProductVariant, err error) {
 	q := "UPDATE product_variants SET product_id = $1, unit_id = $2, unit_size = $3, type = $4, name = $5, description = $6, price = $7 WHERE id = $8 RETURNING *"
-	row := repo.Db.QueryRowContext(ctx, q, params.ProductID, params.UnitId, params.UnitSize, params.Type, params.Name, params.Description, params.Price, params.ID)
+	row := repo.Db.QueryRowContext(ctx, q, params.ProductID, params.UnitID, params.UnitSize, params.Type, params.Name, params.Description, params.Price, params.ID)
 
 	data = &domain.ProductVariant{}
 	if err := row.Scan(
-		&data.ID, &data.ProductID, &data.UnitId,
+		&data.ID, &data.ProductID, &data.UnitID,
 		&data.UnitSize, &data.Type, &data.Name,
 		&data.Description, &data.Price,
 	); err != nil {
@@ -70,5 +70,5 @@ func (repo ProductVariantSQLRepository) Delete(ctx context.Context, params *doma
 }
 
 func NewProductVariantSQLRepository() domain.ICRUDRepository[domain.ProductVariant] {
-	return &ProductVariantSQLRepository{Db: config.DbPool}
+	return &ProductVariantSQLRepository{Db: configs.DbPool}
 }

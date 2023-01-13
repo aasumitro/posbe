@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/store/repository/sql"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"regexp"
@@ -25,7 +25,7 @@ func (suite *storePrefRepositoryTestSuite) SetupSuite() {
 		err error
 	)
 
-	config.DbPool, suite.mock, err = sqlmock.New(
+	configs.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)

@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/catalog/repository/sql"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"regexp"
@@ -23,7 +23,7 @@ type productRepositoryTestSuite struct {
 func (suite *productRepositoryTestSuite) SetupSuite() {
 	var err error
 
-	config.DbPool, suite.mock, err = sqlmock.New(
+	configs.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
@@ -108,7 +108,7 @@ func (suite *productRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() {
 	query := "SELECT * FROM products WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
-	res, err := suite.repo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.repo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -120,13 +120,13 @@ func (suite *productRepositoryTestSuite) TestRepository_Find_ExpectReturnError()
 	query := "SELECT * FROM products WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
-	res, err := suite.repo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.repo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
 
 func (suite *productRepositoryTestSuite) TestRepository_Created_ExpectSuccess() {
-	product := &domain.Product{ID: 1, CategoryId: 1, SubcategoryId: 1, Sku: "12", Image: sql.NullString{String: "test"}, Gallery: sql.NullString{String: "test"}, Name: "test", Price: 12, Description: sql.NullString{String: "test"}}
+	product := &domain.Product{ID: 1, CategoryID: 1, SubcategoryID: 1, Sku: "12", Image: sql.NullString{String: "test"}, Gallery: sql.NullString{String: "test"}, Name: "test", Price: 12, Description: sql.NullString{String: "test"}}
 	data := suite.mock.
 		NewRows([]string{"id", "category_id", "subcategory_id", "sku", "image", "gallery", "name", "price", "description"}).
 		AddRow(1, 1, 1, "12", "test", "test", "test", "test", 12)
@@ -135,7 +135,7 @@ func (suite *productRepositoryTestSuite) TestRepository_Created_ExpectSuccess() 
 	q += "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
 	meta := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(meta).
-		WithArgs(product.CategoryId, product.SubcategoryId,
+		WithArgs(product.CategoryID, product.SubcategoryID,
 			product.Sku, product.Image, product.Gallery, product.Name,
 			product.Description, product.Price).
 		WillReturnRows(data).
@@ -145,7 +145,7 @@ func (suite *productRepositoryTestSuite) TestRepository_Created_ExpectSuccess() 
 	require.NotNil(suite.T(), res)
 }
 func (suite *productRepositoryTestSuite) TestRepository_Created_ExpectError() {
-	product := &domain.Product{ID: 1, CategoryId: 1, SubcategoryId: 1, Sku: "12", Image: sql.NullString{String: "test"}, Gallery: sql.NullString{String: "test"}, Name: "test", Price: 12, Description: sql.NullString{String: "test"}}
+	product := &domain.Product{ID: 1, CategoryID: 1, SubcategoryID: 1, Sku: "12", Image: sql.NullString{String: "test"}, Gallery: sql.NullString{String: "test"}, Name: "test", Price: 12, Description: sql.NullString{String: "test"}}
 	data := suite.mock.
 		NewRows([]string{"id", "category_id", "subcategory_id", "sku", "image", "gallery", "name", "price", "description"}).
 		AddRow(1, nil, nil, nil, nil, nil, nil, nil, nil)
@@ -154,7 +154,7 @@ func (suite *productRepositoryTestSuite) TestRepository_Created_ExpectError() {
 	q += "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
 	meta := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(meta).
-		WithArgs(product.CategoryId, product.SubcategoryId,
+		WithArgs(product.CategoryID, product.SubcategoryID,
 			product.Sku, product.Image, product.Gallery, product.Name,
 			product.Description, product.Price).
 		WillReturnRows(data).
@@ -165,14 +165,14 @@ func (suite *productRepositoryTestSuite) TestRepository_Created_ExpectError() {
 }
 
 func (suite *productRepositoryTestSuite) TestRepository_Updated_ExpectSuccess() {
-	product := &domain.Product{ID: 1, CategoryId: 1, SubcategoryId: 1, Sku: "12", Image: sql.NullString{String: "test"}, Gallery: sql.NullString{String: "test"}, Name: "test", Price: 12, Description: sql.NullString{String: "test"}}
+	product := &domain.Product{ID: 1, CategoryID: 1, SubcategoryID: 1, Sku: "12", Image: sql.NullString{String: "test"}, Gallery: sql.NullString{String: "test"}, Name: "test", Price: 12, Description: sql.NullString{String: "test"}}
 	data := suite.mock.
 		NewRows([]string{"id", "category_id", "subcategory_id", "sku", "image", "gallery", "name", "price", "description"}).
 		AddRow(1, 1, 1, "12", "test", "test", "test", "test", 12)
 	query := "UPDATE products SET category_id = $1, subcategory_id = $2, sku = $3, image = $4, gallery = $5, name = $6, description = $7, price = $8 WHERE id = $9 RETURNING *"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).
-		WithArgs(product.CategoryId, product.SubcategoryId,
+		WithArgs(product.CategoryID, product.SubcategoryID,
 			product.Sku, product.Image, product.Gallery, product.Name,
 			product.Description, product.Price, product.ID).
 		WillReturnRows(data).
@@ -182,14 +182,14 @@ func (suite *productRepositoryTestSuite) TestRepository_Updated_ExpectSuccess() 
 	require.NotNil(suite.T(), res)
 }
 func (suite *productRepositoryTestSuite) TestRepository_Updated_ExpectError() {
-	product := &domain.Product{ID: 1, CategoryId: 1, SubcategoryId: 1, Sku: "12", Image: sql.NullString{String: "test"}, Gallery: sql.NullString{String: "test"}, Name: "test", Price: 12, Description: sql.NullString{String: "test"}}
+	product := &domain.Product{ID: 1, CategoryID: 1, SubcategoryID: 1, Sku: "12", Image: sql.NullString{String: "test"}, Gallery: sql.NullString{String: "test"}, Name: "test", Price: 12, Description: sql.NullString{String: "test"}}
 	data := suite.mock.
 		NewRows([]string{"id", "category_id", "subcategory_id", "sku", "image", "gallery", "name", "price", "description"}).
 		AddRow(1, nil, nil, nil, nil, nil, nil, nil, nil)
 	query := "UPDATE products SET category_id = $1, subcategory_id = $2, sku = $3, image = $4, gallery = $5, name = $6, description = $7, price = $8 WHERE id = $9 RETURNING *"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).
-		WithArgs(product.CategoryId, product.SubcategoryId,
+		WithArgs(product.CategoryID, product.SubcategoryID,
 			product.Sku, product.Image, product.Gallery, product.Name,
 			product.Description, product.Price, product.ID).
 		WillReturnRows(data).

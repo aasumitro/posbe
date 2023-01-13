@@ -27,11 +27,11 @@ type userHandler struct {
 func (handler userHandler) fetch(ctx *gin.Context) {
 	users, err := handler.svc.UserList()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, users)
+	utils.NewHTTPRespond(ctx, http.StatusOK, users)
 }
 
 // users godoc
@@ -51,7 +51,7 @@ func (handler userHandler) show(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -59,11 +59,11 @@ func (handler userHandler) show(ctx *gin.Context) {
 
 	user, err := handler.svc.ShowUser(id)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 	user.Password = ""
-	utils.NewHttpRespond(ctx, http.StatusOK, user)
+	utils.NewHTTPRespond(ctx, http.StatusOK, user)
 }
 
 // users godoc
@@ -87,17 +87,17 @@ func (handler userHandler) show(ctx *gin.Context) {
 func (handler userHandler) store(ctx *gin.Context) {
 	var form domain.User
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	user, err := handler.svc.AddUser(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 	user.Password = ""
-	utils.NewHttpRespond(ctx, http.StatusCreated, user)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, user)
 }
 
 // users godoc
@@ -124,7 +124,7 @@ func (handler userHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -132,18 +132,18 @@ func (handler userHandler) update(ctx *gin.Context) {
 
 	var form domain.User
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	form.ID = id
 	user, err := handler.svc.EditUser(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 	user.Password = ""
-	utils.NewHttpRespond(ctx, http.StatusOK, user)
+	utils.NewHTTPRespond(ctx, http.StatusOK, user)
 }
 
 // users godoc
@@ -163,7 +163,7 @@ func (handler userHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -172,11 +172,11 @@ func (handler userHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteUser(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewUserHandler(accountService domain.IAccountService, router gin.IRoutes) {

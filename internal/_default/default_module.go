@@ -6,5 +6,5 @@ import (
 )
 
 func InitDefaultModule(router *gin.Engine) {
-	http.NewHttpRouter(router)
+	http.NewHTTPRouter(router)
 }

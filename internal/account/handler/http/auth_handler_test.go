@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
+	mocks2 "github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -37,7 +37,7 @@ func (suite *authHandlerTestSuite) SetupSuite() {
 
 	suite.user = &domain.User{
 		ID:       1,
-		RoleId:   1,
+		RoleID:   1,
 		Name:     "lorem ipsum",
 		Username: "lorem",
 		Email:    "lorem@ipsum.id",
@@ -48,8 +48,8 @@ func (suite *authHandlerTestSuite) SetupSuite() {
 }
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldSuccess() {
-	accSvcMock := new(mocks.IAccountService)
-	jwtUtil := new(mocks.IJSONWebToken)
+	accSvcMock := new(mocks2.IAccountService)
+	jwtUtil := new(mocks2.IJSONWebToken)
 	accSvcMock.
 		On("VerifyUserCredentials", mock.Anything, mock.Anything).
 		Return(suite.user, nil).
@@ -61,7 +61,7 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldSuccess() {
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"username": "lorem",
 		"password": "secret",
 	})
@@ -74,12 +74,12 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldSuccess() {
 }
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorEntity() {
-	accSvcMock := new(mocks.IAccountService)
-	jwtUtil := new(mocks.IJSONWebToken)
+	accSvcMock := new(mocks2.IAccountService)
+	jwtUtil := new(mocks2.IJSONWebToken)
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", nil)
+	utils.MockJSONRequest(ctx, "POST", "application/json", nil)
 	AuthHandler{svc: accSvcMock, jwt: jwtUtil}.login(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -89,8 +89,8 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorEntity() {
 }
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorInternalWhenVerify() {
-	accSvcMock := new(mocks.IAccountService)
-	jwtUtil := new(mocks.IJSONWebToken)
+	accSvcMock := new(mocks2.IAccountService)
+	jwtUtil := new(mocks2.IJSONWebToken)
 	accSvcMock.
 		On("VerifyUserCredentials", mock.Anything, mock.Anything).
 		Return(nil, &utils.ServiceError{
@@ -101,7 +101,7 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorInternalWhen
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"username": "lorem",
 		"password": "secret",
 	})
@@ -114,8 +114,8 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorInternalWhen
 }
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorClaimJWT() {
-	accSvcMock := new(mocks.IAccountService)
-	jwtUtil := new(mocks.IJSONWebToken)
+	accSvcMock := new(mocks2.IAccountService)
+	jwtUtil := new(mocks2.IJSONWebToken)
 	accSvcMock.
 		On("VerifyUserCredentials", mock.Anything, mock.Anything).
 		Return(suite.user, nil).
@@ -127,7 +127,7 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorClaimJWT() {
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"username": "lorem",
 		"password": "secret",
 	})
@@ -140,12 +140,12 @@ func (suite *authHandlerTestSuite) TestAuthHandler_Login_ShouldErrorClaimJWT() {
 }
 
 func (suite *authHandlerTestSuite) TestAuthHandler_Logout() {
-	accSvcMock := new(mocks.IAccountService)
-	jwtUtil := new(mocks.IJSONWebToken)
+	accSvcMock := new(mocks2.IAccountService)
+	jwtUtil := new(mocks2.IJSONWebToken)
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", nil)
+	utils.MockJSONRequest(ctx, "POST", "application/json", nil)
 	AuthHandler{svc: accSvcMock, jwt: jwtUtil}.logout(ctx)
 	var got utils.SuccessRespond
 	assert.NotNil(suite.T(), got)

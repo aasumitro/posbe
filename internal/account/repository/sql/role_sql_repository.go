@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type RoleSQLRepository struct {
@@ -84,6 +84,6 @@ func (repo RoleSQLRepository) Delete(ctx context.Context, params *domain.Role) e
 	return err
 }
 
-func NewRoleSQlRepository() domain.ICRUDRepository[domain.Role] {
-	return &RoleSQLRepository{Db: config.DbPool}
+func NewRoleSQLRepository() domain.ICRUDRepository[domain.Role] {
+	return &RoleSQLRepository{Db: configs.DbPool}
 }

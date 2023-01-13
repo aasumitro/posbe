@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/internal/store/handler/http"
 	repository "github.com/aasumitro/posbe/internal/store/repository/sql"
 	"github.com/aasumitro/posbe/internal/store/service"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v9"
@@ -42,19 +42,18 @@ func InitStoreModule(ctx context.Context, router *gin.Engine) {
 
 func shouldCacheData(ctx context.Context) {
 	// run this at first booting
-	if err := config.RedisPool.
+	if err := configs.RedisPool.
 		Get(ctx, "store_prefs").
 		Err(); err != nil && err == redis.Nil {
 		if prefs, err := storePrefRepo.All(ctx); err == nil {
-			var setting = make(domain.StoreSetting)
-			setting = *prefs
+			setting := *prefs
 
 			// store room status
 			if room, _ := strconv.ParseBool(setting["feature_room"].(string)); room {
 				if rooms, err := roomRepo.All(ctx); err == nil {
 					for _, d := range rooms {
 						key := fmt.Sprintf("room_%d_status", d.ID)
-						config.RedisPool.Set(ctx, key, 0, 0)
+						configs.RedisPool.Set(ctx, key, 0, 0)
 					}
 				}
 			}
@@ -64,14 +63,14 @@ func shouldCacheData(ctx context.Context) {
 				if tables, err := tableRepo.All(ctx); err == nil {
 					for _, d := range tables {
 						key := fmt.Sprintf("table_%d_status", d.ID)
-						config.RedisPool.Set(ctx, key, 0, 0)
+						configs.RedisPool.Set(ctx, key, 0, 0)
 					}
 				}
 			}
 
 			jsonData, _ := json.Marshal(prefs)
 			// store data to redis
-			config.RedisPool.Set(ctx, "store_prefs", jsonData, 0)
+			configs.RedisPool.Set(ctx, "store_prefs", jsonData, 0)
 		}
 	}
 }

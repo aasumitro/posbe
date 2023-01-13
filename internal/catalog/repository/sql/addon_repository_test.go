@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/catalog/repository/sql"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"regexp"
@@ -24,7 +24,7 @@ func (suite *addonRepositoryTestSuite) SetupSuite() {
 		err error
 	)
 
-	config.DbPool, suite.mock, err = sqlmock.New(
+	configs.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
@@ -79,7 +79,7 @@ func (suite *addonRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() {
 	query := "SELECT * FROM addons WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
-	res, err := suite.repo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.repo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -92,7 +92,7 @@ func (suite *addonRepositoryTestSuite) TestRepository_Find_ExpectReturnError() {
 	query := "SELECT * FROM addons WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
-	res, err := suite.repo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.repo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }

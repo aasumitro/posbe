@@ -3,7 +3,7 @@ package http
 import (
 	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
+	"github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -139,7 +139,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Store_ShouldSuccess() {
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"name": "lorem",
 	})
 	floorHandler{svc: svcMock}.store(ctx)
@@ -155,7 +155,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Store_ShouldError_Unprocess
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", nil)
+	utils.MockJSONRequest(ctx, "POST", "application/json", nil)
 	floorHandler{svc: svcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -176,7 +176,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Store_ShouldError_Internal(
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"name": "lorem",
 	})
 	floorHandler{svc: svcMock}.store(ctx)
@@ -197,7 +197,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Update_ShouldSuccess() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"name": "lorem",
 	})
 	floorHandler{svc: svcMock}.update(ctx)
@@ -214,7 +214,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Update_ShouldError_BadReque
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	floorHandler{svc: svcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -229,7 +229,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Update_ShouldError_Unproces
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	floorHandler{svc: svcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -251,7 +251,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Update_ShouldError_Internal
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"name": "lorem",
 	})
 	floorHandler{svc: svcMock}.update(ctx)
@@ -272,7 +272,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Destroy_ShouldSuccess() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	floorHandler{svc: svcMock}.destroy(ctx)
 	assert.Equal(suite.T(), http.StatusNoContent, writer.Code)
 }
@@ -290,7 +290,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Destroy_ShouldError() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	floorHandler{svc: svcMock}.destroy(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -305,7 +305,7 @@ func (suite *floorHandlerTestSuite) TestFloorHandler_Destroy_ShouldError_BadRequ
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	floorHandler{svc: svcMock}.destroy(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)

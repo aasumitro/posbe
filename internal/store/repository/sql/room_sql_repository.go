@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 	"time"
 )
 
@@ -14,7 +14,7 @@ type RoomSQLRepository struct {
 
 func (repo RoomSQLRepository) AllWhere(ctx context.Context, key domain.FindWith, val any) (rooms []*domain.Room, err error) {
 	q := "SELECT * FROM rooms "
-	if key == domain.FindWithRelationId {
+	if key == domain.FindWithRelationID {
 		q += "WHERE floor_id = $1"
 	}
 	rows, err := repo.Db.QueryContext(ctx, q, val)
@@ -26,7 +26,7 @@ func (repo RoomSQLRepository) AllWhere(ctx context.Context, key domain.FindWith,
 		var room domain.Room
 
 		if err := rows.Scan(
-			&room.ID, &room.FloorId, &room.Name,
+			&room.ID, &room.FloorID, &room.Name,
 			&room.XPos, &room.YPos, &room.WSize,
 			&room.HSize, &room.Capacity, &room.Price,
 			&room.CreatedAt, &room.UpdatedAt,
@@ -51,7 +51,7 @@ func (repo RoomSQLRepository) All(ctx context.Context) (rooms []*domain.Room, er
 		var room domain.Room
 
 		if err := rows.Scan(
-			&room.ID, &room.FloorId, &room.Name,
+			&room.ID, &room.FloorID, &room.Name,
 			&room.XPos, &room.YPos, &room.WSize,
 			&room.HSize, &room.Capacity, &room.Price,
 			&room.CreatedAt, &room.UpdatedAt,
@@ -68,9 +68,9 @@ func (repo RoomSQLRepository) All(ctx context.Context) (rooms []*domain.Room, er
 func (repo RoomSQLRepository) Find(ctx context.Context, key domain.FindWith, val any) (room *domain.Room, err error) {
 	q := "SELECT * FROM rooms WHERE "
 	switch key {
-	case domain.FindWithId:
+	case domain.FindWithID:
 		q += "id = $1 "
-	case domain.FindWithRelationId:
+	case domain.FindWithRelationID:
 		q += "floor_id = $1 "
 	}
 	q += "LIMIT 1"
@@ -78,7 +78,7 @@ func (repo RoomSQLRepository) Find(ctx context.Context, key domain.FindWith, val
 
 	room = &domain.Room{}
 	if err := row.Scan(
-		&room.ID, &room.FloorId, &room.Name,
+		&room.ID, &room.FloorID, &room.Name,
 		&room.XPos, &room.YPos, &room.WSize,
 		&room.HSize, &room.Capacity, &room.Price,
 		&room.CreatedAt, &room.UpdatedAt,
@@ -94,12 +94,12 @@ func (repo RoomSQLRepository) Create(ctx context.Context, params *domain.Room) (
 	q += "y_pos, w_size, h_size, capacity, price, created_at) "
 	q += "values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q,
-		params.FloorId, params.Name, params.XPos,
+		params.FloorID, params.Name, params.XPos,
 		params.YPos, params.WSize, params.HSize,
 		params.Capacity, params.Price, time.Now().Unix())
 
 	room = &domain.Room{}
-	if err := row.Scan(&room.ID, &room.FloorId, &room.Name,
+	if err := row.Scan(&room.ID, &room.FloorID, &room.Name,
 		&room.XPos, &room.YPos, &room.WSize,
 		&room.HSize, &room.Capacity, &room.Price,
 		&room.CreatedAt, &room.UpdatedAt,
@@ -117,12 +117,12 @@ func (repo RoomSQLRepository) Update(ctx context.Context, params *domain.Room) (
 	q += "capacity= $7, price = $8, updated_at = $9 "
 	q += "WHERE id = $10 RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q,
-		params.FloorId, params.Name, params.XPos,
+		params.FloorID, params.Name, params.XPos,
 		params.YPos, params.WSize, params.HSize,
 		params.Capacity, params.Price, time.Now().Unix(), params.ID)
 
 	room = &domain.Room{}
-	if err := row.Scan(&room.ID, &room.FloorId, &room.Name,
+	if err := row.Scan(&room.ID, &room.FloorID, &room.Name,
 		&room.XPos, &room.YPos, &room.WSize,
 		&room.HSize, &room.Capacity, &room.Price,
 		&room.CreatedAt, &room.UpdatedAt,
@@ -140,5 +140,5 @@ func (repo RoomSQLRepository) Delete(ctx context.Context, params *domain.Room) e
 }
 
 func NewRoomSQLRepository() domain.ICRUDAddOnRepository[domain.Room] {
-	return &RoomSQLRepository{Db: config.DbPool}
+	return &RoomSQLRepository{Db: configs.DbPool}
 }

@@ -1,17 +1,19 @@
-package config
+package configs
 
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
 	"log"
+
+	// postgresql
+	_ "github.com/lib/pq"
 )
 
 func (cfg Config) InitDbConn() {
 	log.Println("Trying to open database connection pool . . . .")
 
 	dbOnce.Do(func() {
-		conn, err := sql.Open(cfg.DBDriver, cfg.DBDsnUrl)
+		conn, err := sql.Open(cfg.DBDriver, cfg.DBDsnURL)
 		if err != nil {
 			panic(fmt.Sprintf("DATABASE_ERROR: %s", err.Error()))
 		}

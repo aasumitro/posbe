@@ -27,11 +27,11 @@ type roleHandler struct {
 func (handler roleHandler) fetch(ctx *gin.Context) {
 	roles, err := handler.svc.RoleList()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, roles)
+	utils.NewHTTPRespond(ctx, http.StatusOK, roles)
 }
 
 // roles godoc
@@ -51,17 +51,17 @@ func (handler roleHandler) fetch(ctx *gin.Context) {
 func (handler roleHandler) store(ctx *gin.Context) {
 	var form domain.Role
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	role, err := handler.svc.AddRole(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, role)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, role)
 }
 
 // roles godoc
@@ -84,7 +84,7 @@ func (handler roleHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -92,18 +92,18 @@ func (handler roleHandler) update(ctx *gin.Context) {
 
 	var form domain.Role
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	form.ID = id
 	role, err := handler.svc.EditRole(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, role)
+	utils.NewHTTPRespond(ctx, http.StatusOK, role)
 }
 
 // roles godoc
@@ -123,7 +123,7 @@ func (handler roleHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -132,11 +132,11 @@ func (handler roleHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteRole(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewRoleHandler(accountService domain.IAccountService, router gin.IRoutes) {

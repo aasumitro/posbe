@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 	"time"
 )
 
@@ -14,7 +14,7 @@ type TableSQLRepository struct {
 
 func (repo TableSQLRepository) AllWhere(ctx context.Context, key domain.FindWith, val any) (tables []*domain.Table, err error) {
 	q := "SELECT * FROM tables "
-	if key == domain.FindWithRelationId {
+	if key == domain.FindWithRelationID {
 		q += "WHERE floor_id = $1"
 	}
 	rows, err := repo.Db.QueryContext(ctx, q, val)
@@ -26,7 +26,7 @@ func (repo TableSQLRepository) AllWhere(ctx context.Context, key domain.FindWith
 		var table domain.Table
 
 		if err := rows.Scan(
-			&table.ID, &table.FloorId, &table.Name,
+			&table.ID, &table.FloorID, &table.Name,
 			&table.XPos, &table.YPos, &table.WSize,
 			&table.HSize, &table.Capacity, &table.Type,
 			&table.CreatedAt, &table.UpdatedAt,
@@ -51,7 +51,7 @@ func (repo TableSQLRepository) All(ctx context.Context) (tables []*domain.Table,
 		var table domain.Table
 
 		if err := rows.Scan(
-			&table.ID, &table.FloorId, &table.Name,
+			&table.ID, &table.FloorID, &table.Name,
 			&table.XPos, &table.YPos, &table.WSize,
 			&table.HSize, &table.Capacity, &table.Type,
 			&table.CreatedAt, &table.UpdatedAt,
@@ -68,9 +68,9 @@ func (repo TableSQLRepository) All(ctx context.Context) (tables []*domain.Table,
 func (repo TableSQLRepository) Find(ctx context.Context, key domain.FindWith, val any) (table *domain.Table, err error) {
 	q := "SELECT * FROM tables WHERE "
 	switch key {
-	case domain.FindWithId:
+	case domain.FindWithID:
 		q += "id = $1 "
-	case domain.FindWithRelationId:
+	case domain.FindWithRelationID:
 		q += "floor_id = $1 "
 	}
 	q += "LIMIT 1"
@@ -78,7 +78,7 @@ func (repo TableSQLRepository) Find(ctx context.Context, key domain.FindWith, va
 
 	table = &domain.Table{}
 	if err := row.Scan(
-		&table.ID, &table.FloorId, &table.Name,
+		&table.ID, &table.FloorID, &table.Name,
 		&table.XPos, &table.YPos, &table.WSize,
 		&table.HSize, &table.Capacity, &table.Type,
 		&table.CreatedAt, &table.UpdatedAt,
@@ -94,12 +94,12 @@ func (repo TableSQLRepository) Create(ctx context.Context, params *domain.Table)
 	q += "y_pos, w_size, h_size, capacity, type, created_at) "
 	q += "values ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q,
-		params.FloorId, params.Name, params.XPos,
+		params.FloorID, params.Name, params.XPos,
 		params.YPos, params.WSize, params.HSize,
 		params.Capacity, params.Type, time.Now().Unix())
 
 	table = &domain.Table{}
-	if err := row.Scan(&table.ID, &table.FloorId, &table.Name,
+	if err := row.Scan(&table.ID, &table.FloorID, &table.Name,
 		&table.XPos, &table.YPos, &table.WSize,
 		&table.HSize, &table.Capacity, &table.Type,
 		&table.CreatedAt, &table.UpdatedAt,
@@ -117,13 +117,13 @@ func (repo TableSQLRepository) Update(ctx context.Context, params *domain.Table)
 	q += "capacity= $7, type = $8, updated_at = $9 "
 	q += "WHERE id = $10 RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q,
-		params.FloorId, params.Name, params.XPos,
+		params.FloorID, params.Name, params.XPos,
 		params.YPos, params.WSize, params.HSize,
 		params.Capacity, params.Type,
 		time.Now().Unix(), params.ID)
 
 	table = &domain.Table{}
-	if err := row.Scan(&table.ID, &table.FloorId, &table.Name,
+	if err := row.Scan(&table.ID, &table.FloorID, &table.Name,
 		&table.XPos, &table.YPos, &table.WSize,
 		&table.HSize, &table.Capacity, &table.Type,
 		&table.CreatedAt, &table.UpdatedAt,
@@ -141,5 +141,5 @@ func (repo TableSQLRepository) Delete(ctx context.Context, params *domain.Table)
 }
 
 func NewTableSQLRepository() domain.ICRUDAddOnRepository[domain.Table] {
-	return &TableSQLRepository{Db: config.DbPool}
+	return &TableSQLRepository{Db: configs.DbPool}
 }

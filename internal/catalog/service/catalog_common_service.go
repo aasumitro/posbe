@@ -35,7 +35,7 @@ func (service catalogCommonService) EditUnit(data *domain.Unit) (units *domain.U
 }
 
 func (service catalogCommonService) DeleteUnit(data *domain.Unit) *utils.ServiceError {
-	data, err := service.unitRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	data, err := service.unitRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{
@@ -80,7 +80,7 @@ func (service catalogCommonService) EditCategory(data *domain.Category) (units *
 }
 
 func (service catalogCommonService) DeleteCategory(data *domain.Category) *utils.ServiceError {
-	data, err := service.categoryRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	data, err := service.categoryRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{
@@ -125,7 +125,7 @@ func (service catalogCommonService) EditSubcategory(data *domain.Subcategory) (u
 }
 
 func (service catalogCommonService) DeleteSubcategory(data *domain.Subcategory) *utils.ServiceError {
-	data, err := service.subcategoryRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	data, err := service.subcategoryRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{
@@ -170,7 +170,7 @@ func (service catalogCommonService) EditAddon(data *domain.Addon) (units *domain
 }
 
 func (service catalogCommonService) DeleteAddon(data *domain.Addon) *utils.ServiceError {
-	data, err := service.addonRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	data, err := service.addonRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &utils.ServiceError{

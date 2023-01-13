@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/account/repository/sql"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"regexp"
@@ -24,12 +24,12 @@ func (suite *userRepositoryTestSuite) SetupSuite() {
 		err error
 	)
 
-	config.DbPool, suite.mock, err = sqlmock.New(
+	configs.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
 
-	suite.userRepo = repoSql.NewUserSQlRepository()
+	suite.userRepo = repoSql.NewUserSQLRepository()
 }
 
 func (suite *userRepositoryTestSuite) AfterTest(_, _ string) {
@@ -87,7 +87,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Find_ExpectedSuccess() 
 	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
-	res, err := suite.userRepo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.userRepo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -152,13 +152,13 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Find_ExpectedError() {
 	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
-	res, err := suite.userRepo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.userRepo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedSuccess() {
-	user := &domain.User{ID: 1, RoleId: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
+	user := &domain.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
 	rows := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
 		AddRow(1, 1, "lorem ipsum", "lorem", "lorem@ipsum.id", "+6275555", "qwe123", 1, "test", "test 12345")
@@ -169,7 +169,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedSuccess(
 	q += "JOIN roles as r ON r.id = u.role_id"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(user.RoleId, user.Name, user.Username, user.Email, user.Phone, user.Password).
+		WithArgs(user.RoleID, user.Name, user.Username, user.Email, user.Phone, user.Password).
 		WillReturnRows(rows).WillReturnError(nil)
 	res, err := suite.userRepo.Create(context.TODO(), user)
 	require.Nil(suite.T(), err)
@@ -177,7 +177,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedSuccess(
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedError() {
-	user := &domain.User{ID: 1, RoleId: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
+	user := &domain.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
 	rows := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
 		AddRow(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
@@ -188,7 +188,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedError() 
 	q += "JOIN roles as r ON r.id = u.role_id"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(user.RoleId, user.Name, user.Username, user.Email, user.Phone, user.Password).
+		WithArgs(user.RoleID, user.Name, user.Username, user.Email, user.Phone, user.Password).
 		WillReturnRows(rows).
 		WillReturnError(nil)
 	res, err := suite.userRepo.Create(context.TODO(), user)
@@ -197,7 +197,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedError() 
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Update_ExpectedSuccess() {
-	user := &domain.User{ID: 1, RoleId: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
+	user := &domain.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
 	rows := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
 		AddRow(1, 1, "lorem ipsum", "lorem", "lorem@ipsum.id", "+6275555", "qwe123", 1, "test", "test 12345")
@@ -208,7 +208,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Update_ExpectedSuccess(
 	q += "JOIN roles as r ON r.id = u.role_id"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(user.RoleId, user.Name, user.Username, user.Email, user.Phone, user.Password, user.ID).
+		WithArgs(user.RoleID, user.Name, user.Username, user.Email, user.Phone, user.Password, user.ID).
 		WillReturnRows(rows).WillReturnError(nil)
 	res, err := suite.userRepo.Update(context.TODO(), user)
 	require.Nil(suite.T(), err)
@@ -216,7 +216,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Update_ExpectedSuccess(
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Update_ExpectedError() {
-	user := &domain.User{ID: 1, RoleId: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
+	user := &domain.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
 	rows := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
 		AddRow(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
@@ -227,7 +227,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Update_ExpectedError() 
 	q += "JOIN roles as r ON r.id = u.role_id"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(user.RoleId, user.Name, user.Username, user.Email, user.Phone, user.Password, user.ID).
+		WithArgs(user.RoleID, user.Name, user.Username, user.Email, user.Phone, user.Password, user.ID).
 		WillReturnRows(rows).WillReturnError(nil)
 	res, err := suite.userRepo.Update(context.TODO(), user)
 	require.Nil(suite.T(), res)
@@ -239,7 +239,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Delete_ExpectedSuccess(
 	suite.mock.ExpectExec(expectedQuery).
 		WithArgs(1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	user := &domain.User{ID: 1, RoleId: 1, Username: "test", Password: "12345"}
+	user := &domain.User{ID: 1, RoleID: 1, Username: "test", Password: "12345"}
 	err := suite.userRepo.Delete(context.TODO(), user)
 	require.Nil(suite.T(), err)
 }

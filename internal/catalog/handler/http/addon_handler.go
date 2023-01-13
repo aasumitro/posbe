@@ -26,11 +26,11 @@ type addonHandler struct {
 func (handler addonHandler) fetch(ctx *gin.Context) {
 	data, err := handler.svc.AddonList()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, data)
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
 }
 
 // addons godoc
@@ -51,17 +51,17 @@ func (handler addonHandler) fetch(ctx *gin.Context) {
 func (handler addonHandler) store(ctx *gin.Context) {
 	var form domain.Addon
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	data, err := handler.svc.AddAddon(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, data)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, data)
 }
 
 // addons godoc
@@ -85,7 +85,7 @@ func (handler addonHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -93,18 +93,18 @@ func (handler addonHandler) update(ctx *gin.Context) {
 
 	var form domain.Addon
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	form.ID = id
 	data, err := handler.svc.EditAddon(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, data)
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
 }
 
 // addons godoc
@@ -124,7 +124,7 @@ func (handler addonHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -133,11 +133,11 @@ func (handler addonHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteAddon(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewAddonHandler(svc domain.ICatalogCommonService, router gin.IRoutes) {

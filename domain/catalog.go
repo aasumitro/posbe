@@ -14,7 +14,7 @@ type (
 
 	Subcategory struct {
 		ID         int    `json:"id"`
-		CategoryId int    `json:"category_id" form:"category_id" binding:"required"`
+		CategoryID int    `json:"category_id" form:"category_id" binding:"required"`
 		Name       string `json:"name" form:"name" binding:"required"`
 	}
 
@@ -34,8 +34,8 @@ type (
 
 	Product struct {
 		ID              int               `json:"id"`
-		CategoryId      int               `json:"category_id" form:"category_id" binding:"required"`
-		SubcategoryId   int               `json:"subcategory_id" form:"subcategory_id" binding:"required"`
+		CategoryID      int               `json:"category_id" form:"category_id" binding:"required"`
+		SubcategoryID   int               `json:"subcategory_id" form:"subcategory_id" binding:"required"`
 		Sku             string            `json:"sku" form:"sku" binding:"required"`
 		Image           sql.NullString    `json:"image" form:"image"`
 		Gallery         sql.NullString    `json:"gallery" form:"gallery"`
@@ -50,7 +50,7 @@ type (
 	ProductVariant struct {
 		ID          int            `json:"id"`
 		ProductID   int            `json:"product_id" form:"product_id" binding:"required"`
-		UnitId      int            `json:"unit_id" form:"product_id" binding:"required"`
+		UnitID      int            `json:"unit_id" form:"product_id" binding:"required"`
 		UnitSize    float32        `json:"unit_size" form:"unit_size" binding:"required"`
 		Type        string         `json:"type" form:"type" binding:"required"`
 		Name        string         `json:"name" form:"name" binding:"required"`
