@@ -3,7 +3,7 @@ package http
 import (
 	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
+	"github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -41,7 +41,7 @@ func (suite *userHandlerTestSuite) SetupSuite() {
 
 	suite.user = &domain.User{
 		ID:       1,
-		RoleId:   1,
+		RoleID:   1,
 		Name:     "lorem ipsum",
 		Username: "lorem",
 		Email:    "lorem@ipsum.id",
@@ -53,7 +53,7 @@ func (suite *userHandlerTestSuite) SetupSuite() {
 		suite.user,
 		{
 			ID:       2,
-			RoleId:   1,
+			RoleID:   1,
 			Name:     "dolor amet",
 			Username: "dolor",
 			Email:    "dolor@amet.id",
@@ -110,7 +110,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Show_ShouldSuccess() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "GET", "application/json", nil)
+	utils.MockJSONRequest(ctx, "GET", "application/json", nil)
 	userHandler{svc: accSvcMock}.show(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -132,7 +132,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Show_ShouldError() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "GET", "application/json", nil)
+	utils.MockJSONRequest(ctx, "GET", "application/json", nil)
 	userHandler{svc: accSvcMock}.show(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -148,7 +148,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Show_ShouldError_BadRequest()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
-	utils.MockJsonRequest(ctx, "GET", "application/json", nil)
+	utils.MockJSONRequest(ctx, "GET", "application/json", nil)
 	userHandler{svc: accSvcMock}.show(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -166,7 +166,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldSuccess() {
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"role_id":  1,
 		"name":     "lorem ipsum",
 		"username": "lorem",
@@ -187,7 +187,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldError_Unprocessab
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", nil)
+	utils.MockJSONRequest(ctx, "POST", "application/json", nil)
 	userHandler{svc: accSvcMock}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -208,7 +208,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Store_ShouldError_Internal() 
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"role_id":  1,
 		"name":     "lorem ipsum",
 		"username": "lorem",
@@ -234,7 +234,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldSuccess() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"role_id":  1,
 		"name":     "lorem ipsum",
 		"username": "lorem",
@@ -256,7 +256,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldError_BadRequest
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	userHandler{svc: accSvcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -271,7 +271,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldError_Unprocessa
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	userHandler{svc: accSvcMock}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -293,7 +293,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Update_ShouldError_Internal()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"role_id":  1,
 		"name":     "lorem ipsum",
 		"username": "lorem",
@@ -319,7 +319,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Destroy_ShouldSuccess() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	userHandler{svc: accSvcMock}.destroy(ctx)
 	assert.Equal(suite.T(), http.StatusNoContent, writer.Code)
 }
@@ -330,7 +330,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Destroy_ShouldError_BadReques
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	userHandler{svc: accSvcMock}.destroy(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -352,7 +352,7 @@ func (suite *userHandlerTestSuite) TestUserHandler_Destroy_ShouldError() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	userHandler{svc: accSvcMock}.destroy(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)

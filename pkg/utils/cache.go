@@ -23,7 +23,7 @@ type (
 
 	CacheDataSupplied struct {
 		Key string
-		Ttl time.Duration
+		TTL time.Duration
 		CbF FNCache
 	}
 )
@@ -40,7 +40,7 @@ func (cache *RedisCache) CacheFirstData(i *CacheDataSupplied) (data any, err err
 			// encode given data
 			jsonData, _ := json.Marshal(data)
 			// store data to redis
-			cache.RdpConn.Set(cache.Ctx, i.Key, jsonData, i.Ttl)
+			cache.RdpConn.Set(cache.Ctx, i.Key, jsonData, i.TTL)
 		}
 		// return back data from repository
 		return data, err

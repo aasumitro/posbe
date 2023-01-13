@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	repoSql "github.com/aasumitro/posbe/internal/store/repository/sql"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"regexp"
@@ -25,7 +25,7 @@ func (suite *floorRepositoryTestSuite) SetupSuite() {
 		err error
 	)
 
-	config.DbPool, suite.mock, err = sqlmock.New(
+	configs.DbPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
@@ -100,7 +100,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Find_ExpectedSuccess(
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(floor)
-	res, err := suite.floorRepo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.floorRepo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -118,7 +118,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Find_ExpectedError() 
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(floor)
-	res, err := suite.floorRepo.Find(context.TODO(), domain.FindWithId, 1)
+	res, err := suite.floorRepo.Find(context.TODO(), domain.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }

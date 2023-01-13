@@ -21,7 +21,7 @@ type (
 	// Table Case Study Restaurant Dine in
 	Table struct {
 		ID        int           `json:"id"`
-		FloorId   int           `json:"floor_id" form:"floor_id" binding:"required"`
+		FloorID   int           `json:"floor_id" form:"floor_id" binding:"required"`
 		Name      string        `json:"name" form:"name" binding:"required"`
 		XPos      float32       `json:"x_pos" form:"x_pos" binding:"required"`
 		YPos      float32       `json:"y_pos" form:"y_pos" binding:"required"`
@@ -36,7 +36,7 @@ type (
 	// Room Case Study Karaoke
 	Room struct {
 		ID        int           `json:"id"`
-		FloorId   int           `json:"floor_id" form:"floor_id" binding:"required"`
+		FloorID   int           `json:"floor_id" form:"floor_id" binding:"required"`
 		Name      string        `json:"name" form:"name" binding:"required"`
 		XPos      float32       `json:"x_pos" form:"x_pos" binding:"required"`
 		YPos      float32       `json:"y_pos" form:"y_pos" binding:"required"`

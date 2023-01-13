@@ -40,7 +40,7 @@ func TestRedisCache_CacheFirstData(t *testing.T) {
 			args: args{
 				&utils.CacheDataSupplied{
 					Key: "lorem",
-					Ttl: 0,
+					TTL: 0,
 					CbF: func() (data any, err error) {
 						return nil, err
 					},
@@ -60,7 +60,7 @@ func TestRedisCache_CacheFirstData(t *testing.T) {
 			args: args{
 				&utils.CacheDataSupplied{
 					Key: "lorem",
-					Ttl: 0,
+					TTL: 0,
 					CbF: func() (data any, err error) {
 						return domain.Role{ID: 1, Name: "test"}, err
 					},
@@ -80,7 +80,7 @@ func TestRedisCache_CacheFirstData(t *testing.T) {
 			args: args{
 				&utils.CacheDataSupplied{
 					Key: "lorem",
-					Ttl: 0,
+					TTL: 0,
 					CbF: func() (data any, err error) {
 						return testData, err
 					},
@@ -100,7 +100,7 @@ func TestRedisCache_CacheFirstData(t *testing.T) {
 			args: args{
 				&utils.CacheDataSupplied{
 					Key: "lorem",
-					Ttl: 0,
+					TTL: 0,
 					CbF: func() (data any, err error) {
 						return nil, errors.New("lorem ipsum")
 					},

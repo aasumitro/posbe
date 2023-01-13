@@ -26,11 +26,11 @@ type subcategoryHandler struct {
 func (handler subcategoryHandler) fetch(ctx *gin.Context) {
 	data, err := handler.svc.SubcategoryList()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, data)
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
 }
 
 // subcategories godoc
@@ -50,17 +50,17 @@ func (handler subcategoryHandler) fetch(ctx *gin.Context) {
 func (handler subcategoryHandler) store(ctx *gin.Context) {
 	var form domain.Subcategory
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	data, err := handler.svc.AddSubcategory(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, data)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, data)
 }
 
 // subcategories godoc
@@ -83,7 +83,7 @@ func (handler subcategoryHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -91,18 +91,18 @@ func (handler subcategoryHandler) update(ctx *gin.Context) {
 
 	var form domain.Subcategory
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	form.ID = id
 	data, err := handler.svc.EditSubcategory(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, data)
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
 }
 
 // subcategories godoc
@@ -122,7 +122,7 @@ func (handler subcategoryHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -131,11 +131,11 @@ func (handler subcategoryHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteSubcategory(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewSubcategoryHandler(svc domain.ICatalogCommonService, router gin.IRoutes) {

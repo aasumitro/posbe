@@ -1,11 +1,11 @@
 package http
 
 import (
+	"github.com/aasumitro/posbe/configs"
 	"net/http"
 	"time"
 
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -33,19 +33,19 @@ type AuthHandler struct {
 func (handler AuthHandler) login(ctx *gin.Context) {
 	var form domain.LoginForm
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
 	data, err := handler.svc.VerifyUserCredentials(form.Username, form.Password)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
 	token, claimErr := handler.jwt.ClaimJWTToken(data)
 	if claimErr != nil {
-		utils.NewHttpRespond(ctx, http.StatusInternalServerError, claimErr.Error())
+		utils.NewHTTPRespond(ctx, http.StatusInternalServerError, claimErr.Error())
 		return
 	}
 
@@ -61,7 +61,7 @@ func (handler AuthHandler) login(ctx *gin.Context) {
 		HttpOnly: true,
 	})
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, data)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, data)
 }
 
 // logout godoc
@@ -82,15 +82,15 @@ func (handler AuthHandler) logout(ctx *gin.Context) {
 		Expires: time.Now().Add(-time.Hour),
 	})
 
-	utils.NewHttpRespond(ctx, http.StatusOK, "LOGGED_OUT")
+	utils.NewHTTPRespond(ctx, http.StatusOK, "LOGGED_OUT")
 }
 
 func NewAuthHandler(accountService domain.IAccountService, router *gin.RouterGroup) {
 	handler := AuthHandler{svc: accountService, jwt: &utils.JSONWebToken{
-		Issuer:    config.Cfg.AppName,
-		SecretKey: []byte(config.Cfg.JWTSecretKey),
+		Issuer:    configs.Cfg.AppName,
+		SecretKey: []byte(configs.Cfg.JWTSecretKey),
 		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(time.Duration(config.Cfg.JWTLifetime) * time.Hour),
+		ExpiredAt: time.Now().Add(time.Duration(configs.Cfg.JWTLifetime) * time.Hour),
 	}}
 
 	router.POST("/login", handler.login)

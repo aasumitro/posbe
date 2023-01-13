@@ -19,13 +19,17 @@ type Password struct {
 	Supplied string
 }
 
-func (p *Password) HashPassword() (string, error) {
-	salt := make([]byte, 32)
+const cost, r, p, k = 32768, 8, 1, 32
+const maxSplit = 2
+const byteSize = 32
+
+func (pwd *Password) HashPassword() (string, error) {
+	salt := make([]byte, byteSize)
 	if _, err := rand.Read(salt); err != nil {
 		return "", err
 	}
 
-	shash, err := scrypt.Key([]byte(p.Supplied), salt, 32768, 8, 1, 32)
+	shash, err := scrypt.Key([]byte(pwd.Supplied), salt, cost, r, p, k)
 	if err != nil {
 		return "", err
 	}
@@ -35,9 +39,9 @@ func (p *Password) HashPassword() (string, error) {
 	return hashedPW, nil
 }
 
-func (p *Password) ComparePasswords() (bool, error) {
-	pwsalt := strings.Split(p.Stored, ".")
-	if len(pwsalt) < 2 {
+func (pwd *Password) ComparePasswords() (bool, error) {
+	pwsalt := strings.Split(pwd.Stored, ".")
+	if len(pwsalt) < maxSplit {
 		return false, errors.ErrorPasswordNotProvideValidHash
 	}
 
@@ -46,7 +50,7 @@ func (p *Password) ComparePasswords() (bool, error) {
 		return false, errors.ErrorPasswordUnableToVerify
 	}
 
-	shash, err := scrypt.Key([]byte(p.Supplied), salt, 32768, 8, 1, 32)
+	shash, err := scrypt.Key([]byte(pwd.Supplied), salt, cost, r, p, k)
 	if err != nil {
 		return false, errors.ErrorPasswordUnableToVerify
 	}

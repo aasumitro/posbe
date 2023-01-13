@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type UnitSQLRepository struct {
@@ -87,5 +87,5 @@ func (repo UnitSQLRepository) Delete(ctx context.Context, params *domain.Unit) e
 }
 
 func NewUnitSQLRepository() domain.ICRUDRepository[domain.Unit] {
-	return &UnitSQLRepository{Db: config.DbPool}
+	return &UnitSQLRepository{Db: configs.DbPool}
 }

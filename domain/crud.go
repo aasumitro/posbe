@@ -5,12 +5,18 @@ import "context"
 type FindWith int64
 
 const (
-	FindWithId FindWith = iota
-	FindWithRelationId
+	FindWithID FindWith = iota
+	FindWithRelationID
 	FindWithName
+	// for user data
 	FindWithUsername
 	FindWithEmail
 	FindWithPhone
+	// for product data
+	FindWithSKU
+	FindWithCategoryID
+	FindWithSubcategoryID
+	FindWithPriceInRange
 )
 
 type ICRUDRepository[T any] interface {
@@ -21,9 +27,13 @@ type ICRUDRepository[T any] interface {
 	Delete(ctx context.Context, params *T) error
 }
 
-// ICRUDAddOnRepository
-// TODO: rename
+// ICRUDAddOnRepository TODO: rename
 type ICRUDAddOnRepository[T any] interface {
 	AllWhere(ctx context.Context, key FindWith, val any) (data []*T, err error)
+	ICRUDRepository[T]
+}
+
+type ICRUDWithSearchRepository[T any] interface {
+	Search(ctx context.Context, keys []FindWith, values []any) (data []*T, err error)
 	ICRUDRepository[T]
 }

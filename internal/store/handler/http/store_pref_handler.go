@@ -25,11 +25,11 @@ type storePrefHandler struct {
 func (handler storePrefHandler) fetch(ctx *gin.Context) {
 	prefs, err := handler.svc.AllPrefs()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, prefs)
+	utils.NewHTTPRespond(ctx, http.StatusOK, prefs)
 }
 
 // store godoc
@@ -49,7 +49,7 @@ func (handler storePrefHandler) fetch(ctx *gin.Context) {
 func (handler storePrefHandler) update(ctx *gin.Context) {
 	var form domain.StorePref
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
 			err.Error())
 		return
@@ -57,11 +57,11 @@ func (handler storePrefHandler) update(ctx *gin.Context) {
 
 	pref, err := handler.svc.UpdatePrefs(form.Key, form.Value)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, pref)
+	utils.NewHTTPRespond(ctx, http.StatusOK, pref)
 }
 
 func NewStorePrefHandler(svc domain.IStorePrefService, router gin.IRoutes) {

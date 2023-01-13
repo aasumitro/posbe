@@ -28,7 +28,7 @@ type floorHandler struct {
 func (handler floorHandler) floorsWith(ctx *gin.Context) {
 	joinParams := strings.ToLower(ctx.Param("join"))
 	if !utils.InArray(joinParams, []string{"rooms", "tables"}) {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			"unsupported join data")
 		return
@@ -43,11 +43,11 @@ func (handler floorHandler) floorsWith(ctx *gin.Context) {
 	}())
 
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, floors)
+	utils.NewHTTPRespond(ctx, http.StatusOK, floors)
 }
 
 // floors godoc
@@ -64,11 +64,11 @@ func (handler floorHandler) floorsWith(ctx *gin.Context) {
 func (handler floorHandler) fetch(ctx *gin.Context) {
 	floors, err := handler.svc.FloorList()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, floors)
+	utils.NewHTTPRespond(ctx, http.StatusOK, floors)
 }
 
 // floors godoc
@@ -87,7 +87,7 @@ func (handler floorHandler) fetch(ctx *gin.Context) {
 func (handler floorHandler) store(ctx *gin.Context) {
 	var form domain.Floor
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
 			err.Error())
 		return
@@ -95,11 +95,11 @@ func (handler floorHandler) store(ctx *gin.Context) {
 
 	floor, err := handler.svc.AddFloor(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, floor)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, floor)
 }
 
 // floors godoc
@@ -121,7 +121,7 @@ func (handler floorHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -129,7 +129,7 @@ func (handler floorHandler) update(ctx *gin.Context) {
 
 	var form domain.Floor
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
 			err.Error())
 		return
@@ -138,11 +138,11 @@ func (handler floorHandler) update(ctx *gin.Context) {
 	form.ID = id
 	floor, err := handler.svc.EditFloor(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, floor)
+	utils.NewHTTPRespond(ctx, http.StatusOK, floor)
 }
 
 // floors godoc
@@ -162,7 +162,7 @@ func (handler floorHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -171,11 +171,11 @@ func (handler floorHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteFloor(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewFloorHandler(svc domain.IStoreService, router gin.IRoutes) {

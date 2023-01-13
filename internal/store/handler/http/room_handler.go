@@ -26,11 +26,11 @@ type roomHandler struct {
 func (handler roomHandler) fetch(ctx *gin.Context) {
 	rooms, err := handler.svc.RoomList()
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, rooms)
+	utils.NewHTTPRespond(ctx, http.StatusOK, rooms)
 }
 
 // rooms godoc
@@ -56,7 +56,7 @@ func (handler roomHandler) fetch(ctx *gin.Context) {
 func (handler roomHandler) store(ctx *gin.Context) {
 	var form domain.Room
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
 			err.Error())
 		return
@@ -64,11 +64,11 @@ func (handler roomHandler) store(ctx *gin.Context) {
 
 	room, err := handler.svc.AddRoom(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusCreated, room)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, room)
 }
 
 // rooms godoc
@@ -97,7 +97,7 @@ func (handler roomHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -105,7 +105,7 @@ func (handler roomHandler) update(ctx *gin.Context) {
 
 	var form domain.Room
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
 			err.Error())
 		return
@@ -114,11 +114,11 @@ func (handler roomHandler) update(ctx *gin.Context) {
 	form.ID = id
 	room, err := handler.svc.EditRoom(&form)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusOK, room)
+	utils.NewHTTPRespond(ctx, http.StatusOK, room)
 }
 
 // rooms godoc
@@ -138,7 +138,7 @@ func (handler roomHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
 	if errParse != nil {
-		utils.NewHttpRespond(ctx,
+		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			errParse.Error())
 		return
@@ -147,11 +147,11 @@ func (handler roomHandler) destroy(ctx *gin.Context) {
 
 	err := handler.svc.DeleteRoom(&data)
 	if err != nil {
-		utils.NewHttpRespond(ctx, err.Code, err.Message)
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
 
-	utils.NewHttpRespond(ctx, http.StatusNoContent, nil)
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
 func NewRoomHandler(svc domain.IStoreService, router gin.IRoutes) {

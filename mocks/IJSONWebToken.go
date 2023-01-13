@@ -9,20 +9,20 @@ type IJSONWebToken struct {
 	mock.Mock
 }
 
-// ClaimJWTToken provides a mock function with given fields:
+// ClaimJWTToken provides a mock function with given fields: payload
 func (_m *IJSONWebToken) ClaimJWTToken(payload interface{}) (string, error) {
-	ret := _m.Called()
+	ret := _m.Called(payload)
 
 	var r0 string
-	if rf, ok := ret.Get(0).(func() string); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(interface{}) string); ok {
+		r0 = rf(payload)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(interface{}) error); ok {
+		r1 = rf(payload)
 	} else {
 		r1 = ret.Error(1)
 	}

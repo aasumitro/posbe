@@ -12,7 +12,7 @@ type (
 
 	User struct {
 		ID       int    `json:"id"`
-		RoleId   int    `json:"role_id,omitempty" form:"role_id" binding:"required"`
+		RoleID   int    `json:"role_id,omitempty" form:"role_id" binding:"required"`
 		Name     string `json:"name" form:"name" binding:"required"`
 		Username string `json:"username" form:"username" binding:"required"`
 		Email    string `json:"email" form:"email"`

@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
 	"github.com/aasumitro/posbe/internal/catalog/service"
+	"github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -33,8 +33,8 @@ func (suite *catalogCommonService) SetupSuite() {
 	suite.units = []*domain.Unit{suite.unit, {ID: 2, Magnitude: "test 2", Name: "test 2", Symbol: "test 2"}}
 	suite.category = &domain.Category{ID: 1, Name: "test"}
 	suite.categories = []*domain.Category{suite.category, {ID: 1, Name: "test 2"}}
-	suite.subcategory = &domain.Subcategory{ID: 1, CategoryId: 1, Name: "test"}
-	suite.subcategories = []*domain.Subcategory{suite.subcategory, {ID: 2, CategoryId: 1, Name: "test 2"}}
+	suite.subcategory = &domain.Subcategory{ID: 1, CategoryID: 1, Name: "test"}
+	suite.subcategories = []*domain.Subcategory{suite.subcategory, {ID: 2, CategoryID: 1, Name: "test 2"}}
 
 	suite.addon = &domain.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
 	suite.addons = []*domain.Addon{suite.addon, {ID: 2, Name: "test 2", Description: "test 2", Price: 2}}
@@ -150,6 +150,20 @@ func (suite *catalogCommonService) TestService_DeleteUnit_ShouldErrorWhenFind() 
 	err := svc.DeleteUnit(suite.unit)
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), err, suite.svcErr)
+	repoMock.AssertExpectations(suite.T())
+}
+func (suite *catalogCommonService) TestService_DeleteUnit_ShouldErrorWhenFindNotFound() {
+	repoMock := new(mocks.ICRUDRepository[domain.Unit])
+	svc := service.NewCatalogCommonService(context.TODO(), repoMock,
+		new(mocks.ICRUDRepository[domain.Category]), new(mocks.ICRUDRepository[domain.Subcategory]),
+		new(mocks.ICRUDRepository[domain.Addon]))
+	repoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteUnit(suite.unit)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
 	repoMock.AssertExpectations(suite.T())
 }
 func (suite *catalogCommonService) TestService_DeleteUnit_ShouldErrorWhenDelete() {
@@ -280,6 +294,20 @@ func (suite *catalogCommonService) TestService_DeleteCategory_ShouldErrorWhenFin
 	require.Equal(suite.T(), err, suite.svcErr)
 	repoMock.AssertExpectations(suite.T())
 }
+func (suite *catalogCommonService) TestService_DeleteCategory_ShouldErrorWhenFindNotFound() {
+	repoMock := new(mocks.ICRUDRepository[domain.Category])
+	svc := service.NewCatalogCommonService(context.TODO(),
+		new(mocks.ICRUDRepository[domain.Unit]), repoMock, new(mocks.ICRUDRepository[domain.Subcategory]),
+		new(mocks.ICRUDRepository[domain.Addon]))
+	repoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteCategory(suite.category)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	repoMock.AssertExpectations(suite.T())
+}
 func (suite *catalogCommonService) TestService_DeleteCategory_ShouldErrorWhenDelete() {
 	repoMock := new(mocks.ICRUDRepository[domain.Category])
 	svc := service.NewCatalogCommonService(context.TODO(),
@@ -408,6 +436,20 @@ func (suite *catalogCommonService) TestService_DeleteSubcategory_ShouldErrorWhen
 	require.Equal(suite.T(), err, suite.svcErr)
 	repoMock.AssertExpectations(suite.T())
 }
+func (suite *catalogCommonService) TestService_DeleteSubcategory_ShouldErrorWhenFindNotFound() {
+	repoMock := new(mocks.ICRUDRepository[domain.Subcategory])
+	svc := service.NewCatalogCommonService(context.TODO(),
+		new(mocks.ICRUDRepository[domain.Unit]), new(mocks.ICRUDRepository[domain.Category]), repoMock,
+		new(mocks.ICRUDRepository[domain.Addon]))
+	repoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteSubcategory(suite.subcategory)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	repoMock.AssertExpectations(suite.T())
+}
 func (suite *catalogCommonService) TestService_DeleteSubcategory_ShouldErrorWhenDelete() {
 	repoMock := new(mocks.ICRUDRepository[domain.Subcategory])
 	svc := service.NewCatalogCommonService(context.TODO(),
@@ -534,6 +576,20 @@ func (suite *catalogCommonService) TestService_DeleteAddon_ShouldErrorWhenFind()
 	err := svc.DeleteAddon(suite.addon)
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), err, suite.svcErr)
+	repoMock.AssertExpectations(suite.T())
+}
+func (suite *catalogCommonService) TestService_DeleteAddon_ShouldErrorWhenFindNotFound() {
+	repoMock := new(mocks.ICRUDRepository[domain.Addon])
+	svc := service.NewCatalogCommonService(context.TODO(),
+		new(mocks.ICRUDRepository[domain.Unit]), new(mocks.ICRUDRepository[domain.Category]),
+		new(mocks.ICRUDRepository[domain.Subcategory]), repoMock)
+	repoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteAddon(suite.addon)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
 	repoMock.AssertExpectations(suite.T())
 }
 func (suite *catalogCommonService) TestService_DeleteAddon_ShouldErrorWhenDelete() {

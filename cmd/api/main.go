@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/docs"
 	"github.com/aasumitro/posbe/internal/_default"
 	"github.com/aasumitro/posbe/internal/account"
 	"github.com/aasumitro/posbe/internal/catalog"
 	"github.com/aasumitro/posbe/internal/store"
 	"github.com/aasumitro/posbe/internal/transaction"
-	"github.com/aasumitro/posbe/pkg/config"
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -37,22 +37,22 @@ func init() {
 
 func initConfig() {
 	// Load app environment
-	config.LoadConfig()
+	configs.LoadConfig()
 
 	// Init database connection
-	config.Cfg.InitDbConn()
+	configs.Cfg.InitDbConn()
 
 	// Init cache connection
-	config.Cfg.InitRedisConn()
+	configs.Cfg.InitRedisConn()
 
-	if !config.Cfg.AppDebug {
-		config.Cfg.InitCrashReporting()
+	if !configs.Cfg.AppDebug {
+		configs.Cfg.InitCrashReporting()
 		gin.SetMode(gin.ReleaseMode)
 	}
 }
 
 func initEngine() {
-	if config.Cfg.AppDebug {
+	if configs.Cfg.AppDebug {
 		accessLogFile, _ := os.Create("./temps/access.log")
 		gin.DefaultWriter = io.MultiWriter(accessLogFile, os.Stdout)
 
@@ -62,17 +62,17 @@ func initEngine() {
 
 	appEngine = gin.Default()
 
-	if !config.Cfg.AppDebug {
+	if !configs.Cfg.AppDebug {
 		appEngine.Use(sentrygin.New(sentrygin.Options{}))
 	}
 }
 
 func initSwaggerInfo() {
 	docs.SwaggerInfo.BasePath = appEngine.BasePath()
-	docs.SwaggerInfo.Title = config.Cfg.AppName
-	docs.SwaggerInfo.Description = config.Cfg.AppDescription
-	docs.SwaggerInfo.Version = config.Cfg.AppVersion
-	docs.SwaggerInfo.Host = config.Cfg.AppUrl
+	docs.SwaggerInfo.Title = configs.Cfg.AppName
+	docs.SwaggerInfo.Description = configs.Cfg.AppDescription
+	docs.SwaggerInfo.Version = configs.Cfg.AppVersion
+	docs.SwaggerInfo.Host = configs.Cfg.AppURL
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }
 
@@ -80,7 +80,7 @@ func main() {
 	// Load registered modules
 	loadModules()
 	// start engine
-	log.Fatal(appEngine.Run(config.Cfg.AppUrl))
+	log.Fatal(appEngine.Run(configs.Cfg.AppURL))
 }
 
 func loadModules() {

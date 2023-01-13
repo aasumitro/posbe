@@ -12,7 +12,7 @@ import (
 type httpHandler struct{}
 
 func (handler httpHandler) home(context *gin.Context) {
-	utils.NewHttpRespond(context, http.StatusOK, map[string]interface{}{
+	utils.NewHTTPRespond(context, http.StatusOK, map[string]interface{}{
 		"01_title":       "POSBE",
 		"02_description": "Point of Sales Backend",
 		"03_api_spec": fmt.Sprintf(
@@ -31,18 +31,18 @@ func (handler httpHandler) home(context *gin.Context) {
 }
 
 func (handler httpHandler) noMethod(context *gin.Context) {
-	utils.NewHttpRespond(context, http.StatusNotFound, "HTTP_METHOD_NOT_FOUND")
+	utils.NewHTTPRespond(context, http.StatusNotFound, "HTTP_METHOD_NOT_FOUND")
 }
 
 func (handler httpHandler) notFound(context *gin.Context) {
-	utils.NewHttpRespond(context, http.StatusNotFound, "HTTP_ROUTE_NOT_FOUND")
+	utils.NewHTTPRespond(context, http.StatusNotFound, "HTTP_ROUTE_NOT_FOUND")
 }
 
 func (handler httpHandler) ping(context *gin.Context) {
-	utils.NewHttpRespond(context, http.StatusOK, "PONG")
+	utils.NewHTTPRespond(context, http.StatusOK, "PONG")
 }
 
-func NewHttpRouter(router *gin.Engine) {
+func NewHTTPRouter(router *gin.Engine) {
 	handler := &httpHandler{}
 	router.NoMethod(handler.noMethod)
 	router.NoRoute(handler.notFound)

@@ -2,12 +2,13 @@ package service_test
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
 	"github.com/aasumitro/posbe/internal/account/service"
-	"github.com/aasumitro/posbe/pkg/config"
+	mocks2 "github.com/aasumitro/posbe/mocks"
 	svcErr "github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/alicebob/miniredis/v2"
@@ -48,7 +49,7 @@ func (suite *accountTestSuite) SetupSuite() {
 
 	suite.user = &domain.User{
 		ID:       1,
-		RoleId:   1,
+		RoleID:   1,
 		Name:     "lorem ipsum",
 		Username: "lorem",
 		Email:    "lorem@ipsum.id",
@@ -61,7 +62,7 @@ func (suite *accountTestSuite) SetupSuite() {
 		suite.user,
 		{
 			ID:       2,
-			RoleId:   1,
+			RoleID:   1,
 			Name:     "dolor amet",
 			Username: "dolor",
 			Email:    "dolor@amet.id",
@@ -76,18 +77,18 @@ func (suite *accountTestSuite) SetupSuite() {
 		Message: "UNEXPECTED",
 	}
 
-	config.RedisPool = redis.NewClient(&redis.Options{
+	configs.RedisPool = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
 }
 
 func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnModel() {
-	config.RedisPool = redis.NewClient(&redis.Options{
+	configs.RedisPool = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
-	cacheMock := new(mocks.Cache)
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	cacheMock := new(mocks2.Cache)
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 
@@ -105,24 +106,24 @@ func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnM
 }
 
 func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnString() {
-	config.RedisPool = redis.NewClient(&redis.Options{
+	configs.RedisPool = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
-	cacheMock := new(mocks.Cache)
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	cacheMock := new(mocks2.Cache)
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
 		On("All", mock.Anything).
 		Return(nil, nil).Once()
-	dataJson, _ := json.Marshal(suite.roles)
-	config.RedisPool.Set(context.TODO(), "roles", dataJson, 1)
+	json, _ := json.Marshal(suite.roles)
+	configs.RedisPool.Set(context.TODO(), "roles", json, 1)
 	cacheMock.On("CacheFirstData", &utils.CacheDataSupplied{
 		Key: "roles",
-		Ttl: time.Hour * 1,
+		TTL: time.Hour * 1,
 		CbF: nil,
-	}).Return(dataJson, nil).Once()
+	}).Return(json, nil).Once()
 	data, err := accSvc.RoleList()
 	suite.T().Log(data)
 	suite.T().Log(err)
@@ -132,8 +133,8 @@ func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnS
 }
 
 func (suite *accountTestSuite) TestAccountService_RoleList_ShouldError() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -148,8 +149,8 @@ func (suite *accountTestSuite) TestAccountService_RoleList_ShouldError() {
 }
 
 func (suite *accountTestSuite) TestAccountService_AddRole_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -164,8 +165,8 @@ func (suite *accountTestSuite) TestAccountService_AddRole_ShouldSuccess() {
 }
 
 func (suite *accountTestSuite) TestAccountService_AddRole_ShouldError() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -180,8 +181,8 @@ func (suite *accountTestSuite) TestAccountService_AddRole_ShouldError() {
 }
 
 func (suite *accountTestSuite) TestAccountService_EditRole_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -196,8 +197,8 @@ func (suite *accountTestSuite) TestAccountService_EditRole_ShouldSuccess() {
 }
 
 func (suite *accountTestSuite) TestAccountService_EditRole_ShouldError() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -212,8 +213,8 @@ func (suite *accountTestSuite) TestAccountService_EditRole_ShouldError() {
 }
 
 func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -228,10 +229,23 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldSuccess() {
 	require.Nil(suite.T(), err)
 	roleRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *accountTestSuite) TestService_DeleteRole_ShouldErrorWhenFindNotFound() {
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
+	svc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	roleRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteRole(suite.role)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	roleRepoMock.AssertExpectations(suite.T())
+}
 func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorInternal() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -245,8 +259,8 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorInternal
 }
 
 func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorUsage() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -263,8 +277,8 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorUsage() 
 }
 
 func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorWhenDelete() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	roleRepoMock.
@@ -282,8 +296,8 @@ func (suite *accountTestSuite) TestAccountService_DeleteRole_ShouldErrorWhenDele
 }
 
 func (suite *accountTestSuite) TestAccountService_UserList_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -298,8 +312,8 @@ func (suite *accountTestSuite) TestAccountService_UserList_ShouldSuccess() {
 }
 
 func (suite *accountTestSuite) TestAccountService_UserList_ShouldError() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -314,8 +328,8 @@ func (suite *accountTestSuite) TestAccountService_UserList_ShouldError() {
 }
 
 func (suite *accountTestSuite) TestAccountService_ShowUser_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -330,8 +344,8 @@ func (suite *accountTestSuite) TestAccountService_ShowUser_ShouldSuccess() {
 }
 
 func (suite *accountTestSuite) TestAccountService_ShowUser_ShouldError() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -346,8 +360,8 @@ func (suite *accountTestSuite) TestAccountService_ShowUser_ShouldError() {
 }
 
 func (suite *accountTestSuite) TestAccountService_AddUser_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -362,9 +376,9 @@ func (suite *accountTestSuite) TestAccountService_AddUser_ShouldSuccess() {
 }
 
 func (suite *accountTestSuite) TestAccountService_AddUser_ShouldError_Password() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
-	pwdMock := new(mocks.IPassword)
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
+	pwdMock := new(mocks2.IPassword)
 	pwdMock.
 		On("HashPassword").
 		Return("", errors.New("UNEXPECTED")).
@@ -379,8 +393,8 @@ func (suite *accountTestSuite) TestAccountService_AddUser_ShouldError_Password()
 }
 
 func (suite *accountTestSuite) TestAccountService_AddUser_ShouldError() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -395,8 +409,8 @@ func (suite *accountTestSuite) TestAccountService_AddUser_ShouldError() {
 }
 
 func (suite *accountTestSuite) TestAccountService_EditUser_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -411,9 +425,9 @@ func (suite *accountTestSuite) TestAccountService_EditUser_ShouldSuccess() {
 }
 
 func (suite *accountTestSuite) TestAccountService_EditUser_ShouldError_Password() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
-	pwdMock := new(mocks.IPassword)
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
+	pwdMock := new(mocks2.IPassword)
 	pwdMock.
 		On("HashPassword").
 		Return("", errors.New("UNEXPECTED")).
@@ -428,8 +442,8 @@ func (suite *accountTestSuite) TestAccountService_EditUser_ShouldError_Password(
 }
 
 func (suite *accountTestSuite) TestAccountService_EditUser_ShouldError() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -444,8 +458,8 @@ func (suite *accountTestSuite) TestAccountService_EditUser_ShouldError() {
 }
 
 func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -460,10 +474,23 @@ func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldSuccess() {
 	require.Nil(suite.T(), err)
 	roleRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *accountTestSuite) TestService_DeleteUser_ShouldErrorWhenFindNotFound() {
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
+	svc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	userRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	err := svc.DeleteUser(suite.user)
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	userRepoMock.AssertExpectations(suite.T())
+}
 func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldErrorWhenFind() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -477,8 +504,8 @@ func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldErrorWhenFind
 }
 
 func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldErrorWhenDelete() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -496,8 +523,8 @@ func (suite *accountTestSuite) TestAccountService_DeleteUser_ShouldErrorWhenDele
 }
 
 func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldSuccess() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -511,8 +538,8 @@ func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldSu
 }
 
 func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorFind() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.
@@ -524,11 +551,27 @@ func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldEr
 	require.Nil(suite.T(), user)
 	roleRepoMock.AssertExpectations(suite.T())
 }
-
+func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorWhenFindNotFound() {
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
+	svc := service.NewAccountService(context.TODO(),
+		roleRepoMock, userRepoMock)
+	userRepoMock.
+		On("Find", mock.Anything, mock.Anything, mock.Anything).
+		Once().
+		Return(nil, sql.ErrNoRows)
+	user, err := svc.VerifyUserCredentials(suite.user.Username, suite.user.Password)
+	require.NotNil(suite.T(), err)
+	require.Nil(suite.T(), user)
+	roleRepoMock.AssertExpectations(suite.T())
+	require.NotNil(suite.T(), err)
+	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
+	userRepoMock.AssertExpectations(suite.T())
+}
 func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorComparePassword() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
-	pwdUtil := new(mocks.IPassword)
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
+	pwdUtil := new(mocks2.IPassword)
 	accSvc := service.NewAccountServiceTest(context.TODO(),
 		roleRepoMock, userRepoMock, pwdUtil)
 	userRepoMock.
@@ -546,8 +589,8 @@ func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldEr
 }
 
 func (suite *accountTestSuite) TestAccountService_VerifyUserCredentials_ShouldErrorPassword() {
-	roleRepoMock := new(mocks.ICRUDRepository[domain.Role])
-	userRepoMock := new(mocks.ICRUDRepository[domain.User])
+	roleRepoMock := new(mocks2.ICRUDRepository[domain.Role])
+	userRepoMock := new(mocks2.ICRUDRepository[domain.User])
 	accSvc := service.NewAccountService(context.TODO(),
 		roleRepoMock, userRepoMock)
 	userRepoMock.

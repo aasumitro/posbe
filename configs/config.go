@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"database/sql"
@@ -24,15 +24,15 @@ type Config struct {
 	AppDescription    string `mapstructure:"APP_DESC"`
 	AppDebug          bool   `mapstructure:"APP_DEBUG"`
 	AppVersion        string `mapstructure:"APP_VERSION"`
-	AppUrl            string `mapstructure:"APP_URL"`
+	AppURL            string `mapstructure:"APP_URL"`
 	DBDriver          string `mapstructure:"DB_DRIVER"`
-	DBDsnUrl          string `mapstructure:"DB_DSN_URL"`
+	DBDsnURL          string `mapstructure:"DB_DSN_URL"`
 	JWTSecretKey      string `mapstructure:"JWT_SECRET_KEY"`
 	JWTLifetime       int    `mapstructure:"JWT_LIFETIME"`
 	CacheDriver       string `mapstructure:"CACHE_DRIVER"`
-	CacheDsnUrl       string `mapstructure:"CACHE_DSN_URL"`
+	CacheDsnURL       string `mapstructure:"CACHE_DSN_URL"`
 	CrashReportDriver string `mapstructure:"CRASH_REPORT_DRIVER"`
-	CrashReportDsnUrl string `mapstructure:"CRASH_REPORT_DSN_URL"`
+	CrashReportDsnURL string `mapstructure:"CRASH_REPORT_DSN_URL"`
 }
 
 func LoadConfig() {

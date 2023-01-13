@@ -14,7 +14,7 @@ type IStorePrefService struct {
 	mock.Mock
 }
 
-// StoreSettings provides a mock function with given fields:
+// AllPrefs provides a mock function with given fields:
 func (_m *IStorePrefService) AllPrefs() (*domain.StoreSetting, *utils.ServiceError) {
 	ret := _m.Called()
 
@@ -39,7 +39,7 @@ func (_m *IStorePrefService) AllPrefs() (*domain.StoreSetting, *utils.ServiceErr
 	return r0, r1
 }
 
-// UpdateStorePrefs provides a mock function with given fields: key, value
+// UpdatePrefs provides a mock function with given fields: key, value
 func (_m *IStorePrefService) UpdatePrefs(key string, value string) (*domain.StoreSetting, *utils.ServiceError) {
 	ret := _m.Called(key, value)
 

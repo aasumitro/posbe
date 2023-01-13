@@ -3,8 +3,8 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 )
 
 type UserSQLRepository struct {
@@ -12,9 +12,11 @@ type UserSQLRepository struct {
 }
 
 func (repo UserSQLRepository) All(ctx context.Context) (users []*domain.User, err error) {
-	q := "SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, "
-	q += "r.id as role_id, r.name as role_name, r.description FROM users as u "
-	q += "JOIN roles as r ON r.id = u.role_id"
+	q := `
+		SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, 
+		r.id as role_id, r.name as role_name, r.description FROM users as u 
+		JOIN roles as r ON r.id = u.role_id
+	`
 	rows, err := repo.Db.QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
@@ -25,7 +27,7 @@ func (repo UserSQLRepository) All(ctx context.Context) (users []*domain.User, er
 		var user domain.User
 
 		if err := rows.Scan(
-			&user.ID, &user.RoleId,
+			&user.ID, &user.RoleID,
 			&user.Name, &user.Username,
 			&user.Email, &user.Phone,
 			&user.Role.ID, &user.Role.Name,
@@ -47,12 +49,13 @@ func (repo UserSQLRepository) All(ctx context.Context) (users []*domain.User, er
 }
 
 func (repo UserSQLRepository) Find(ctx context.Context, key domain.FindWith, val any) (user *domain.User, err error) {
-	q := "SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, u.password, "
-	q += "r.id as role_id, r.name as role_name, r.description FROM users as u "
-	q += "JOIN roles as r ON r.id = u.role_id WHERE "
-
+	q := `
+		SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, u.password, 
+		r.id as role_id, r.name as role_name, r.description FROM users as u 
+		JOIN roles as r ON r.id = u.role_id WHERE 
+	`
 	switch key {
-	case domain.FindWithId:
+	case domain.FindWithID:
 		q += "u.id = $1"
 	case domain.FindWithName:
 		q += "u.name LIKE %$1%"
@@ -77,7 +80,7 @@ func (repo UserSQLRepository) Create(ctx context.Context, params *domain.User) (
 	q += "r.id as role_id, r.name as role_name, r.description FROM u "
 	q += "JOIN roles as r ON r.id = u.role_id"
 	row := repo.Db.QueryRowContext(
-		ctx, q, params.RoleId, params.Name,
+		ctx, q, params.RoleID, params.Name,
 		params.Username, params.Email, params.Phone,
 		params.Password)
 	return scanData(row)
@@ -90,7 +93,7 @@ func (repo UserSQLRepository) Update(ctx context.Context, params *domain.User) (
 	q += "r.id as role_id, r.name as role_name, r.description FROM u "
 	q += "JOIN roles as r ON r.id = u.role_id"
 	row := repo.Db.QueryRowContext(
-		ctx, q, params.RoleId, params.Name, params.Username,
+		ctx, q, params.RoleID, params.Name, params.Username,
 		params.Email, params.Phone, params.Password, params.ID)
 	return scanData(row)
 }
@@ -105,7 +108,7 @@ func scanData(row *sql.Row) (data *domain.User, err error) {
 	var user domain.User
 
 	if err := row.Scan(
-		&user.ID, &user.RoleId, &user.Name,
+		&user.ID, &user.RoleID, &user.Name,
 		&user.Username, &user.Email, &user.Phone, &user.Password,
 		&user.Role.ID, &user.Role.Name, &user.Role.Description,
 	); err != nil {
@@ -121,6 +124,6 @@ func scanData(row *sql.Row) (data *domain.User, err error) {
 	}, nil
 }
 
-func NewUserSQlRepository() domain.ICRUDRepository[domain.User] {
-	return &UserSQLRepository{Db: config.DbPool}
+func NewUserSQLRepository() domain.ICRUDRepository[domain.User] {
+	return &UserSQLRepository{Db: configs.DbPool}
 }

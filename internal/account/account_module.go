@@ -3,11 +3,11 @@ package account
 import (
 	"context"
 	"encoding/json"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/internal/account/handler/http"
 	repository "github.com/aasumitro/posbe/internal/account/repository/sql"
 	"github.com/aasumitro/posbe/internal/account/service"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/http/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v9"
@@ -19,8 +19,8 @@ var (
 )
 
 func InitAccountModule(ctx context.Context, router *gin.Engine) {
-	userRepository = repository.NewUserSQlRepository()
-	roleRepository = repository.NewRoleSQlRepository()
+	userRepository = repository.NewUserSQLRepository()
+	roleRepository = repository.NewRoleSQLRepository()
 	accountService := service.NewAccountService(ctx,
 		roleRepository, userRepository)
 	shouldCacheData(ctx)
@@ -35,14 +35,14 @@ func InitAccountModule(ctx context.Context, router *gin.Engine) {
 
 func shouldCacheData(ctx context.Context) {
 	// run this at first booting
-	if err := config.RedisPool.
+	if err := configs.RedisPool.
 		Get(ctx, "roles").
 		Err(); err != nil && err == redis.Nil {
 		if roles, err := roleRepository.All(ctx); err == nil {
 			// encode given data
 			jsonData, _ := json.Marshal(roles)
 			// store data to redis
-			config.RedisPool.Set(ctx,
+			configs.RedisPool.Set(ctx,
 				"roles", jsonData, 0)
 		}
 	}

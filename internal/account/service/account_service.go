@@ -2,9 +2,10 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/config"
 	"github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"net/http"
@@ -23,10 +24,10 @@ var (
 )
 
 func (service accountService) RoleList() (roles []*domain.Role, errorData *utils.ServiceError) {
-	helper := utils.RedisCache{Ctx: service.ctx, RdpConn: config.RedisPool}
+	helper := utils.RedisCache{Ctx: service.ctx, RdpConn: configs.RedisPool}
 	data, err := helper.CacheFirstData(&utils.CacheDataSupplied{
 		Key: roleCacheKey,
-		Ttl: time.Hour * 1,
+		TTL: time.Hour * 1,
 		CbF: func() (data any, err error) {
 			return service.roleRepo.All(service.ctx)
 		},
@@ -48,7 +49,7 @@ func (service accountService) RoleList() (roles []*domain.Role, errorData *utils
 func (service accountService) AddRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
 	data, err := service.roleRepo.Create(service.ctx, data)
 
-	config.RedisPool.Del(service.ctx, roleCacheKey)
+	configs.RedisPool.Del(service.ctx, roleCacheKey)
 
 	return utils.ValidateDataRow[domain.Role](data, err)
 }
@@ -56,14 +57,21 @@ func (service accountService) AddRole(data *domain.Role) (role *domain.Role, err
 func (service accountService) EditRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
 	data, err := service.roleRepo.Update(service.ctx, data)
 
-	config.RedisPool.Del(service.ctx, roleCacheKey)
+	configs.RedisPool.Del(service.ctx, roleCacheKey)
 
 	return utils.ValidateDataRow[domain.Role](data, err)
 }
 
 func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError {
-	role, err := service.roleRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	role, err := service.roleRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -85,7 +93,7 @@ func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError 
 		}
 	}
 
-	config.RedisPool.Del(service.ctx, roleCacheKey)
+	configs.RedisPool.Del(service.ctx, roleCacheKey)
 
 	return nil
 }
@@ -97,7 +105,7 @@ func (service accountService) UserList() (users []*domain.User, errorData *utils
 }
 
 func (service accountService) ShowUser(id int) (user *domain.User, errorData *utils.ServiceError) {
-	data, err := service.userRepo.Find(service.ctx, domain.FindWithId, id)
+	data, err := service.userRepo.Find(service.ctx, domain.FindWithID, id)
 
 	return utils.ValidateDataRow[domain.User](data, err)
 }
@@ -149,8 +157,15 @@ func (service accountService) EditUser(data *domain.User) (user *domain.User, er
 }
 
 func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError {
-	user, err := service.userRepo.Find(service.ctx, domain.FindWithId, data.ID)
+	user, err := service.userRepo.Find(service.ctx, domain.FindWithID, data.ID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -171,6 +186,13 @@ func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError 
 func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
 	user, err := service.userRepo.Find(service.ctx, domain.FindWithUsername, username)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, &utils.ServiceError{
+				Code:    http.StatusNotFound,
+				Message: err.Error(),
+			}
+		}
+
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),

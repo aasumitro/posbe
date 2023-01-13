@@ -3,7 +3,7 @@ package http
 import (
 	"encoding/json"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/domain/mocks"
+	"github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -21,8 +21,8 @@ type subcategoryHandlerTestSuite struct {
 }
 
 func (suite *subcategoryHandlerTestSuite) SetupSuite() {
-	suite.row = &domain.Subcategory{ID: 1, CategoryId: 1, Name: "test"}
-	suite.rows = []*domain.Subcategory{suite.row, {ID: 2, CategoryId: 1, Name: "test 2"}}
+	suite.row = &domain.Subcategory{ID: 1, CategoryID: 1, Name: "test"}
+	suite.rows = []*domain.Subcategory{suite.row, {ID: 2, CategoryID: 1, Name: "test 2"}}
 }
 
 func (suite *subcategoryHandlerTestSuite) TestHandler_Fetch_ShouldSuccess() {
@@ -68,7 +68,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Store_ShouldSuccess() {
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"name":        "lorem",
 		"category_id": 1,
 	})
@@ -88,7 +88,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Store_ShouldError_Unproces
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", nil)
+	utils.MockJSONRequest(ctx, "POST", "application/json", nil)
 	subcategoryHandler{svc: svc}.store(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -107,7 +107,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Store_ShouldError_Internal
 	writer := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
-	utils.MockJsonRequest(ctx, "POST", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "POST", "application/json", map[string]interface{}{
 		"name":        "lorem",
 		"category_id": 1,
 	})
@@ -129,7 +129,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Update_ShouldSuccess() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"name":        "lorem",
 		"category_id": 1,
 	})
@@ -146,14 +146,13 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Update_ShouldError_BadRequ
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd123"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	subcategoryHandler{svc: svc}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
 	assert.Equal(suite.T(), http.StatusBadRequest, writer.Code)
 	assert.Equal(suite.T(), http.StatusBadRequest, got.Code)
 	assert.Equal(suite.T(), http.StatusText(http.StatusBadRequest), got.Status)
-
 }
 func (suite *subcategoryHandlerTestSuite) TestHandler_Update_ShouldError_UnprocessableEntity() {
 	svc := new(mocks.ICatalogCommonService)
@@ -161,7 +160,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Update_ShouldError_Unproce
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", nil)
+	utils.MockJSONRequest(ctx, "PUT", "application/json", nil)
 	subcategoryHandler{svc: svc}.update(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -180,7 +179,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Update_ShouldError_Interna
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "PUT", "application/json", map[string]interface{}{
+	utils.MockJSONRequest(ctx, "PUT", "application/json", map[string]interface{}{
 		"name":        "lorem",
 		"category_id": 1,
 	})
@@ -202,7 +201,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Destroy_ShouldSuccess() {
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	subcategoryHandler{svc: svc}.destroy(ctx)
 	assert.Equal(suite.T(), http.StatusNoContent, writer.Code)
 }
@@ -217,7 +216,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Destroy_ShouldErrorInterna
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	subcategoryHandler{svc: svc}.destroy(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)
@@ -231,7 +230,7 @@ func (suite *subcategoryHandlerTestSuite) TestHandler_Destroy_ShouldErrorBadRequ
 	ctx, _ := gin.CreateTestContext(writer)
 	ctx.Request = &http.Request{Header: make(http.Header)}
 	ctx.Params = []gin.Param{{Key: "id", Value: "asd1"}}
-	utils.MockJsonRequest(ctx, "DELETE", "application/json", nil)
+	utils.MockJSONRequest(ctx, "DELETE", "application/json", nil)
 	subcategoryHandler{svc: svc}.destroy(ctx)
 	var got utils.SuccessRespond
 	_ = json.Unmarshal(writer.Body.Bytes(), &got)

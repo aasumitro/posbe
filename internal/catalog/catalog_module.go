@@ -14,8 +14,12 @@ func InitCatalogModule(ctx context.Context, router *gin.Engine) {
 	categoryRepository := repository.NewCategorySQLRepository()
 	subcategoryRepository := repository.NewSubcategorySQLRepository()
 	addonRepository := repository.NewAddonSQLRepository()
+	productRepository := repository.NewProductSQLRepository()
+	productVariantRepository := repository.NewProductVariantSQLRepository()
 	catalogCommonService := service.NewCatalogCommonService(ctx, unitRepository,
 		categoryRepository, subcategoryRepository, addonRepository)
+	productCommonService := service.NewCatalogProductService(ctx,
+		productRepository, productVariantRepository)
 	routerGroup := router.Group("v1")
 	protectedRouter := routerGroup.
 		Use(middleware.Auth()).
@@ -24,4 +28,5 @@ func InitCatalogModule(ctx context.Context, router *gin.Engine) {
 	http.NewCategoryHandler(catalogCommonService, protectedRouter)
 	http.NewSubcategoryHandler(catalogCommonService, protectedRouter)
 	http.NewAddonHandler(catalogCommonService, protectedRouter)
+	http.NewProductVariantHandler(productCommonService, protectedRouter)
 }
