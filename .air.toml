@@ -3,15 +3,15 @@
 # Working directory
 # . or absolute path, please note that the directories following must be under root
 root = "."
-tmp_dir = "build"
+tmp_dir = "temps"
 
 [build]
 # Just plain old shell command. You could use `make` as well.
-cmd = "go build -o ./build/posbe ./cmd/api/."
+cmd = "go build -o ./temps/build/posbe ./cmd/api/."
 # Binary file yields from `cmd`.
 bin = "build"
 # Customize binary.
-full_bin = "./build/posbe"
+full_bin = "./temps/build/posbe"
 # This log file places in your tmp_dir.
 log = "air_errors.log"
 # Watch these filename extensions.
