@@ -15,17 +15,17 @@ deps:
 
 build: swag
 	@ echo "Build Binary"
-	@ mkdir ./build && mkdir ./build/db
-	@ cp ./db/fresh.db ./build/db/local-data.db && cp .example.env ./build/.env
+	@ mkdir ./build
+	@ cp .example.env ./build/.env
 	@ go mod tidy -compat=1.19
-	@ go build -o ./build/pokewar ./cmd/web/main.go
-	@ GOOS=windows GOARCH=amd64 go build -o ./build/pokewar.exe ./cmd/web/main.go
+	@ go build -o ./build/posbe ./cmd/api/main.go
+	@ GOOS=windows GOARCH=amd64 go build -o ./build/posbe.exe ./cmd/api/main.go
 	@ echo "generate binary done"
 
 swag: tests
 	@ echo "Re-generate Swagger File (API Spec docs)"
 	@ swag init --parseDependency --parseInternal \
-		--parseDepth 4 -g ./cmd/web/main.go
+		--parseDepth 4 -g ./cmd/api/main.go
 	@ echo "generate swagger file done"
 
 tests: $(MOCKERY) $(GOTESTSUM) lint
@@ -43,7 +43,7 @@ lint: $(GOLANGCI)
 run:
 	@echo "Run App"
 	go mod tidy -compat=1.19
-	go run ./cmd/web/main.go
+	go run ./cmd/api/main.go
 
 watch:
 	air
