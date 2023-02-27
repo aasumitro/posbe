@@ -5,14 +5,14 @@ go 1.19
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/alicebob/miniredis/v2 v2.30.0
-	github.com/getsentry/sentry-go v0.16.0
+	github.com/getsentry/sentry-go v0.18.0
 	github.com/gin-gonic/gin v1.8.2
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
-	github.com/golang-jwt/jwt/v4 v4.4.3
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/lib/pq v1.10.7
 	github.com/spf13/viper v1.15.0
-	github.com/stretchr/testify v1.8.1
-	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
+	github.com/stretchr/testify v1.8.2
+	github.com/swaggo/files v1.0.0
 	github.com/swaggo/gin-swagger v1.5.3
 	github.com/swaggo/swag v1.8.10
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
