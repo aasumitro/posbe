@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"github.com/aasumitro/posbe/pkg/errors"
+	"github.com/aasumitro/posbe/commons"
 	"golang.org/x/crypto/scrypt"
 	"strings"
 )
@@ -42,17 +42,17 @@ func (pwd *Password) HashPassword() (string, error) {
 func (pwd *Password) ComparePasswords() (bool, error) {
 	pwsalt := strings.Split(pwd.Stored, ".")
 	if len(pwsalt) < maxSplit {
-		return false, errors.ErrorPasswordNotProvideValidHash
+		return false, commons.ErrorPasswordNotProvideValidHash
 	}
 
 	salt, err := hex.DecodeString(pwsalt[1])
 	if err != nil {
-		return false, errors.ErrorPasswordUnableToVerify
+		return false, commons.ErrorPasswordUnableToVerify
 	}
 
 	shash, err := scrypt.Key([]byte(pwd.Supplied), salt, cost, r, p, k)
 	if err != nil {
-		return false, errors.ErrorPasswordUnableToVerify
+		return false, commons.ErrorPasswordUnableToVerify
 	}
 
 	return hex.EncodeToString(shash) == pwsalt[0], nil

@@ -22,7 +22,7 @@ build: swag
 	@ GOOS=windows GOARCH=amd64 go build -o ./build/posbe.exe ./cmd/api/main.go
 	@ echo "generate binary done"
 
-swag: tests
+api-docs: tests
 	@ echo "Re-generate Swagger File (API Spec docs)"
 	@ swag init --parseDependency --parseInternal \
 		--parseDepth 4 -g ./cmd/api/main.go
@@ -46,4 +46,5 @@ run:
 	go run ./cmd/api/main.go
 
 watch:
+	go mod tidy -compat=1.19
 	air

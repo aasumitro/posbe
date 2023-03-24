@@ -1,1 +1,1 @@
-### Errors Localization for Frontend
+### Errors Constants Localization for Frontend

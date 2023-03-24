@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	FNCache func() (data any, err error)
+	FN func() (data any, err error)
 
 	// Cache Interface
 	// maybe not just for redis
@@ -24,7 +24,7 @@ type (
 	CacheDataSupplied struct {
 		Key string
 		TTL time.Duration
-		CbF FNCache
+		CbF FN
 	}
 )
 

@@ -5,11 +5,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	svcErr "github.com/aasumitro/posbe/commons"
 	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/internal/account/service"
 	mocks2 "github.com/aasumitro/posbe/mocks"
-	svcErr "github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v9"
@@ -117,13 +117,13 @@ func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnS
 	roleRepoMock.
 		On("All", mock.Anything).
 		Return(nil, nil).Once()
-	json, _ := json.Marshal(suite.roles)
-	configs.RedisPool.Set(context.TODO(), "roles", json, 1)
+	jsonData, _ := json.Marshal(suite.roles)
+	configs.RedisPool.Set(context.TODO(), "roles", jsonData, 1)
 	cacheMock.On("CacheFirstData", &utils.CacheDataSupplied{
 		Key: "roles",
 		TTL: time.Hour * 1,
 		CbF: nil,
-	}).Return(json, nil).Once()
+	}).Return(jsonData, nil).Once()
 	data, err := accSvc.RoleList()
 	suite.T().Log(data)
 	suite.T().Log(err)
