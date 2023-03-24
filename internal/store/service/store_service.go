@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"database/sql"
+	"github.com/aasumitro/posbe/commons"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"net/http"
 	"reflect"
@@ -54,7 +54,7 @@ func (service storeService) DeleteFloor(data *domain.Floor) *utils.ServiceError 
 	if floor.TotalTables >= 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusForbidden,
-			Message: errors.ErrorUnableToDelete,
+			Message: commons.ErrorUnableToDelete,
 		}
 	}
 

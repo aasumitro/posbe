@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	svcErr "github.com/aasumitro/posbe/commons"
 	"github.com/aasumitro/posbe/domain"
 	"github.com/aasumitro/posbe/internal/store/service"
-	mocks2 "github.com/aasumitro/posbe/mocks"
-	svcErr "github.com/aasumitro/posbe/pkg/errors"
+	"github.com/aasumitro/posbe/mocks"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -78,9 +78,9 @@ func (suite *storeTestSuite) SetupSuite() {
 
 // ================= FLOOR TEST CASE
 func (suite *storeTestSuite) TestStoreService_FloorList_ShouldSuccess() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("All", mock.Anything).
 		Once().
@@ -93,9 +93,9 @@ func (suite *storeTestSuite) TestStoreService_FloorList_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_FloorList_ShouldError() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("All", mock.Anything).
 		Once().
@@ -108,9 +108,9 @@ func (suite *storeTestSuite) TestStoreService_FloorList_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_AddFloor_ShouldSuccess() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Create", mock.Anything, mock.Anything).
 		Once().
@@ -123,9 +123,9 @@ func (suite *storeTestSuite) TestStoreService_AddFloor_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_AddFloor_ShouldError() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Create", mock.Anything, mock.Anything).
 		Once().
@@ -138,9 +138,9 @@ func (suite *storeTestSuite) TestStoreService_AddFloor_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_EditFloor_ShouldSuccess() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Update", mock.Anything, mock.Anything).
 		Once().
@@ -153,9 +153,9 @@ func (suite *storeTestSuite) TestStoreService_EditFloor_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_EditFloor_ShouldError() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Update", mock.Anything, mock.Anything).
 		Once().
@@ -168,9 +168,9 @@ func (suite *storeTestSuite) TestStoreService_EditFloor_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldSuccess() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -185,9 +185,9 @@ func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorWhenFind() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -198,9 +198,9 @@ func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorWhenFind() 
 	floorRepoMock.AssertExpectations(suite.T())
 }
 func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorWhenFindNotFound() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -211,9 +211,9 @@ func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorWhenFindNot
 	floorRepoMock.AssertExpectations(suite.T())
 }
 func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorHasTables() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -228,9 +228,9 @@ func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorHasTables()
 }
 
 func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorWhenDelete() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks2.ICRUDAddOnRepository[domain.Table]),
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	svc := service.NewStoreService(context.TODO(), floorRepoMock, new(mocks.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -247,11 +247,11 @@ func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorWhenDelete(
 
 // ================== TABLE TEST CASE
 func (suite *storeTestSuite) TestStoreService_TableList_ShouldSuccess() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("All", mock.Anything).
 		Once().
@@ -264,11 +264,11 @@ func (suite *storeTestSuite) TestStoreService_TableList_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_TableList_ShouldError() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("All", mock.Anything).
 		Once().
@@ -281,11 +281,11 @@ func (suite *storeTestSuite) TestStoreService_TableList_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_AddTable_ShouldSuccess() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("Create", mock.Anything, mock.Anything).
 		Once().
@@ -298,11 +298,11 @@ func (suite *storeTestSuite) TestStoreService_AddTable_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_AddTable_ShouldError() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("Create", mock.Anything, mock.Anything).
 		Once().
@@ -315,11 +315,11 @@ func (suite *storeTestSuite) TestStoreService_AddTable_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_EditTable_ShouldSuccess() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("Update", mock.Anything, mock.Anything).
 		Once().
@@ -332,11 +332,11 @@ func (suite *storeTestSuite) TestStoreService_EditTable_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_EditTable_ShouldError() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("Update", mock.Anything, mock.Anything).
 		Once().
@@ -349,11 +349,11 @@ func (suite *storeTestSuite) TestStoreService_EditTable_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldSuccess() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -368,11 +368,11 @@ func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenFind() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -383,11 +383,11 @@ func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenFind() 
 	tableRepoMock.AssertExpectations(suite.T())
 }
 func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenFindNotFound() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -398,11 +398,11 @@ func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenFindNot
 	tableRepoMock.AssertExpectations(suite.T())
 }
 func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenDelete() {
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDRepository[domain.Floor]),
 		tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	tableRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
@@ -419,10 +419,10 @@ func (suite *storeTestSuite) TestStoreService_DeleteTable_ShouldErrorWhenDelete(
 
 // =================== ROOM TEST CASE
 func (suite *storeTestSuite) TestStoreService_RoomList_ShouldSuccess() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("All", mock.Anything).
@@ -436,10 +436,10 @@ func (suite *storeTestSuite) TestStoreService_RoomList_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_RoomList_ShouldError() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("All", mock.Anything).
@@ -453,10 +453,10 @@ func (suite *storeTestSuite) TestStoreService_RoomList_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_AddRoom_ShouldSuccess() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("Create", mock.Anything, mock.Anything).
@@ -470,10 +470,10 @@ func (suite *storeTestSuite) TestStoreService_AddRoom_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_AddRoom_ShouldError() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("Create", mock.Anything, mock.Anything).
@@ -487,10 +487,10 @@ func (suite *storeTestSuite) TestStoreService_AddRoom_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_EditRoom_ShouldSuccess() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("Update", mock.Anything, mock.Anything).
@@ -504,10 +504,10 @@ func (suite *storeTestSuite) TestStoreService_EditRoom_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_EditRoom_ShouldError() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("Update", mock.Anything, mock.Anything).
@@ -521,10 +521,10 @@ func (suite *storeTestSuite) TestStoreService_EditRoom_ShouldError() {
 }
 
 func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldSuccess() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
@@ -540,10 +540,10 @@ func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenFind() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
@@ -555,10 +555,10 @@ func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenFind() {
 	roomRepoMock.AssertExpectations(suite.T())
 }
 func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenFindNotFound() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
@@ -570,10 +570,10 @@ func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenFindNotF
 	roomRepoMock.AssertExpectations(suite.T())
 }
 func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenDelete() {
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
-		new(mocks2.ICRUDRepository[domain.Floor]),
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDRepository[domain.Floor]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	roomRepoMock.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
@@ -591,11 +591,11 @@ func (suite *storeTestSuite) TestStoreService_DeleteRoom_ShouldErrorWhenDelete()
 
 // =================== ADD ON TEST CASE
 func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldSuccess() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
 		floorRepoMock, tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("All", mock.Anything).
 		Once().
@@ -619,11 +619,11 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldErrorAllWhere() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
 		floorRepoMock, tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("All", mock.Anything).
 		Once().
@@ -647,11 +647,11 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithTable_ShouldErrorAllWher
 }
 
 func (suite *storeTestSuite) TestStoreService_FloorsWithRoom_ShouldSuccess() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
 		floorRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	floorRepoMock.
 		On("All", mock.Anything).
@@ -676,11 +676,11 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithRoom_ShouldSuccess() {
 }
 
 func (suite *storeTestSuite) TestStoreService_FloorsWithRoom_ShouldErrorAllWhere() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	roomRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Room])
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	roomRepoMock := new(mocks.ICRUDAddOnRepository[domain.Room])
 	svc := service.NewStoreService(context.TODO(),
 		floorRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Table]),
+		new(mocks.ICRUDAddOnRepository[domain.Table]),
 		roomRepoMock)
 	floorRepoMock.
 		On("All", mock.Anything).
@@ -705,11 +705,11 @@ func (suite *storeTestSuite) TestStoreService_FloorsWithRoom_ShouldErrorAllWhere
 }
 
 func (suite *storeTestSuite) TestStoreService_FloorsWith_ShouldErrorFind() {
-	floorRepoMock := new(mocks2.ICRUDRepository[domain.Floor])
-	tableRepoMock := new(mocks2.ICRUDAddOnRepository[domain.Table])
+	floorRepoMock := new(mocks.ICRUDRepository[domain.Floor])
+	tableRepoMock := new(mocks.ICRUDAddOnRepository[domain.Table])
 	svc := service.NewStoreService(context.TODO(),
 		floorRepoMock, tableRepoMock,
-		new(mocks2.ICRUDAddOnRepository[domain.Room]))
+		new(mocks.ICRUDAddOnRepository[domain.Room]))
 	floorRepoMock.
 		On("All", mock.Anything).
 		Once().

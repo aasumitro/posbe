@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"github.com/aasumitro/posbe/commons"
 	"github.com/aasumitro/posbe/configs"
 	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/errors"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"net/http"
 	"time"
@@ -81,7 +81,7 @@ func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError 
 	if role.Usage >= 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusForbidden,
-			Message: errors.ErrorUnableToDelete,
+			Message: commons.ErrorUnableToDelete,
 		}
 	}
 
