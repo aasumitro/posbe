@@ -10,7 +10,7 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/lib/pq v1.10.9
-	github.com/spf13/viper v1.15.0
+	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
@@ -52,8 +52,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/spf13/afero v1.9.3 // indirect
-	github.com/spf13/cast v1.5.0 // indirect
+	github.com/spf13/afero v1.9.5 // indirect
+	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
