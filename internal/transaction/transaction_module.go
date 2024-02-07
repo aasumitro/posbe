@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitTransactionModule(ctx context.Context, router *gin.Engine) {
+func InitTransactionModule(_ context.Context, _ *gin.Engine) {
 	// Order
 	// OrderItem
 	// OrderBill

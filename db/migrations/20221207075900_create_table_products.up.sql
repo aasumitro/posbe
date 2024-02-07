@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS products (
     gallery TEXT,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    price FLOAT NOT NULL
+    price FLOAT NOT NULL,
+    created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
+    updated_at BIGINT
 );
 
 ALTER TABLE products ADD CONSTRAINT fk_products_categories
