@@ -4,9 +4,10 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"github.com/aasumitro/posbe/commons"
-	"golang.org/x/crypto/scrypt"
 	"strings"
+
+	"github.com/aasumitro/posbe/common"
+	"golang.org/x/crypto/scrypt"
 )
 
 type IPassword interface {
@@ -42,17 +43,17 @@ func (pwd *Password) HashPassword() (string, error) {
 func (pwd *Password) ComparePasswords() (bool, error) {
 	pwsalt := strings.Split(pwd.Stored, ".")
 	if len(pwsalt) < maxSplit {
-		return false, commons.ErrorPasswordNotProvideValidHash
+		return false, common.ErrorPasswordNotProvideValidHash
 	}
 
 	salt, err := hex.DecodeString(pwsalt[1])
 	if err != nil {
-		return false, commons.ErrorPasswordUnableToVerify
+		return false, common.ErrorPasswordUnableToVerify
 	}
 
 	shash, err := scrypt.Key([]byte(pwd.Supplied), salt, cost, r, p, k)
 	if err != nil {
-		return false, commons.ErrorPasswordUnableToVerify
+		return false, common.ErrorPasswordUnableToVerify
 	}
 
 	return hex.EncodeToString(shash) == pwsalt[0], nil

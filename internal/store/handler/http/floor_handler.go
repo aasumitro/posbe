@@ -1,16 +1,18 @@
 package http
 
 import (
-	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/utils"
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
+
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/gin-gonic/gin"
 )
 
 type floorHandler struct {
-	svc domain.IStoreService
+	svc model.IStoreService
 }
 
 // floors godoc
@@ -21,25 +23,25 @@ type floorHandler struct {
 // @Accept       json
 // @Produce      json
 // @Param 	join path string true "join with data, available join rooms, tables" Enums(rooms, tables)
-// @Success 200 {object} utils.SuccessRespond{data=domain.Floor} "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=model.Floor} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/floors/{join} [GET]
 func (handler floorHandler) floorsWith(ctx *gin.Context) {
 	joinParams := strings.ToLower(ctx.Param("join"))
-	if !utils.InArray(joinParams, []string{"rooms", "tables"}) {
+	if slices.Contains([]string{"rooms", "tables"}, joinParams) {
 		utils.NewHTTPRespond(ctx,
 			http.StatusBadRequest,
 			"unsupported join data")
 		return
 	}
 
-	floors, err := handler.svc.FloorsWith(func() any {
+	floors, err := handler.svc.FloorsWith(ctx, func() any {
 		if joinParams == "rooms" {
-			return domain.Room{}
+			return model.Room{}
 		}
 
-		return domain.Table{}
+		return model.Table{}
 	}())
 
 	if err != nil {
@@ -57,12 +59,12 @@ func (handler floorHandler) floorsWith(ctx *gin.Context) {
 // @Tags 		 Floors
 // @Accept       json
 // @Produce      json
-// @Success 200 {object} utils.SuccessRespond{data=[]domain.Floor} "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]model.Floor} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/floors [GET]
 func (handler floorHandler) fetch(ctx *gin.Context) {
-	floors, err := handler.svc.FloorList()
+	floors, err := handler.svc.FloorList(ctx)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -79,13 +81,13 @@ func (handler floorHandler) fetch(ctx *gin.Context) {
 // @Accept       mpfd
 // @Produce      json
 // @Param name 	formData string true "name"
-// @Success 201 {object} utils.SuccessRespond{data=domain.Floor} "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=model.Floor} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/floors [POST]
 func (handler floorHandler) store(ctx *gin.Context) {
-	var form domain.Floor
+	var form model.Floor
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
@@ -93,7 +95,7 @@ func (handler floorHandler) store(ctx *gin.Context) {
 		return
 	}
 
-	floor, err := handler.svc.AddFloor(&form)
+	floor, err := handler.svc.AddFloor(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -111,7 +113,7 @@ func (handler floorHandler) store(ctx *gin.Context) {
 // @Produce      json
 // @Param id   			path     int  	true "floor id"
 // @Param name 			formData string true "name"
-// @Success 200 {object} utils.SuccessRespond{data=domain.Floor} "CREATED RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=model.Floor} "CREATED RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
@@ -127,7 +129,7 @@ func (handler floorHandler) update(ctx *gin.Context) {
 		return
 	}
 
-	var form domain.Floor
+	var form model.Floor
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
@@ -136,7 +138,7 @@ func (handler floorHandler) update(ctx *gin.Context) {
 	}
 
 	form.ID = id
-	floor, err := handler.svc.EditFloor(&form)
+	floor, err := handler.svc.EditFloor(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -167,9 +169,9 @@ func (handler floorHandler) destroy(ctx *gin.Context) {
 			errParse.Error())
 		return
 	}
-	data := domain.Floor{ID: id}
+	data := model.Floor{ID: id}
 
-	err := handler.svc.DeleteFloor(&data)
+	err := handler.svc.DeleteFloor(ctx, &data)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -178,7 +180,7 @@ func (handler floorHandler) destroy(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewFloorHandler(svc domain.IStoreService, router gin.IRoutes) {
+func NewFloorHandler(svc model.IStoreService, router gin.IRoutes) {
 	handler := floorHandler{svc: svc}
 	router.GET("/floors/:join", handler.floorsWith)
 	router.GET("/floors", handler.fetch)

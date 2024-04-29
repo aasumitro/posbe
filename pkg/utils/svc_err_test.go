@@ -2,7 +2,7 @@ package utils_test
 
 import (
 	"errors"
-	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/pkg/model"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -19,19 +19,19 @@ func TestValidateDataRow(t *testing.T) {
 		wantValueData *T
 		wantErrData   *utils.ServiceError
 	}
-	tests := []testCase[domain.Role]{
+	tests := []testCase[model.Role]{
 		{
 			name: "Validate Row Should Success",
-			args: args[domain.Role]{
-				data: &domain.Role{ID: 1, Name: "ipsum"},
+			args: args[model.Role]{
+				data: &model.Role{ID: 1, Name: "ipsum"},
 				err:  nil,
 			},
-			wantValueData: &domain.Role{ID: 1, Name: "ipsum"},
+			wantValueData: &model.Role{ID: 1, Name: "ipsum"},
 			wantErrData:   nil,
 		},
 		{
 			name: "Validate Row Should Error",
-			args: args[domain.Role]{
+			args: args[model.Role]{
 				data: nil,
 				err:  errors.New("LOREM"),
 			},
@@ -59,17 +59,17 @@ func TestValidateDataRows(t *testing.T) {
 		wantValueData []*T
 		wantErrData   *utils.ServiceError
 	}
-	tests := []testCase[domain.Role]{
+	tests := []testCase[model.Role]{
 		{
 			name: "Validate Row Should Success",
-			args: args[domain.Role]{
-				data: []*domain.Role{
+			args: args[model.Role]{
+				data: []*model.Role{
 					{ID: 1, Name: "ipsum"},
 					{ID: 2, Name: "lorem"},
 				},
 				err: nil,
 			},
-			wantValueData: []*domain.Role{
+			wantValueData: []*model.Role{
 				{ID: 1, Name: "ipsum"},
 				{ID: 2, Name: "lorem"},
 			},
@@ -77,7 +77,7 @@ func TestValidateDataRows(t *testing.T) {
 		},
 		{
 			name: "Validate Row Should Error",
-			args: args[domain.Role]{
+			args: args[model.Role]{
 				data: nil,
 				err:  errors.New("LOREM"),
 			},

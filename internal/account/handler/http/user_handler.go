@@ -1,52 +1,52 @@
 package http
 
 import (
-	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/http/middleware"
-	"github.com/aasumitro/posbe/pkg/utils"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/aasumitro/posbe/pkg/http/middleware"
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/gin-gonic/gin"
 )
 
 type userHandler struct {
-	svc domain.IAccountService
+	svc model.IAccountService
 }
 
 // users godoc
 // @Schemes
-// @Summary 	 User List
-// @Description  Get User List.
-// @Tags 		 Users
-// @Accept       json
-// @Produce      json
+// @Summary User List
+// @Description Get User List.
+// @Tags Users
+// @Accept json
+// @Produce json
 // @Success 200 {object} utils.SuccessRespond{data=[]domain.User} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/users [GET]
+// @Router /api/v1/users [GET]
 func (handler userHandler) fetch(ctx *gin.Context) {
-	users, err := handler.svc.UserList()
+	users, err := handler.svc.UserList(ctx)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-
 	utils.NewHTTPRespond(ctx, http.StatusOK, users)
 }
 
 // users godoc
 // @Schemes
-// @Summary 	 Show User
-// @Description  Get User By ID.
-// @Tags 		 Users
-// @Accept       json
-// @Produce      json
-// @Param        id   path      int  true  "User ID"
+// @Summary Show User
+// @Description Get User By ID.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
 // @Success 200 {object} utils.SuccessRespond{data=domain.User} "OK RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/users/{id} [GET]
+// @Router /api/v1/users/{id} [GET]
 func (handler userHandler) show(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
@@ -56,8 +56,7 @@ func (handler userHandler) show(ctx *gin.Context) {
 			errParse.Error())
 		return
 	}
-
-	user, err := handler.svc.ShowUser(id)
+	user, err := handler.svc.ShowUser(ctx, id)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -68,11 +67,11 @@ func (handler userHandler) show(ctx *gin.Context) {
 
 // users godoc
 // @Schemes
-// @Summary 	 Store User Data
-// @Description  Create new User.
-// @Tags 		 Users
-// @Accept       mpfd
-// @Produce      json
+// @Summary Store User Data
+// @Description Create new User.
+// @Tags Users
+// @Accept mpfd
+// @Produce json
 // @Param role_id 	formData string true "role id"
 // @Param name 		formData string true "full name"
 // @Param username 	formData string true "username"
@@ -83,15 +82,14 @@ func (handler userHandler) show(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/users [POST]
+// @Router /api/v1/users [POST]
 func (handler userHandler) store(ctx *gin.Context) {
-	var form domain.User
+	var form model.User
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
-
-	user, err := handler.svc.AddUser(&form)
+	user, err := handler.svc.AddUser(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -102,11 +100,11 @@ func (handler userHandler) store(ctx *gin.Context) {
 
 // users godoc
 // @Schemes
-// @Summary 	 Update User Data
-// @Description  Update Specified User Data by ID.
-// @Tags 		 Users
-// @Accept       mpfd
-// @Produce      json
+// @Summary Update User Data
+// @Description Update Specified User Data by ID.
+// @Tags Users
+// @Accept mpfd
+// @Produce json
 // @Param id   		path     int  	true "user id"
 // @Param role_id 	formData string false "role id"
 // @Param name 		formData string false "full name"
@@ -119,7 +117,7 @@ func (handler userHandler) store(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/users/{id} [PUT]
+// @Router /api/v1/users/{id} [PUT]
 func (handler userHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
@@ -129,15 +127,13 @@ func (handler userHandler) update(ctx *gin.Context) {
 			errParse.Error())
 		return
 	}
-
-	var form domain.User
+	var form model.User
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
-
 	form.ID = id
-	user, err := handler.svc.EditUser(&form)
+	user, err := handler.svc.EditUser(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -148,17 +144,17 @@ func (handler userHandler) update(ctx *gin.Context) {
 
 // users godoc
 // @Schemes
-// @Summary 	 Destroy User Data
-// @Description  Delete User By ID.
-// @Tags 		 Users
-// @Accept       json
-// @Produce      json
-// @Param        id   path      int  true  "user id"
+// @Summary Destroy User Data
+// @Description Delete User By ID.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path int true "user id"
 // @Success 204 "NO CONTENT RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/users/{id} [DELETE]
+// @Router /api/v1/users/{id} [DELETE]
 func (handler userHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
@@ -168,18 +164,16 @@ func (handler userHandler) destroy(ctx *gin.Context) {
 			errParse.Error())
 		return
 	}
-	data := domain.User{ID: id}
-
-	err := handler.svc.DeleteUser(&data)
+	data := model.User{ID: id}
+	err := handler.svc.DeleteUser(ctx, &data)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewUserHandler(accountService domain.IAccountService, router gin.IRoutes) {
+func NewUserHandler(accountService model.IAccountService, router gin.IRoutes) {
 	handler := userHandler{svc: accountService}
 	router.GET("/users", handler.fetch)
 	router.GET("/users/:id", handler.show)

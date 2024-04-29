@@ -3,32 +3,29 @@ package sql_test
 import (
 	"context"
 	"errors"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
-	repoSql "github.com/aasumitro/posbe/internal/account/repository/sql"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 	"regexp"
 	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/config"
+	repoSql "github.com/aasumitro/posbe/internal/account/repository/sql"
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
 type userRepositoryTestSuite struct {
 	suite.Suite
 	mock     sqlmock.Sqlmock
-	userRepo domain.ICRUDRepository[domain.User]
+	userRepo model.ICRUDRepository[model.User]
 }
 
 func (suite *userRepositoryTestSuite) SetupSuite() {
-	var (
-		err error
-	)
-
-	configs.DbPool, suite.mock, err = sqlmock.New(
+	var err error
+	config.PostgresPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
-
 	suite.userRepo = repoSql.NewUserSQLRepository()
 }
 
@@ -87,7 +84,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Find_ExpectedSuccess() 
 	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
-	res, err := suite.userRepo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.userRepo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -97,31 +94,31 @@ func (suite *userRepositoryTestSuite) TestUserRepository_FindBY_ExpectedSuccess(
 	tests := []struct {
 		name  string
 		args  string
-		key   domain.FindWith
+		key   model.FindWith
 		value string
 	}{
 		{
 			name:  "test find with name",
 			args:  "u.name LIKE %$1%",
-			key:   domain.FindWithName,
+			key:   model.FindWithName,
 			value: "lorem",
 		},
 		{
 			name:  "test find with username",
 			args:  "u.username = $1",
-			key:   domain.FindWithUsername,
+			key:   model.FindWithUsername,
 			value: "lorem",
 		},
 		{
 			name:  "test find with email",
 			args:  "u.email = $1",
-			key:   domain.FindWithEmail,
+			key:   model.FindWithEmail,
 			value: "lorem@ipsum.id",
 		},
 		{
 			name:  "test find with phone",
 			args:  "u.phone = $1",
-			key:   domain.FindWithPhone,
+			key:   model.FindWithPhone,
 			value: "+6275555",
 		},
 	}
@@ -152,13 +149,13 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Find_ExpectedError() {
 	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(user)
-	res, err := suite.userRepo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.userRepo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedSuccess() {
-	user := &domain.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
+	user := &model.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
 	rows := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
 		AddRow(1, 1, "lorem ipsum", "lorem", "lorem@ipsum.id", "+6275555", "qwe123", 1, "test", "test 12345")
@@ -177,7 +174,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedSuccess(
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedError() {
-	user := &domain.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
+	user := &model.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
 	rows := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
 		AddRow(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
@@ -197,7 +194,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Create_ExpectedError() 
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Update_ExpectedSuccess() {
-	user := &domain.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
+	user := &model.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
 	rows := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
 		AddRow(1, 1, "lorem ipsum", "lorem", "lorem@ipsum.id", "+6275555", "qwe123", 1, "test", "test 12345")
@@ -216,7 +213,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Update_ExpectedSuccess(
 }
 
 func (suite *userRepositoryTestSuite) TestUserRepository_Update_ExpectedError() {
-	user := &domain.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
+	user := &model.User{ID: 1, RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Phone: "+627888", Password: "12345"}
 	rows := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "phone", "password", "role_id", "role_name", "role_description"}).
 		AddRow(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
@@ -239,7 +236,7 @@ func (suite *userRepositoryTestSuite) TestUserRepository_Delete_ExpectedSuccess(
 	suite.mock.ExpectExec(expectedQuery).
 		WithArgs(1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	user := &domain.User{ID: 1, RoleID: 1, Username: "test", Password: "12345"}
+	user := &model.User{ID: 1, RoleID: 1, Username: "test", Password: "12345"}
 	err := suite.userRepo.Delete(context.TODO(), user)
 	require.Nil(suite.T(), err)
 }

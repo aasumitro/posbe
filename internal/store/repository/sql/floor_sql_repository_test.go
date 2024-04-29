@@ -3,29 +3,28 @@ package sql_test
 import (
 	"context"
 	"errors"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
-	repoSql "github.com/aasumitro/posbe/internal/store/repository/sql"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/config"
+	repoSql "github.com/aasumitro/posbe/internal/store/repository/sql"
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
 type floorRepositoryTestSuite struct {
 	suite.Suite
 	mock      sqlmock.Sqlmock
-	floorRepo domain.ICRUDRepository[domain.Floor]
+	floorRepo model.ICRUDRepository[model.Floor]
 }
 
 func (suite *floorRepositoryTestSuite) SetupSuite() {
-	var (
-		err error
-	)
+	var err error
 
-	configs.DbPool, suite.mock, err = sqlmock.New(
+	config.PostgresPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
@@ -100,7 +99,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Find_ExpectedSuccess(
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(floor)
-	res, err := suite.floorRepo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.floorRepo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -118,13 +117,13 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Find_ExpectedError() 
 	q += "WHERE floors.id = $1 GROUP BY floors.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(floor)
-	res, err := suite.floorRepo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.floorRepo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
 
 func (suite *floorRepositoryTestSuite) TestFloorRepository_Create_ExpectedSuccess() {
-	floor := &domain.Floor{ID: 1, Name: "test"}
+	floor := &model.Floor{ID: 1, Name: "test"}
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "created_at", "updated_at"}).
 		AddRow(1, "test", "123123", "12312312")
@@ -139,7 +138,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Create_ExpectedSucces
 }
 
 func (suite *floorRepositoryTestSuite) TestFloorRepository_Create_ExpectedError() {
-	floor := &domain.Floor{ID: 1, Name: "test"}
+	floor := &model.Floor{ID: 1, Name: "test"}
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "created_at", "updated_at"}).
 		AddRow(1, nil, nil, nil)
@@ -154,7 +153,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Create_ExpectedError(
 }
 
 func (suite *floorRepositoryTestSuite) TestFloorRepository_Update_ExpectedSuccess() {
-	floor := &domain.Floor{ID: 1, Name: "test"}
+	floor := &model.Floor{ID: 1, Name: "test"}
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "created_at", "updated_at"}).
 		AddRow(1, "test", "123123", "12312312")
@@ -169,7 +168,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Update_ExpectedSucces
 }
 
 func (suite *floorRepositoryTestSuite) TestFloorRepository_Update_ExpectedError() {
-	floor := &domain.Floor{ID: 1, Name: "test"}
+	floor := &model.Floor{ID: 1, Name: "test"}
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "created_at", "updated_at"}).
 		AddRow(1, nil, nil, nil)
@@ -188,7 +187,7 @@ func (suite *floorRepositoryTestSuite) TestFloorRepository_Delete_ExpectedSucces
 	suite.mock.ExpectExec(expectedQuery).
 		WithArgs(1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	floor := &domain.Floor{ID: 1, Name: "test"}
+	floor := &model.Floor{ID: 1, Name: "test"}
 	err := suite.floorRepo.Delete(context.TODO(), floor)
 	require.Nil(suite.T(), err)
 }

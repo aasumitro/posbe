@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/aasumitro/posbe/domain"
+	"testing"
+
+	"github.com/aasumitro/posbe/pkg/model"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/alicebob/miniredis/v2"
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestRedisCache_CacheFirstData(t *testing.T) {
@@ -21,7 +22,7 @@ func TestRedisCache_CacheFirstData(t *testing.T) {
 	type args struct {
 		i *utils.CacheDataSupplied
 	}
-	testData, _ := json.Marshal(domain.Role{ID: 1, Name: "test"})
+	testData, _ := json.Marshal(model.Role{ID: 1, Name: "test"})
 	tests := []struct {
 		name     string
 		fields   fields
@@ -62,11 +63,11 @@ func TestRedisCache_CacheFirstData(t *testing.T) {
 					Key: "lorem",
 					TTL: 0,
 					CbF: func() (data any, err error) {
-						return domain.Role{ID: 1, Name: "test"}, err
+						return model.Role{ID: 1, Name: "test"}, err
 					},
 				},
 			},
-			wantData: domain.Role{ID: 1, Name: "test"},
+			wantData: model.Role{ID: 1, Name: "test"},
 			wantErr:  assert.NoError,
 		},
 		{

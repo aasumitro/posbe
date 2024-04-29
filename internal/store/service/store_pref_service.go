@@ -3,26 +3,31 @@ package service
 import (
 	"context"
 	"database/sql"
-	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"errors"
 	"net/http"
+
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/pkg/utils"
 )
 
 type storePrefService struct {
-	ctx      context.Context
-	prefRepo domain.IStorePrefRepository
+	prefRepo model.IStorePrefRepository
 }
 
-func (service storePrefService) AllPrefs() (prefs *domain.StoreSetting, errData *utils.ServiceError) {
-	data, err := service.prefRepo.All(service.ctx)
-
-	return utils.ValidateDataRow[domain.StoreSetting](data, err)
+func (service storePrefService) AllPrefs(
+	ctx context.Context,
+) (prefs *model.StoreSetting, errData *utils.ServiceError) {
+	data, err := service.prefRepo.All(ctx)
+	return utils.ValidateDataRow[model.StoreSetting](data, err)
 }
 
-func (service storePrefService) UpdatePrefs(key, value string) (prefs *domain.StoreSetting, errData *utils.ServiceError) {
-	_, err := service.prefRepo.Find(service.ctx, key)
+func (service storePrefService) UpdatePrefs(
+	ctx context.Context,
+	key, value string,
+) (prefs *model.StoreSetting, errData *utils.ServiceError) {
+	_, err := service.prefRepo.Find(ctx, key)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
@@ -35,7 +40,7 @@ func (service storePrefService) UpdatePrefs(key, value string) (prefs *domain.St
 		}
 	}
 
-	data, err := service.prefRepo.Update(service.ctx, key, value)
+	data, err := service.prefRepo.Update(ctx, key, value)
 	if err != nil {
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
@@ -47,11 +52,9 @@ func (service storePrefService) UpdatePrefs(key, value string) (prefs *domain.St
 }
 
 func NewStorePrefService(
-	ctx context.Context,
-	prefRepo domain.IStorePrefRepository,
-) domain.IStorePrefService {
+	prefRepo model.IStorePrefRepository,
+) model.IStorePrefService {
 	return &storePrefService{
-		ctx:      ctx,
 		prefRepo: prefRepo,
 	}
 }

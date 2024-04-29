@@ -3,28 +3,27 @@ package sql_test
 import (
 	"context"
 	"errors"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
-	repoSql "github.com/aasumitro/posbe/internal/catalog/repository/sql"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 	"regexp"
 	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/config"
+	repoSql "github.com/aasumitro/posbe/internal/catalog/repository/sql"
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
 type unitRepositoryTestSuite struct {
 	suite.Suite
 	mock sqlmock.Sqlmock
-	repo domain.ICRUDRepository[domain.Unit]
+	repo model.ICRUDRepository[model.Unit]
 }
 
 func (suite *unitRepositoryTestSuite) SetupSuite() {
-	var (
-		err error
-	)
+	var err error
 
-	configs.DbPool, suite.mock, err = sqlmock.New(
+	config.PostgresPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
@@ -79,7 +78,7 @@ func (suite *unitRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() {
 	query := "SELECT * FROM units WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
-	res, err := suite.repo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -92,13 +91,13 @@ func (suite *unitRepositoryTestSuite) TestRepository_Find_ExpectReturnError() {
 	query := "SELECT * FROM units WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
-	res, err := suite.repo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
 
 func (suite *unitRepositoryTestSuite) TestRepository_Created_ExpectSuccess() {
-	unit := &domain.Unit{ID: 1, Magnitude: "test", Name: "test", Symbol: "test"}
+	unit := &model.Unit{ID: 1, Magnitude: "test", Name: "test", Symbol: "test"}
 	data := suite.mock.
 		NewRows([]string{"id", "magnitude", "name", "symbol"}).
 		AddRow(1, "test", "test", "test")
@@ -114,7 +113,7 @@ func (suite *unitRepositoryTestSuite) TestRepository_Created_ExpectSuccess() {
 }
 
 func (suite *unitRepositoryTestSuite) TestRepository_Created_ExpectError() {
-	unit := &domain.Unit{ID: 1, Magnitude: "test", Name: "test", Symbol: "test"}
+	unit := &model.Unit{ID: 1, Magnitude: "test", Name: "test", Symbol: "test"}
 	data := suite.mock.
 		NewRows([]string{"id", "magnitude", "name", "symbol"}).
 		AddRow(1, nil, nil, nil)
@@ -130,7 +129,7 @@ func (suite *unitRepositoryTestSuite) TestRepository_Created_ExpectError() {
 }
 
 func (suite *unitRepositoryTestSuite) TestRepository_Updated_ExpectSuccess() {
-	unit := &domain.Unit{ID: 1, Magnitude: "test", Name: "test", Symbol: "test"}
+	unit := &model.Unit{ID: 1, Magnitude: "test", Name: "test", Symbol: "test"}
 	data := suite.mock.
 		NewRows([]string{"id", "magnitude", "name", "symbol"}).
 		AddRow(1, "test", "test", "test")
@@ -146,7 +145,7 @@ func (suite *unitRepositoryTestSuite) TestRepository_Updated_ExpectSuccess() {
 }
 
 func (suite *unitRepositoryTestSuite) TestRepository_Updated_ExpectError() {
-	unit := &domain.Unit{ID: 1, Magnitude: "test", Name: "test", Symbol: "test"}
+	unit := &model.Unit{ID: 1, Magnitude: "test", Name: "test", Symbol: "test"}
 	data := suite.mock.
 		NewRows([]string{"id", "magnitude", "name", "symbol"}).
 		AddRow(1, nil, nil, nil)
@@ -166,7 +165,7 @@ func (suite *unitRepositoryTestSuite) TestRepository_Delete_ExpectSuccess() {
 	suite.mock.ExpectExec(expectedQuery).
 		WithArgs(1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	data := &domain.Unit{ID: 1}
+	data := &model.Unit{ID: 1}
 	err := suite.repo.Delete(context.TODO(), data)
 	require.Nil(suite.T(), err)
 }

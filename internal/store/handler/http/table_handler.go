@@ -1,15 +1,16 @@
 package http
 
 import (
-	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/utils"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/gin-gonic/gin"
 )
 
 type tableHandler struct {
-	svc domain.IStoreService
+	svc model.IStoreService
 }
 
 // tables godoc
@@ -19,12 +20,12 @@ type tableHandler struct {
 // @Tags 		 Tables
 // @Accept       json
 // @Produce      json
-// @Success 200 {object} utils.SuccessRespond{data=[]domain.Table} "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]model.Table} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/tables [GET]
 func (handler tableHandler) fetch(ctx *gin.Context) {
-	tables, err := handler.svc.TableList()
+	tables, err := handler.svc.TableList(ctx)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -48,13 +49,13 @@ func (handler tableHandler) fetch(ctx *gin.Context) {
 // @Param h_size 	formData string true "height"
 // @Param capacity 	formData string true "capacity"
 // @Param type 		formData string true "type"
-// @Success 201 {object} utils.SuccessRespond{data=domain.Table} "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=model.Table} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /v1/tables [POST]
 func (handler tableHandler) store(ctx *gin.Context) {
-	var form domain.Table
+	var form model.Table
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
@@ -62,7 +63,7 @@ func (handler tableHandler) store(ctx *gin.Context) {
 		return
 	}
 
-	table, err := handler.svc.AddTable(&form)
+	table, err := handler.svc.AddTable(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -87,7 +88,7 @@ func (handler tableHandler) store(ctx *gin.Context) {
 // @Param h_size 	formData string true "height"
 // @Param capacity 	formData string true "capacity"
 // @Param type 		formData string true "type"
-// @Success 200 {object} utils.SuccessRespond{data=domain.Table} "CREATED RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=model.Table} "CREATED RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
@@ -103,7 +104,7 @@ func (handler tableHandler) update(ctx *gin.Context) {
 		return
 	}
 
-	var form domain.Table
+	var form model.Table
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx,
 			http.StatusUnprocessableEntity,
@@ -112,7 +113,7 @@ func (handler tableHandler) update(ctx *gin.Context) {
 	}
 
 	form.ID = id
-	table, err := handler.svc.EditTable(&form)
+	table, err := handler.svc.EditTable(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -143,9 +144,9 @@ func (handler tableHandler) destroy(ctx *gin.Context) {
 			errParse.Error())
 		return
 	}
-	data := domain.Table{ID: id}
+	data := model.Table{ID: id}
 
-	err := handler.svc.DeleteTable(&data)
+	err := handler.svc.DeleteTable(ctx, &data)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -154,7 +155,7 @@ func (handler tableHandler) destroy(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewTableHandler(svc domain.IStoreService, router gin.IRoutes) {
+func NewTableHandler(svc model.IStoreService, router gin.IRoutes) {
 	handler := tableHandler{svc: svc}
 	router.GET("/tables", handler.fetch)
 	router.POST("/tables", handler.store)

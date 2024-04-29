@@ -3,15 +3,16 @@ package sql
 import (
 	"context"
 	"database/sql"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
+
+	"github.com/aasumitro/posbe/config"
+	"github.com/aasumitro/posbe/pkg/model"
 )
 
 type AddonSQLRepository struct {
 	Db *sql.DB
 }
 
-func (repo AddonSQLRepository) All(ctx context.Context) (data []*domain.Addon, err error) {
+func (repo AddonSQLRepository) All(ctx context.Context) (data []*model.Addon, err error) {
 	q := "SELECT * FROM addons"
 	rows, err := repo.Db.QueryContext(ctx, q)
 	if err != nil {
@@ -20,7 +21,7 @@ func (repo AddonSQLRepository) All(ctx context.Context) (data []*domain.Addon, e
 	defer func(rows *sql.Rows) { _ = rows.Close() }(rows)
 
 	for rows.Next() {
-		var addon domain.Addon
+		var addon model.Addon
 
 		if err := rows.Scan(
 			&addon.ID, &addon.Name,
@@ -35,11 +36,11 @@ func (repo AddonSQLRepository) All(ctx context.Context) (data []*domain.Addon, e
 	return data, nil
 }
 
-func (repo AddonSQLRepository) Find(ctx context.Context, _ domain.FindWith, val any) (data *domain.Addon, err error) {
+func (repo AddonSQLRepository) Find(ctx context.Context, _ model.FindWith, val any) (data *model.Addon, err error) {
 	q := "SELECT * FROM addons WHERE id = $1 LIMIT 1"
 	row := repo.Db.QueryRowContext(ctx, q, val)
 
-	data = &domain.Addon{}
+	data = &model.Addon{}
 	if err := row.Scan(
 		&data.ID, &data.Name,
 		&data.Description, &data.Price,
@@ -50,11 +51,11 @@ func (repo AddonSQLRepository) Find(ctx context.Context, _ domain.FindWith, val 
 	return data, nil
 }
 
-func (repo AddonSQLRepository) Create(ctx context.Context, params *domain.Addon) (data *domain.Addon, err error) {
+func (repo AddonSQLRepository) Create(ctx context.Context, params *model.Addon) (data *model.Addon, err error) {
 	q := "INSERT INTO addons (name, description, price) VALUES ($1, $2, $3) RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q, params.Name, params.Description, params.Price)
 
-	data = &domain.Addon{}
+	data = &model.Addon{}
 	if err := row.Scan(
 		&data.ID, &data.Name,
 		&data.Description, &data.Price,
@@ -65,11 +66,11 @@ func (repo AddonSQLRepository) Create(ctx context.Context, params *domain.Addon)
 	return data, nil
 }
 
-func (repo AddonSQLRepository) Update(ctx context.Context, params *domain.Addon) (data *domain.Addon, err error) {
+func (repo AddonSQLRepository) Update(ctx context.Context, params *model.Addon) (data *model.Addon, err error) {
 	q := "UPDATE addons SET name = $1, description = $2, price = $3 WHERE id = $4 RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q, params.Name, params.Description, params.Price, params.ID)
 
-	data = &domain.Addon{}
+	data = &model.Addon{}
 	if err := row.Scan(
 		&data.ID, &data.Name,
 		&data.Description, &data.Price,
@@ -80,12 +81,12 @@ func (repo AddonSQLRepository) Update(ctx context.Context, params *domain.Addon)
 	return data, nil
 }
 
-func (repo AddonSQLRepository) Delete(ctx context.Context, params *domain.Addon) error {
+func (repo AddonSQLRepository) Delete(ctx context.Context, params *model.Addon) error {
 	q := "DELETE FROM addons WHERE id = $1"
 	_, err := repo.Db.ExecContext(ctx, q, params.ID)
 	return err
 }
 
-func NewAddonSQLRepository() domain.ICRUDRepository[domain.Addon] {
-	return &AddonSQLRepository{Db: configs.DbPool}
+func NewAddonSQLRepository() model.ICRUDRepository[model.Addon] {
+	return &AddonSQLRepository{Db: config.PostgresPool}
 }

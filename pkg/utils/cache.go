@@ -3,8 +3,10 @@ package utils
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-redis/redis/v9"
+	"errors"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type (
@@ -36,7 +38,7 @@ func (cache *RedisCache) CacheFirstData(i *CacheDataSupplied) (data any, err err
 		// load data from repository
 		data, err = i.CbF()
 		// if redis is connected and data is null save data from repository
-		if errCache == redis.Nil {
+		if errors.Is(errCache, redis.Nil) {
 			// encode given data
 			jsonData, _ := json.Marshal(data)
 			// store data to redis

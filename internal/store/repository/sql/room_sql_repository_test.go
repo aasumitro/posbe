@@ -3,29 +3,28 @@ package sql_test
 import (
 	"context"
 	"errors"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
-	repoSql "github.com/aasumitro/posbe/internal/store/repository/sql"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/config"
+	repoSql "github.com/aasumitro/posbe/internal/store/repository/sql"
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
 type roomRepositoryTestSuite struct {
 	suite.Suite
 	mock     sqlmock.Sqlmock
-	roomRepo domain.ICRUDAddOnRepository[domain.Room]
+	roomRepo model.ICRUDAddOnRepository[model.Room]
 }
 
 func (suite *roomRepositoryTestSuite) SetupSuite() {
-	var (
-		err error
-	)
+	var err error
 
-	configs.DbPool, suite.mock, err = sqlmock.New(
+	config.PostgresPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
@@ -45,7 +44,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_AllWhere_ExpectedReturn
 	q := "SELECT * FROM rooms WHERE floor_id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(rooms)
-	res, err := suite.roomRepo.AllWhere(context.TODO(), domain.FindWithRelationID, 1)
+	res, err := suite.roomRepo.AllWhere(context.TODO(), model.FindWithRelationID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -55,7 +54,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_AllWhere_ExpectedReturn
 	q := "SELECT * FROM rooms WHERE floor_id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnError(errors.New(""))
-	res, err := suite.roomRepo.AllWhere(context.TODO(), domain.FindWithRelationID, 1)
+	res, err := suite.roomRepo.AllWhere(context.TODO(), model.FindWithRelationID, 1)
 	require.NotNil(suite.T(), err)
 	require.Nil(suite.T(), res)
 }
@@ -68,7 +67,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_AllWhere_ExpectedReturn
 	q := "SELECT * FROM rooms WHERE floor_id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(rooms)
-	res, err := suite.roomRepo.AllWhere(context.TODO(), domain.FindWithRelationID, 1)
+	res, err := suite.roomRepo.AllWhere(context.TODO(), model.FindWithRelationID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
@@ -116,7 +115,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Find_ExpectedSuccess() 
 	q := "SELECT * FROM rooms WHERE id = $1 LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(rooms)
-	res, err := suite.roomRepo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.roomRepo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -129,7 +128,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_FindRelation_ExpectedSu
 	q := "SELECT * FROM rooms WHERE floor_id = $1 LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(room)
-	res, err := suite.roomRepo.Find(context.TODO(), domain.FindWithRelationID, 1)
+	res, err := suite.roomRepo.Find(context.TODO(), model.FindWithRelationID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -142,13 +141,13 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Find_ExpectedError() {
 	q := "SELECT * FROM rooms WHERE id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(table)
-	res, err := suite.roomRepo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.roomRepo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
 
 func (suite *roomRepositoryTestSuite) TestRoomRepository_Create_ExpectedSuccess() {
-	room := &domain.Room{FloorID: 1, Name: "test", XPos: 1, YPos: 1, WSize: 1, HSize: 1, Capacity: 1, Price: 1}
+	room := &model.Room{FloorID: 1, Name: "test", XPos: 1, YPos: 1, WSize: 1, HSize: 1, Capacity: 1, Price: 1}
 	rows := suite.mock.
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "price", "created_at", "updated_at"}).
 		AddRow(1, 1, "test", 1, 2, 3, 4, 5, 1, "13123", "123123")
@@ -166,7 +165,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Create_ExpectedSuccess(
 }
 
 func (suite *roomRepositoryTestSuite) TestRoomRepository_Create_ExpectedError() {
-	room := &domain.Room{FloorID: 1, Name: "test", XPos: 1, YPos: 1, WSize: 1, HSize: 1, Capacity: 1, Price: 1}
+	room := &model.Room{FloorID: 1, Name: "test", XPos: 1, YPos: 1, WSize: 1, HSize: 1, Capacity: 1, Price: 1}
 	rows := suite.mock.
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "price", "created_at", "updated_at"}).
 		AddRow(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
@@ -184,7 +183,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Create_ExpectedError() 
 }
 
 func (suite *roomRepositoryTestSuite) TestRoomRepository_Update_ExpectedSuccess() {
-	room := &domain.Room{ID: 1, FloorID: 1, Name: "test", XPos: 1, YPos: 1, WSize: 1, HSize: 1, Capacity: 1, Price: 1}
+	room := &model.Room{ID: 1, FloorID: 1, Name: "test", XPos: 1, YPos: 1, WSize: 1, HSize: 1, Capacity: 1, Price: 1}
 	rows := suite.mock.
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "price", "created_at", "updated_at"}).
 		AddRow(1, 1, "test", 1, 2, 3, 4, 5, 1, "13123", "123123")
@@ -204,7 +203,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Update_ExpectedSuccess(
 }
 
 func (suite *roomRepositoryTestSuite) TestRoomRepository_Update_ExpectedError() {
-	room := &domain.Room{ID: 1, FloorID: 1, Name: "test", XPos: 1, YPos: 1, WSize: 1, HSize: 1, Capacity: 1, Price: 1}
+	room := &model.Room{ID: 1, FloorID: 1, Name: "test", XPos: 1, YPos: 1, WSize: 1, HSize: 1, Capacity: 1, Price: 1}
 	rows := suite.mock.
 		NewRows([]string{"id", "floor_id", "name", "x_pos", "y_pos", "w_size", "h_size", "capacity", "price", "created_at", "updated_at"}).
 		AddRow(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
@@ -228,7 +227,7 @@ func (suite *roomRepositoryTestSuite) TestRoomRepository_Delete_ExpectedSuccess(
 	suite.mock.ExpectExec(expectedQuery).
 		WithArgs(1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	room := &domain.Room{ID: 1}
+	room := &model.Room{ID: 1}
 	err := suite.roomRepo.Delete(context.TODO(), room)
 	require.Nil(suite.T(), err)
 }

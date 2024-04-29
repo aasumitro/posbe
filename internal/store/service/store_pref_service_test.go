@@ -4,14 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/aasumitro/posbe/domain"
+	"testing"
+
 	"github.com/aasumitro/posbe/internal/store/service"
 	"github.com/aasumitro/posbe/mocks"
+	"github.com/aasumitro/posbe/pkg/model"
 	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type storePrefTestSuite struct {
@@ -21,18 +22,18 @@ type storePrefTestSuite struct {
 
 func (suite *storePrefTestSuite) TestStorePrefService_AllPrefs_ShouldSuccess() {
 	repo := new(mocks.IStorePrefRepository)
-	svc := service.NewStorePrefService(context.TODO(), repo)
+	svc := service.NewStorePrefService(repo)
 	repo.
 		On("All", mock.Anything).
 		Once().
-		Return(&domain.StoreSetting{
+		Return(&model.StoreSetting{
 			"lorem": "lorem",
 			"ipsum": "ipsum",
 		}, nil)
-	data, err := svc.AllPrefs()
+	data, err := svc.AllPrefs(context.TODO())
 	require.Nil(suite.T(), err)
 	require.NotNil(suite.T(), data)
-	require.Equal(suite.T(), data, &domain.StoreSetting{
+	require.Equal(suite.T(), data, &model.StoreSetting{
 		"lorem": "lorem",
 		"ipsum": "ipsum",
 	})
@@ -41,12 +42,12 @@ func (suite *storePrefTestSuite) TestStorePrefService_AllPrefs_ShouldSuccess() {
 
 func (suite *storePrefTestSuite) TestStorePrefService_AllPrefs_ShouldError() {
 	repo := new(mocks.IStorePrefRepository)
-	svc := service.NewStorePrefService(context.TODO(), repo)
+	svc := service.NewStorePrefService(repo)
 	repo.
 		On("All", mock.Anything).
 		Once().
 		Return(nil, errors.New("UNEXPECTED"))
-	data, err := svc.AllPrefs()
+	data, err := svc.AllPrefs(context.TODO())
 	require.Nil(suite.T(), data)
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), err, &utils.ServiceError{
@@ -58,19 +59,19 @@ func (suite *storePrefTestSuite) TestStorePrefService_AllPrefs_ShouldError() {
 
 func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldSuccess() {
 	repo := new(mocks.IStorePrefRepository)
-	svc := service.NewStorePrefService(context.TODO(), repo)
+	svc := service.NewStorePrefService(repo)
 	repo.
 		On("Find", mock.Anything, mock.Anything).
 		Once().
-		Return(&domain.StoreSetting{"lorem": "lorem"}, nil)
+		Return(&model.StoreSetting{"lorem": "lorem"}, nil)
 	repo.
 		On("Update", mock.Anything, mock.Anything, mock.Anything).
 		Once().
-		Return(&domain.StoreSetting{"lorem": "lorem"}, nil)
-	data, err := svc.UpdatePrefs("test", "test")
+		Return(&model.StoreSetting{"lorem": "lorem"}, nil)
+	data, err := svc.UpdatePrefs(context.TODO(), "test", "test")
 	require.Nil(suite.T(), err)
 	require.NotNil(suite.T(), data)
-	require.Equal(suite.T(), data, &domain.StoreSetting{
+	require.Equal(suite.T(), data, &model.StoreSetting{
 		"lorem": "lorem",
 	})
 	repo.AssertExpectations(suite.T())
@@ -78,12 +79,12 @@ func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldSuccess(
 
 func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldErrorWhenFind() {
 	repo := new(mocks.IStorePrefRepository)
-	svc := service.NewStorePrefService(context.TODO(), repo)
+	svc := service.NewStorePrefService(repo)
 	repo.
 		On("Find", mock.Anything, mock.Anything).
 		Once().
 		Return(nil, errors.New("UNEXPECTED"))
-	data, err := svc.UpdatePrefs("test", "test")
+	data, err := svc.UpdatePrefs(context.TODO(), "test", "test")
 	require.Nil(suite.T(), data)
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), err, &utils.ServiceError{
@@ -94,12 +95,12 @@ func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldErrorWhe
 }
 func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldErrorWhenFindNotFound() {
 	repo := new(mocks.IStorePrefRepository)
-	svc := service.NewStorePrefService(context.TODO(), repo)
+	svc := service.NewStorePrefService(repo)
 	repo.
 		On("Find", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(nil, sql.ErrNoRows)
-	data, err := svc.UpdatePrefs("test", "test")
+	data, err := svc.UpdatePrefs(context.TODO(), "test", "test")
 	require.Nil(suite.T(), data)
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), err, &utils.ServiceError{Code: 404, Message: "sql: no rows in result set"})
@@ -107,16 +108,16 @@ func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldErrorWhe
 }
 func (suite *storePrefTestSuite) TestStorePrefService_UpdatePrefs_ShouldErrorWhenDelete() {
 	repo := new(mocks.IStorePrefRepository)
-	svc := service.NewStorePrefService(context.TODO(), repo)
+	svc := service.NewStorePrefService(repo)
 	repo.
 		On("Find", mock.Anything, mock.Anything).
 		Once().
-		Return(&domain.StoreSetting{"lorem": "lorem"}, nil)
+		Return(&model.StoreSetting{"lorem": "lorem"}, nil)
 	repo.
 		On("Update", mock.Anything, mock.Anything, mock.Anything).
 		Once().
 		Return(nil, errors.New("UNEXPECTED"))
-	data, err := svc.UpdatePrefs("test", "test")
+	data, err := svc.UpdatePrefs(context.TODO(), "test", "test")
 	require.Nil(suite.T(), data)
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), err, &utils.ServiceError{

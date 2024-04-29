@@ -41,7 +41,6 @@ linters:
     - gomnd
     - gosec
     - revive
-#    - goimports          # Check import statements are formatted according to the 'goimport' command
 issues:
   exclude-rules:
     - path: _test\.go
@@ -52,6 +51,5 @@ issues:
         - lll
 run:
   timeout: 5m
-  go: "1.19"
+  go: "1.22"
   modules-download-mode: readonly
-  skip-dirs: []

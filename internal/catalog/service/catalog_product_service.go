@@ -3,128 +3,145 @@ package service
 import (
 	"context"
 	"database/sql"
-	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"errors"
 	"net/http"
+
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/pkg/utils"
 )
 
 type catalogProductService struct {
-	ctx                context.Context
-	productRepo        domain.ICRUDWithSearchRepository[domain.Product]
-	productVariantRepo domain.ICRUDRepository[domain.ProductVariant]
+	productRepo        model.ICRUDWithSearchRepository[model.Product]
+	productVariantRepo model.ICRUDRepository[model.ProductVariant]
 }
 
-func (service catalogProductService) ProductSearch(keys []domain.FindWith, values []any) (products []*domain.Product, errData *utils.ServiceError) {
-	data, err := service.productRepo.Search(service.ctx, keys, values)
-
-	return utils.ValidateDataRows[domain.Product](data, err)
+func (service catalogProductService) ProductSearch(
+	ctx context.Context,
+	keys []model.FindWith,
+	values []any,
+) (products []*model.Product, errData *utils.ServiceError) {
+	data, err := service.productRepo.Search(ctx, keys, values)
+	return utils.ValidateDataRows[model.Product](data, err)
 }
 
-func (service catalogProductService) ProductList() (products []*domain.Product, errData *utils.ServiceError) {
-	data, err := service.productRepo.All(service.ctx)
-
-	return utils.ValidateDataRows[domain.Product](data, err)
+func (service catalogProductService) ProductList(
+	ctx context.Context,
+) (products []*model.Product, errData *utils.ServiceError) {
+	data, err := service.productRepo.All(ctx)
+	return utils.ValidateDataRows[model.Product](data, err)
 }
 
-func (service catalogProductService) ProductDetail(id int) (product *domain.Product, errData *utils.ServiceError) {
-	data, err := service.productRepo.Find(service.ctx, domain.FindWithID, id)
-
-	return utils.ValidateDataRow[domain.Product](data, err)
+func (service catalogProductService) ProductDetail(
+	ctx context.Context,
+	id int,
+) (product *model.Product, errData *utils.ServiceError) {
+	data, err := service.productRepo.Find(ctx, model.FindWithID, id)
+	return utils.ValidateDataRow[model.Product](data, err)
 }
 
-func (service catalogProductService) AddProduct(data *domain.Product) (product *domain.Product, errData *utils.ServiceError) {
-	variants := data.ProductVariants
-	data, err := service.productRepo.Create(service.ctx, data)
-
+func (service catalogProductService) AddProduct(
+	ctx context.Context,
+	item *model.Product,
+) (product *model.Product, errData *utils.ServiceError) {
+	variants := item.ProductVariants
+	data, err := service.productRepo.Create(ctx, item)
+	if data == nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusNotFound,
+			Message: errors.New("product not found"),
+		}
+	}
 	if len(variants) > 0 {
 		for _, v := range variants {
 			v.ProductID = data.ID
-			_, _ = service.productVariantRepo.Create(service.ctx, v)
+			_, _ = service.productVariantRepo.Create(ctx, v)
 		}
 	}
-
-	return utils.ValidateDataRow[domain.Product](data, err)
+	return utils.ValidateDataRow[model.Product](data, err)
 }
 
-func (service catalogProductService) EditProduct(data *domain.Product) (product *domain.Product, errData *utils.ServiceError) {
-	data, err := service.productRepo.Update(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.Product](data, err)
+func (service catalogProductService) EditProduct(
+	ctx context.Context,
+	item *model.Product,
+) (product *model.Product, errData *utils.ServiceError) {
+	data, err := service.productRepo.Update(ctx, item)
+	return utils.ValidateDataRow[model.Product](data, err)
 }
 
-func (service catalogProductService) DeleteProduct(data *domain.Product) *utils.ServiceError {
-	data, err := service.productRepo.Find(service.ctx, domain.FindWithID, data.ID)
+func (service catalogProductService) DeleteProduct(
+	ctx context.Context,
+	item *model.Product,
+) *utils.ServiceError {
+	data, err := service.productRepo.Find(ctx, model.FindWithID, item.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
 			}
 		}
-
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
-	err = service.productRepo.Delete(service.ctx, data)
-	if err != nil {
+	if err := service.productRepo.Delete(ctx, data); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	return nil
 }
 
-func (service catalogProductService) AddProductVariant(data *domain.ProductVariant) (units *domain.ProductVariant, errData *utils.ServiceError) {
-	data, err := service.productVariantRepo.Create(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.ProductVariant](data, err)
+func (service catalogProductService) AddProductVariant(
+	ctx context.Context,
+	item *model.ProductVariant,
+) (units *model.ProductVariant, errData *utils.ServiceError) {
+	data, err := service.productVariantRepo.Create(ctx, item)
+	return utils.ValidateDataRow[model.ProductVariant](data, err)
 }
 
-func (service catalogProductService) EditProductVariant(data *domain.ProductVariant) (units *domain.ProductVariant, errData *utils.ServiceError) {
-	data, err := service.productVariantRepo.Update(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.ProductVariant](data, err)
+func (service catalogProductService) EditProductVariant(
+	ctx context.Context,
+	item *model.ProductVariant,
+) (units *model.ProductVariant, errData *utils.ServiceError) {
+	data, err := service.productVariantRepo.Update(ctx, item)
+	return utils.ValidateDataRow[model.ProductVariant](data, err)
 }
 
-func (service catalogProductService) DeleteProductVariant(data *domain.ProductVariant) *utils.ServiceError {
-	data, err := service.productVariantRepo.Find(service.ctx, domain.FindWithID, data.ID)
+func (service catalogProductService) DeleteProductVariant(
+	ctx context.Context,
+	item *model.ProductVariant,
+) *utils.ServiceError {
+	data, err := service.productVariantRepo.Find(
+		ctx, model.FindWithID, item.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
 			}
 		}
-
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
-	err = service.productVariantRepo.Delete(service.ctx, data)
-	if err != nil {
+	if err := service.productVariantRepo.Delete(ctx, data); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	return nil
 }
 
 func NewCatalogProductService(
-	ctx context.Context,
-	productRepo domain.ICRUDWithSearchRepository[domain.Product],
-	productVariantRepo domain.ICRUDRepository[domain.ProductVariant],
-) domain.ICatalogProductService {
+	productRepo model.ICRUDWithSearchRepository[model.Product],
+	productVariantRepo model.ICRUDRepository[model.ProductVariant],
+) model.ICatalogProductService {
 	return &catalogProductService{
-		ctx:                ctx,
 		productRepo:        productRepo,
 		productVariantRepo: productVariantRepo,
 	}

@@ -23,9 +23,9 @@ VALUES
     ('feature_floor', '1'),  -- true or false
     ('feature_room', '0'),  -- true or false
     ('feature_table', '1'),  -- true or false
-       -- ('feature_', ''),  -- true or false
-    ('fe_theme', 'dark'),  -- dark or light
-    ('fe_lang', 'id'),  -- en_US or id_ID
-    ('fe_locale', 'Asia/Makassar'), -- Asia/Jayapura Asia/Makassar, Asia/Jakarta
+    -- ('feature_', ''),  -- true or false
+    ('fe_theme', 'light'),  -- dark or light
+    ('fe_lang', 'en_US'),  -- en_US or id_ID
+    ('fe_locale', 'Asia/Makassar'), -- Asia/Jayapura, Asia/Makassar, Asia/Jakarta
     ('currency', 'IDR'), -- IDR/USD
-    ('currency_rate', '15400'); -- TO USD
+    ('currency_rate', '16200'); -- TO USD
