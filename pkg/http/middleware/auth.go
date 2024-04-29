@@ -20,7 +20,7 @@ func Auth() gin.HandlerFunc {
 		token, err := jwt.ParseWithClaims(
 			tokenCookie.Value,
 			&utils.JWTClaim{},
-			func(token *jwt.Token) (interface{}, error) {
+			func(_ *jwt.Token) (interface{}, error) {
 				return []byte(config.Instance.JWTSecretKey), nil
 			})
 		if err != nil && !token.Valid {

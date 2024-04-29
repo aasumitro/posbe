@@ -33,7 +33,6 @@ linters:
     - unparam
     - unused
     - whitespace
-    - depguard
     - dupl
     - goconst
     - lll

@@ -9,11 +9,11 @@ import (
 	"github.com/aasumitro/posbe/pkg/model"
 )
 
-type StoreShiftSqlRepository struct {
+type StoreShiftSQLRepository struct {
 	Db *sql.DB
 }
 
-func (repo StoreShiftSqlRepository) All(
+func (repo StoreShiftSQLRepository) All(
 	ctx context.Context,
 ) (data []*model.Shift, err error) {
 	q := "SELECT * FROM shifts"
@@ -35,15 +35,15 @@ func (repo StoreShiftSqlRepository) All(
 }
 
 // Find will not impl
-func (repo StoreShiftSqlRepository) Find(
+func (repo StoreShiftSQLRepository) Find(
 	_ context.Context,
 	_ model.FindWith, _ any,
 ) (data *model.Shift, err error) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
-func (repo StoreShiftSqlRepository) Create(
+func (repo StoreShiftSQLRepository) Create(
 	ctx context.Context,
 	params *model.Shift,
 ) (data *model.Shift, err error) {
@@ -62,7 +62,7 @@ func (repo StoreShiftSqlRepository) Create(
 	return data, nil
 }
 
-func (repo StoreShiftSqlRepository) Update(
+func (repo StoreShiftSQLRepository) Update(
 	ctx context.Context,
 	params *model.Shift,
 ) (data *model.Shift, err error) {
@@ -82,7 +82,7 @@ func (repo StoreShiftSqlRepository) Update(
 	return data, nil
 }
 
-func (repo StoreShiftSqlRepository) Delete(
+func (repo StoreShiftSQLRepository) Delete(
 	ctx context.Context,
 	params *model.Shift,
 ) error {
@@ -103,7 +103,7 @@ func (repo StoreShiftSqlRepository) Delete(
 	return tr.Commit()
 }
 
-func (repo StoreShiftSqlRepository) OpenShift(
+func (repo StoreShiftSQLRepository) OpenShift(
 	ctx context.Context,
 	form *model.StoreShiftForm,
 ) error {
@@ -115,7 +115,7 @@ func (repo StoreShiftSqlRepository) OpenShift(
 		form.Cash, time.Now().Unix()).Err()
 }
 
-func (repo StoreShiftSqlRepository) CloseShift(
+func (repo StoreShiftSQLRepository) CloseShift(
 	ctx context.Context,
 	form *model.StoreShiftForm,
 ) error {
@@ -130,5 +130,5 @@ func (repo StoreShiftSqlRepository) CloseShift(
 }
 
 func NewStoreShiftSQLRepository() model.IStoreShiftRepository {
-	return &StoreShiftSqlRepository{Db: config.PostgresPool}
+	return &StoreShiftSQLRepository{Db: config.PostgresPool}
 }
