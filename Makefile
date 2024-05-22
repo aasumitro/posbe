@@ -44,13 +44,20 @@ run-lint: $(GOLANGCI)
 	@ golangci-lint cache clean
 	@ golangci-lint run -c .golangci.yaml ./...
 
-.Phony: run
-run:
+.Phony: run-api
+run-api:
 	@echo "Run App"
 	go mod tidy -compat=1.22
 	go run ./cmd/api/main.go
 
-.Phony: run-watch
-run-watch:
+.Phony: run-watch-api
+run-watch-api:
 	go mod tidy -compat=1.22
 	air
+
+.Phony: run-app
+run-app:
+	@echo "Run App"
+	cd ./web && npm run build && cd ..
+	go mod tidy -compat=1.22
+	go run ./cmd/api/main.go

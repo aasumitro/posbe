@@ -3,7 +3,7 @@ linters-settings:
     threshold: 800
   lll:
     line-length: 200
-  gomnd:
+  mnd:
     checks:
       - argument
       - case
@@ -37,14 +37,13 @@ linters:
     - goconst
     - lll
     - noctx
-    - gomnd
+    - mnd
     - gosec
     - revive
 issues:
   exclude-rules:
     - path: _test\.go
       linters:
-        - gomnd
         - dupl
         - goconst
         - lll

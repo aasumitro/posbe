@@ -3,10 +3,12 @@ package internal
 import (
 	"context"
 	"errors"
-	"fmt"
+	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -16,6 +18,7 @@ import (
 	"github.com/aasumitro/posbe/internal/catalog"
 	"github.com/aasumitro/posbe/internal/store"
 	"github.com/aasumitro/posbe/internal/transaction"
+	"github.com/aasumitro/posbe/web"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -23,6 +26,18 @@ import (
 	"github.com/tavsec/gin-healthcheck/checks"
 	healthcheckconfig "github.com/tavsec/gin-healthcheck/config"
 )
+
+type embeddedFile struct {
+	fs.File
+}
+
+func (f *embeddedFile) Close() error {
+	return nil
+}
+
+func (f *embeddedFile) Seek(offset int64, whence int) (int64, error) {
+	return f.File.(io.Seeker).Seek(offset, whence)
+}
 
 func RunServer(ctx context.Context) {
 	// Create a context that listens for the interrupt signal from the OS.
@@ -83,21 +98,40 @@ func registerPublicRoutes(
 ) {
 	router := engine
 	// no route handler
-	router.NoRoute(func(ctx *gin.Context) {
-		ctx.String(http.StatusNotFound,
-			"HTTP_ROUTE_NOT_FOUND")
-	})
-	// no route handler
 	router.NoMethod(func(ctx *gin.Context) {
 		ctx.String(http.StatusNotFound,
 			"HTTP_METHOD_NOT_FOUND")
 	})
+	// no route handler
+	router.NoRoute(func(ctx *gin.Context) {
+		if !strings.Contains(ctx.FullPath(), "/fe/") {
+			ctx.String(http.StatusNotFound,
+				"route that you are looking for is not found")
+			return
+		}
+		file, err := web.SPAAssets().Open("index.html")
+		if err != nil {
+			ctx.String(http.StatusInternalServerError,
+				"failed to open spa file: ", err.Error())
+			return
+		}
+		defer func() { _ = file.Close() }()
+		fileInfo, err := file.Stat()
+		if err != nil {
+			ctx.String(http.StatusInternalServerError,
+				"failed to get spa file info: ", err.Error())
+			return
+		}
+		http.ServeContent(
+			ctx.Writer, ctx.Request, fileInfo.Name(),
+			fileInfo.ModTime(), &embeddedFile{file})
+	})
 	// main route handler
 	router.GET(common.EmptyPath, func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, fmt.Sprintf("%s %s",
-			config.Instance.AppName,
-			config.Instance.AppVersion))
+		ctx.Redirect(http.StatusTemporaryRedirect, "/fe")
 	})
+	// client (web ui) route handler
+	router.StaticFS("/fe", http.FS(web.SPAAssets()))
 	// swagger docs routes
 	router.GET("/api-specs/*any",
 		ginSwagger.WrapHandler(swaggerFiles.Handler,

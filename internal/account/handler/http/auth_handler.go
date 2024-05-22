@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AuthHandler struct {
+type authHandler struct {
 	svc model.IAccountService
 	jwt utils.IJSONWebToken
 }
@@ -31,7 +31,7 @@ type AuthHandler struct {
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE_ENTITY_RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL_SERVER_ERROR_RESPOND"
 // @Router /api/v1/login [POST]
-func (handler AuthHandler) login(ctx *gin.Context) {
+func (handler authHandler) login(ctx *gin.Context) {
 	var form model.LoginForm
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
@@ -68,7 +68,7 @@ func (handler AuthHandler) login(ctx *gin.Context) {
 // @Produce json
 // @Success 200 {object} utils.SuccessRespond "CREATED_RESPOND"
 // @Router /api/v1/logout [POST]
-func (handler AuthHandler) logout(ctx *gin.Context) {
+func (handler authHandler) logout(ctx *gin.Context) {
 	http.SetCookie(ctx.Writer, &http.Cookie{
 		Name:    "jwt",
 		Value:   "",
@@ -80,7 +80,7 @@ func (handler AuthHandler) logout(ctx *gin.Context) {
 }
 
 func NewAuthHandler(accountService model.IAccountService, router *gin.RouterGroup) {
-	handler := AuthHandler{svc: accountService, jwt: &utils.JSONWebToken{
+	handler := authHandler{svc: accountService, jwt: &utils.JSONWebToken{
 		Issuer:    config.Instance.AppName,
 		SecretKey: []byte(config.Instance.JWTSecretKey),
 		IssuedAt:  time.Now(),

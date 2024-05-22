@@ -48,7 +48,6 @@ func shouldCacheData(ctx context.Context) {
 		Err(); err != nil && errors.Is(err, redis.Nil) {
 		if prefs, err := storePrefRepo.All(ctx); err == nil {
 			setting := *prefs
-
 			// store room status
 			if room, _ := strconv.ParseBool(setting["feature_room"].(string)); room {
 				if rooms, err := roomRepo.All(ctx); err == nil {
@@ -58,7 +57,6 @@ func shouldCacheData(ctx context.Context) {
 					}
 				}
 			}
-
 			// store table status
 			if table, _ := strconv.ParseBool(setting["feature_table"].(string)); table {
 				if tables, err := tableRepo.All(ctx); err == nil {
@@ -68,7 +66,6 @@ func shouldCacheData(ctx context.Context) {
 					}
 				}
 			}
-
 			jsonData, _ := json.Marshal(prefs)
 			// store data to redis
 			config.RedisPool.Set(ctx, "store_prefs", jsonData, 0)

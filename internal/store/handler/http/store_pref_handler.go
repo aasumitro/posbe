@@ -14,11 +14,11 @@ type storePrefHandler struct {
 
 // store godoc
 // @Schemes
-// @Summary 	 Store Settings
-// @Description  Get Store Settings List.
-// @Tags 		 Store
-// @Accept       json
-// @Produce      json
+// @Summary Store Settings
+// @Description Get Store Settings List.
+// @Tags Store
+// @Accept json
+// @Produce json
 // @Success 200 {object} utils.SuccessRespond{data=[]model.StoreSetting} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -29,19 +29,18 @@ func (handler storePrefHandler) fetch(ctx *gin.Context) {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-
 	utils.NewHTTPRespond(ctx, http.StatusOK, prefs)
 }
 
 // store godoc
 // @Schemes
-// @Summary 	 Update Floor Data
-// @Description  Update Floor Data by ID.
-// @Tags 		 Store
-// @Accept       mpfd
-// @Produce      json
-// @Param key   			formData string true "key"
-// @Param value 			formData string true "value"
+// @Summary Update Floor Data
+// @Description Update Floor Data by ID.
+// @Tags Store
+// @Accept mpfd
+// @Produce json
+// @Param key formData string true "key"
+// @Param value formData string true "value"
 // @Success 200 {object} utils.SuccessRespond{data=model.StoreSetting} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
@@ -55,13 +54,11 @@ func (handler storePrefHandler) update(ctx *gin.Context) {
 			err.Error())
 		return
 	}
-
 	pref, err := handler.svc.UpdatePrefs(ctx, form.Key, form.Value)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-
 	utils.NewHTTPRespond(ctx, http.StatusOK, pref)
 }
 

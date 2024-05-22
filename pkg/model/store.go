@@ -51,12 +51,13 @@ type (
 
 	// Shift is reference section data for store
 	Shift struct {
-		ID        int           `json:"id"`
-		Name      string        `json:"name"`
-		StartTime int64         `json:"start_time"`
-		EndTime   int64         `json:"end_time"`
-		CreatedAt sql.NullInt64 `json:"created_at"`
-		UpdatedAt sql.NullInt64 `json:"updated_at,omitempty"`
+		ID           int           `json:"id"`
+		Name         string        `json:"name"`
+		StartTime    int64         `json:"start_time"`
+		EndTime      int64         `json:"end_time"`
+		CreatedAt    sql.NullInt64 `json:"created_at"`
+		UpdatedAt    sql.NullInt64 `json:"updated_at,omitempty"`
+		CurrentShift *StoreShift   `json:"current_shift,omitempty" binding:"-"`
 	}
 
 	// StorePref store setting
@@ -79,6 +80,11 @@ type (
 		CreatedAt sql.NullInt64 `json:"created_at"`
 		UpdatedAt sql.NullInt64 `json:"updated_at,omitempty"`
 		Shift     *Shift        `json:"shift,omitempty" binding:"-"`
+	}
+
+	StoreShiftTransaction struct {
+		ID         int
+		OrderCount int
 	}
 
 	StoreShiftForm struct {

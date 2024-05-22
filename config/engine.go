@@ -45,6 +45,8 @@ func ServerEngine() Option {
 			// set global variables
 			GinEngine = gin.Default()
 			// set cors middleware
+			tw := 12
+			maxAge := time.Hour * time.Duration(tw)
 			GinEngine.Use(cors.New(cors.Config{
 				AllowOrigins:     allowOrigins,
 				AllowMethods:     []string{"GET, POST, PATCH, DELETE"},
@@ -54,7 +56,7 @@ func ServerEngine() Option {
 				AllowOriginFunc: func(origin string) bool {
 					return slices.Contains(allowOrigins, origin)
 				},
-				MaxAge: 12 * time.Hour,
+				MaxAge: maxAge,
 			}))
 			if !cfg.AppDebug {
 				// setup sentry middleware

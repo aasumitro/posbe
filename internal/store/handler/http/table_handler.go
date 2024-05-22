@@ -15,11 +15,11 @@ type tableHandler struct {
 
 // tables godoc
 // @Schemes
-// @Summary 	 Table List
-// @Description  Get Table List.
-// @Tags 		 Tables
-// @Accept       json
-// @Produce      json
+// @Summary Table List
+// @Description Get Table List.
+// @Tags Tables
+// @Accept json
+// @Produce json
 // @Success 200 {object} utils.SuccessRespond{data=[]model.Table} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -30,17 +30,16 @@ func (handler tableHandler) fetch(ctx *gin.Context) {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-
 	utils.NewHTTPRespond(ctx, http.StatusOK, tables)
 }
 
 // tables godoc
 // @Schemes
-// @Summary 	 Store Table Data
-// @Description  Create new Table.
-// @Tags 		 Tables
-// @Accept       mpfd
-// @Produce      json
+// @Summary Store Table Data
+// @Description Create new Table.
+// @Tags Tables
+// @Accept mpfd
+// @Produce json
 // @Param floor_id 	formData string true "floor id"
 // @Param name 		formData string true "name"
 // @Param x_pos 	formData string true "x position"
@@ -62,23 +61,21 @@ func (handler tableHandler) store(ctx *gin.Context) {
 			err.Error())
 		return
 	}
-
 	table, err := handler.svc.AddTable(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-
 	utils.NewHTTPRespond(ctx, http.StatusCreated, table)
 }
 
 // tables godoc
 // @Schemes
-// @Summary 	 Update Table Data
-// @Description  Update Table Data by ID.
-// @Tags 		 Tables
-// @Accept       mpfd
-// @Produce      json
+// @Summary Update Table Data
+// @Description Update Table Data by ID.
+// @Tags Tables
+// @Accept mpfd
+// @Produce json
 // @Param id   		path     int  	true "table id"
 // @Param floor_id 	formData string true "floor id"
 // @Param name 		formData string true "name"
@@ -103,7 +100,6 @@ func (handler tableHandler) update(ctx *gin.Context) {
 			errParse.Error())
 		return
 	}
-
 	var form model.Table
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx,
@@ -111,24 +107,22 @@ func (handler tableHandler) update(ctx *gin.Context) {
 			err.Error())
 		return
 	}
-
 	form.ID = id
 	table, err := handler.svc.EditTable(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-
 	utils.NewHTTPRespond(ctx, http.StatusOK, table)
 }
 
 // tables godoc
 // @Schemes
-// @Summary 	 Delete Table Data
-// @Description  Delete Table Data by ID.
-// @Tags 		 Tables
-// @Accept       json
-// @Produce      json
+// @Summary Delete Table Data
+// @Description Delete Table Data by ID.
+// @Tags Tables
+// @Accept json
+// @Produce json
 // @Param id   	path     int  	true "table id"
 // @Success 204 "NO CONTENT RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
@@ -145,13 +139,11 @@ func (handler tableHandler) destroy(ctx *gin.Context) {
 		return
 	}
 	data := model.Table{ID: id}
-
 	err := handler.svc.DeleteTable(ctx, &data)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
