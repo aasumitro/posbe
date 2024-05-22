@@ -13,7 +13,7 @@ const DefaultLayout: React.FC<Props> = (props) => {
   const location = useLocation();
 
   useEffect(() => {
-      setLogin(true)
+    setLogin(true)
   }, [setLogin, location])
 
   return (
@@ -21,12 +21,12 @@ const DefaultLayout: React.FC<Props> = (props) => {
       <div className=" flex-col md:flex min-h-screen w-full bg-muted/40">
         {(isLogin) && <Sidebar />}
         <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-            {(isLogin) && <Header />}
-            <div className="flex min-h-screen w-full flex-col">
-                {props.children}
-            </div>
+          {(isLogin) && <Header />}
+          <div className="flex min-h-screen w-full flex-col">
+            {props.children}
+          </div>
         </div>
-        <Toaster/>
+        <Toaster />
       </div>
     </>
   )
