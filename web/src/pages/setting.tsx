@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { Button } from "@/components/ui/button.tsx";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {Button} from "@/components/ui/button.tsx";
 
 export function Setting() {
   return (<>
@@ -12,7 +12,7 @@ export function Setting() {
       <div
         className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
         <nav
-          className="grid gap-4 text-sm text-muted-foreground" x-chunk="dashboard-04-chunk-0"
+          className="grid gap-4 text-sm text-muted-foreground"
         >
           <a href="#" className="font-semibold text-primary">
             General
@@ -33,7 +33,7 @@ export function Setting() {
             </CardHeader>
             <CardContent>
               <form>
-                <Input placeholder="Store Name" />
+                <Input placeholder="Store Name"/>
               </form>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">

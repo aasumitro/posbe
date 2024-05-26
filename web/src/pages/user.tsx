@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { Button } from "@/components/ui/button.tsx";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {Button} from "@/components/ui/button.tsx";
 
 export function User() {
   return (
@@ -31,7 +31,7 @@ export function User() {
             </CardHeader>
             <CardContent>
               <form>
-                <Input placeholder="Store Name" />
+                <Input placeholder="Store Name"/>
               </form>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">

@@ -1,18 +1,18 @@
-import { Button } from "@/components/ui/button.tsx";
+import {Button} from "@/components/ui/button.tsx";
 import {
   DropdownMenu, DropdownMenuCheckboxItem,
   DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import { ChevronLeft, ChevronRight, Copy, CreditCard, File, ListFilter, MoreVertical, Truck } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Separator } from "@radix-ui/react-dropdown-menu";
-import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination.tsx";
-import { Progress } from "@/components/ui/progress.tsx";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
-import { Badge } from "@/components/ui/badge.tsx";
+import {ChevronLeft, ChevronRight, Copy, CreditCard, File, ListFilter, MoreVertical, Truck} from "lucide-react";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {Separator} from "@radix-ui/react-dropdown-menu";
+import {Pagination, PaginationContent, PaginationItem} from "@/components/ui/pagination.tsx";
+import {Progress} from "@/components/ui/progress.tsx";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {Badge} from "@/components/ui/badge.tsx";
 
 export function Transaction() {
   return (
@@ -44,7 +44,7 @@ export function Transaction() {
               </div>
             </CardContent>
             <CardFooter>
-              <Progress value={25} aria-label="25% increase" />
+              <Progress value={25} aria-label="25% increase"/>
             </CardFooter>
           </Card>
           <Card x-chunk="dashboard-05-chunk-2">
@@ -58,7 +58,7 @@ export function Transaction() {
               </div>
             </CardContent>
             <CardFooter>
-              <Progress value={12} aria-label="12% increase" />
+              <Progress value={12} aria-label="12% increase"/>
             </CardFooter>
           </Card>
         </div>
@@ -77,13 +77,13 @@ export function Transaction() {
                     size="sm"
                     className="h-7 gap-1 text-sm"
                   >
-                    <ListFilter className="h-3.5 w-3.5" />
+                    <ListFilter className="h-3.5 w-3.5"/>
                     <span className="sr-only sm:not-sr-only">Filter</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator/>
                   <DropdownMenuCheckboxItem checked>
                     Fulfilled
                   </DropdownMenuCheckboxItem>
@@ -100,7 +100,7 @@ export function Transaction() {
                 variant="outline"
                 className="h-7 gap-1 text-sm"
               >
-                <File className="h-3.5 w-3.5" />
+                <File className="h-3.5 w-3.5"/>
                 <span className="sr-only sm:not-sr-only">Export</span>
               </Button>
             </div>
@@ -311,7 +311,7 @@ export function Transaction() {
                   variant="outline"
                   className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
                 >
-                  <Copy className="h-3 w-3" />
+                  <Copy className="h-3 w-3"/>
                   <span className="sr-only">Copy Order ID</span>
                 </Button>
               </CardTitle>
@@ -319,7 +319,7 @@ export function Transaction() {
             </div>
             <div className="ml-auto flex items-center gap-1">
               <Button size="sm" variant="outline" className="h-8 gap-1">
-                <Truck className="h-3.5 w-3.5" />
+                <Truck className="h-3.5 w-3.5"/>
                 <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
                   Track Order
                 </span>
@@ -327,14 +327,14 @@ export function Transaction() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="outline" className="h-8 w-8">
-                    <MoreVertical className="h-3.5 w-3.5" />
+                    <MoreVertical className="h-3.5 w-3.5"/>
                     <span className="sr-only">More</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>Edit</DropdownMenuItem>
                   <DropdownMenuItem>Export</DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator/>
                   <DropdownMenuItem>Trash</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -357,7 +357,7 @@ export function Transaction() {
                   <span>$49.00</span>
                 </li>
               </ul>
-              <Separator className="my-2" />
+              <Separator className="my-2"/>
               <ul className="grid gap-3">
                 <li className="flex items-center justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
@@ -377,7 +377,7 @@ export function Transaction() {
                 </li>
               </ul>
             </div>
-            <Separator className="my-4" />
+            <Separator className="my-4"/>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-3">
                 <div className="font-semibold">Shipping Information</div>
@@ -394,7 +394,7 @@ export function Transaction() {
                 </div>
               </div>
             </div>
-            <Separator className="my-4" />
+            <Separator className="my-4"/>
             <div className="grid gap-3">
               <div className="font-semibold">Customer Information</div>
               <dl className="grid gap-3">
@@ -416,13 +416,13 @@ export function Transaction() {
                 </div>
               </dl>
             </div>
-            <Separator className="my-4" />
+            <Separator className="my-4"/>
             <div className="grid gap-3">
               <div className="font-semibold">Payment Information</div>
               <dl className="grid gap-3">
                 <div className="flex items-center justify-between">
                   <dt className="flex items-center gap-1 text-muted-foreground">
-                    <CreditCard className="h-4 w-4" />
+                    <CreditCard className="h-4 w-4"/>
                     Visa
                   </dt>
                   <dd>**** **** **** 4532</dd>
@@ -438,13 +438,13 @@ export function Transaction() {
               <PaginationContent>
                 <PaginationItem>
                   <Button size="icon" variant="outline" className="h-6 w-6">
-                    <ChevronLeft className="h-3.5 w-3.5" />
+                    <ChevronLeft className="h-3.5 w-3.5"/>
                     <span className="sr-only">Previous Order</span>
                   </Button>
                 </PaginationItem>
                 <PaginationItem>
                   <Button size="icon" variant="outline" className="h-6 w-6">
-                    <ChevronRight className="h-3.5 w-3.5" />
+                    <ChevronRight className="h-3.5 w-3.5"/>
                     <span className="sr-only">Next Order</span>
                   </Button>
                 </PaginationItem>
