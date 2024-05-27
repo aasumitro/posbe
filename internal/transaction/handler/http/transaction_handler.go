@@ -1,6 +1,6 @@
 package http
 
-type transactioHandler struct{}
+// type  transactioHandler struct{}
 
 // list
 // detail
@@ -10,4 +10,4 @@ type transactioHandler struct{}
 // we will not impl delete func
 // user can only update the transaction data
 
-func NewTransactionHandler() {}
+// func NewTransactionHandler() {}

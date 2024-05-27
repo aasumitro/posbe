@@ -1,8 +1,6 @@
 package http
 
-type orderHandler struct{}
-
+// type orderHandler struct{}
 // add order items to transaction
 // payment
-
-func NewOrderHandler() {}
+// func NewOrderHandler() {}
