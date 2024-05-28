@@ -1,45 +1,211 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {Input} from "@/components/ui/input.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
+import {
+  DropdownMenu,
+  DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu.tsx";
+import {File, MoreHorizontal, PlusCircle} from "lucide-react";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {Badge} from "@/components/ui/badge.tsx";
 
 export function User() {
   return (
-    <main
-      className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
-      <div className="mx-auto grid w-full max-w-6xl gap-2">
-        <h1 className="text-3xl font-semibold">Users</h1>
-      </div>
-      <div
-        className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
-        <nav
-          className="grid gap-4 text-sm text-muted-foreground"
-        >
-          <a href="#" className="font-semibold text-primary">
-            Employees
-          </a>
-          <a href="#">
-            Customers
-          </a>
-        </nav>
-        <div className="grid gap-6">
-          <Card x-chunk="dashboard-04-chunk-1">
+    <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+      <Tabs defaultValue="employees">
+        <div className="flex items-center">
+          <TabsList>
+            <TabsTrigger value="employees">Employees</TabsTrigger>
+            <TabsTrigger value="customers">Customers</TabsTrigger>
+          </TabsList>
+          <div className="ml-auto flex items-center gap-2">
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline" className="h-8 gap-1">
+                  <File className="h-3.5 w-3.5"/>
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Export
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  Filter by
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator/>
+                <DropdownMenuItem>
+                  All
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Employee
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Customer
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" className="h-8 gap-1">
+                  <PlusCircle className="h-3.5 w-3.5"/>
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                   New User
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  User type
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator/>
+                <DropdownMenuItem>
+                  Employee
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  Customer
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        <TabsContent value="employees">
+          <Card>
             <CardHeader>
-              <CardTitle>Store Name</CardTitle>
+              <CardTitle>Employees</CardTitle>
               <CardDescription>
-                Used to identify your store in the marketplace.
+                Manage your employee and view their sales performance.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form>
-                <Input placeholder="Store Name"/>
-              </form>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="hidden w-[100px] sm:table-cell">
+                      <span className="sr-only">Image</span>
+                    </TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Price
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Total Sales
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Created at
+                    </TableHead>
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="hidden sm:table-cell">
+                      <img
+                        alt="Product image"
+                        className="aspect-square rounded-md object-cover"
+                        height="64"
+                        src="/placeholder.svg"
+                        width="64"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      Laser Lemonade Machine
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Draft</Badge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      $499.99
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      25
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      2023-07-12 10:42 AM
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MoreHorizontal className="h-4 w-4"/>
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="hidden sm:table-cell">
+                      <img
+                        alt="Product image"
+                        className="aspect-square rounded-md object-cover"
+                        height="64"
+                        src="/placeholder.svg"
+                        width="64"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      Hypernova Headphones
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">Active</Badge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      $129.99
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      100
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      2023-10-18 03:21 PM
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MoreHorizontal className="h-4 w-4"/>
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </CardContent>
-            <CardFooter className="border-t px-6 py-4">
-              <Button>Save</Button>
+            <CardFooter>
+              <div className="text-xs text-muted-foreground">
+                Showing <strong>1-10</strong> of <strong>32</strong>
+                {" "} products
+              </div>
             </CardFooter>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+      </Tabs>
     </main>
   )
 }
