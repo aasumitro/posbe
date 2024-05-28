@@ -22,7 +22,7 @@ type storePrefHandler struct {
 // @Success 200 {object} utils.SuccessRespond{data=[]model.StoreSetting} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/store/prefs [GET]
+// @Router /api/v1/store/prefs [GET]
 func (handler storePrefHandler) fetch(ctx *gin.Context) {
 	prefs, err := handler.svc.AllPrefs(ctx)
 	if err != nil {
@@ -45,7 +45,7 @@ func (handler storePrefHandler) fetch(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router  /v1/store/prefs [PUT]
+// @Router  /api/v1/store/prefs [PUT]
 func (handler storePrefHandler) update(ctx *gin.Context) {
 	var form model.StorePref
 	if err := ctx.ShouldBind(&form); err != nil {

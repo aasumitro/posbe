@@ -40,7 +40,7 @@ func (handler subcategoryHandler) fetch(ctx *gin.Context) {
 // @Description Create new Subcategory.
 // @Tags Product Subcategories
 // @Accept mpfd
-// @Produce
+// @Produce json
 // @Param name 			formData string true "name"
 // @Param category_id 	formData string true "category_id"
 // @Success 201 {object} utils.SuccessRespond{data=model.Subcategory} "CREATED RESPOND"

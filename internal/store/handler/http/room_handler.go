@@ -23,7 +23,7 @@ type roomHandler struct {
 // @Success 200 {object} utils.SuccessRespond{data=[]model.Room} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/rooms [GET]
+// @Router /api/v1/rooms [GET]
 func (handler roomHandler) fetch(ctx *gin.Context) {
 	rooms, err := handler.svc.RoomList(ctx)
 	if err != nil {
@@ -53,7 +53,7 @@ func (handler roomHandler) fetch(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/rooms [POST]
+// @Router /api/v1/rooms [POST]
 func (handler roomHandler) store(ctx *gin.Context) {
 	var form model.Room
 	if err := ctx.ShouldBind(&form); err != nil {
@@ -91,7 +91,7 @@ func (handler roomHandler) store(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/rooms/{id} [PUT]
+// @Router /api/v1/rooms/{id} [PUT]
 func (handler roomHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
@@ -129,7 +129,7 @@ func (handler roomHandler) update(ctx *gin.Context) {
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/rooms/{id} [DELETE]
+// @Router /api/v1/rooms/{id} [DELETE]
 func (handler roomHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)

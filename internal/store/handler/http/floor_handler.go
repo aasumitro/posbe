@@ -26,7 +26,7 @@ type floorHandler struct {
 // @Success 200 {object} utils.SuccessRespond{data=model.Floor} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/floors/{join} [GET]
+// @Router /api/v1/floors/{join} [GET]
 func (handler floorHandler) floorsWith(ctx *gin.Context) {
 	joinParams := strings.ToLower(ctx.Param("join"))
 	if slices.Contains([]string{"rooms", "tables"}, joinParams) {
@@ -58,7 +58,7 @@ func (handler floorHandler) floorsWith(ctx *gin.Context) {
 // @Success 200 {object} utils.SuccessRespond{data=[]model.Floor} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/floors [GET]
+// @Router /api/v1/floors [GET]
 func (handler floorHandler) fetch(ctx *gin.Context) {
 	floors, err := handler.svc.FloorList(ctx)
 	if err != nil {
@@ -80,7 +80,7 @@ func (handler floorHandler) fetch(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/floors [POST]
+// @Router /api/v1/floors [POST]
 func (handler floorHandler) store(ctx *gin.Context) {
 	var form model.Floor
 	if err := ctx.ShouldBind(&form); err != nil {
@@ -111,7 +111,7 @@ func (handler floorHandler) store(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/floors/{id} [PUT]
+// @Router /api/v1/floors/{id} [PUT]
 func (handler floorHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
@@ -149,7 +149,7 @@ func (handler floorHandler) update(ctx *gin.Context) {
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/floors/{id} [DELETE]
+// @Router /api/v1/floors/{id} [DELETE]
 func (handler floorHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)

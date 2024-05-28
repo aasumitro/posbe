@@ -110,7 +110,7 @@ func (handler unitHandler) update(ctx *gin.Context) {
 // @Schemes
 // @Summary Delete Unit Data
 // @Description Delete Unit Data by ID.
-// @Tags Units
+// @Tags Product Units
 // @Accept json
 // @Produce json
 // @Param id path int true "unit id"

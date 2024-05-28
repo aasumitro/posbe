@@ -23,7 +23,7 @@ type tableHandler struct {
 // @Success 200 {object} utils.SuccessRespond{data=[]model.Table} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/tables [GET]
+// @Router /api/v1/tables [GET]
 func (handler tableHandler) fetch(ctx *gin.Context) {
 	tables, err := handler.svc.TableList(ctx)
 	if err != nil {
@@ -52,7 +52,7 @@ func (handler tableHandler) fetch(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/tables [POST]
+// @Router /api/v1/tables [POST]
 func (handler tableHandler) store(ctx *gin.Context) {
 	var form model.Table
 	if err := ctx.ShouldBind(&form); err != nil {
@@ -90,7 +90,7 @@ func (handler tableHandler) store(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/tables/{id} [PUT]
+// @Router /api/v1/tables/{id} [PUT]
 func (handler tableHandler) update(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
@@ -128,7 +128,7 @@ func (handler tableHandler) update(ctx *gin.Context) {
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
-// @Router /v1/tables/{id} [DELETE]
+// @Router /api/v1/tables/{id} [DELETE]
 func (handler tableHandler) destroy(ctx *gin.Context) {
 	idParams := ctx.Param("id")
 	id, errParse := strconv.Atoi(idParams)
