@@ -5,7 +5,7 @@
 ### Auth END-Point
 ===
 ### POST - logged user in
-POST http://localhost:8000/v1/login
+POST http://localhost:8000/api/v1/login
 Content-Type: application/json
 
 {
@@ -14,19 +14,19 @@ Content-Type: application/json
 }
 
 ### POST - logged user out
-POST http://localhost:8000/v1/logout
+POST http://localhost:8000/api/v1/logout
 Authorization: Bearer "TOKEN_HERE"
 
 ===
 ### Roles END-Point
 ===
 ### GET - fetch list of roles
-GET http://localhost:8000/v1/roles
+GET http://localhost:8000/api/v1/roles
 Authorization: Bearer "TOKEN_HERE"
 accept: application/json
 
 ### POST - store new role
-POST http://localhost:8000/v1/roles
+POST http://localhost:8000/api/v1/roles
 Authorization: Bearer "TOKEN_HERE"
 Content-Type: application/json
 
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ### PUT - Update specified role data
-PUT http://localhost:8000/v1/roles/4
+PUT http://localhost:8000/api/v1/roles/4
 Authorization: Bearer "TOKEN_HERE"
 Content-Type: application/json
 
@@ -46,7 +46,7 @@ Content-Type: application/json
 }
 
 ### DELETE - Destroy specified role data
-DELETE http://localhost:8000/v1/roles/5
+DELETE http://localhost:8000/api/v1/roles/5
 Authorization: Bearer "TOKEN_HERE"
 
 ===
@@ -54,17 +54,17 @@ Authorization: Bearer "TOKEN_HERE"
 ===
 
 ### GET - fetch list of users
-GET http://localhost:8000/v1/users
+GET http://localhost:8000/api/v1/users
 Authorization: Bearer "TOKEN_HERE"
 accept: application/json
 
 ### GET - show specified users
-GET http://localhost:8000/v1/users/1
+GET http://localhost:8000/api/v1/users/1
 Authorization: Bearer "TOKEN_HERE"
 accept: application/json
 
 ### POST - store new user
-POST http://localhost:8000/v1/users
+POST http://localhost:8000/api/v1/users
 Authorization: Bearer "TOKEN_HERE"
 Content-Type: application/json
 
@@ -78,7 +78,7 @@ Content-Type: application/json
 }
 
 ### PUT - Update specified user
-PUT http://localhost:8000/v1/users/2
+PUT http://localhost:8000/api/v1/users/2
 Authorization: Bearer "TOKEN_HERE"
 Content-Type: application/json
 
@@ -92,5 +92,5 @@ Content-Type: application/json
 }
 
 ### DELETE - Destroy specified user
-DELETE http://localhost:8000/v1/users/2
+DELETE http://localhost:8000/api/v1/users/2
 Authorization: Bearer "TOKEN_HERE"

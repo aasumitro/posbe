@@ -3,21 +3,22 @@ package sql_test
 import (
 	"context"
 	"errors"
+	"regexp"
+	"testing"
+
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
+	"github.com/aasumitro/posbe/config"
 	repoSql "github.com/aasumitro/posbe/internal/account/repository/sql"
+	"github.com/aasumitro/posbe/pkg/model"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"regexp"
-	"testing"
 )
 
 type roleRepositoryTestSuite struct {
 	suite.Suite
 	mock     sqlmock.Sqlmock
-	roleRepo domain.ICRUDRepository[domain.Role]
+	roleRepo model.ICRUDRepository[model.Role]
 }
 
 // SetupSuite is useful in cases where the setup code is time-consuming and isn't modified in any of the tests.
@@ -25,15 +26,11 @@ type roleRepositoryTestSuite struct {
 // and all the tests used the same data and only ran SELECT statements. In this scenario,
 // SetupSuite could be used once to load the database with data.
 func (suite *roleRepositoryTestSuite) SetupSuite() {
-	var (
-		err error
-	)
-
-	configs.DbPool, suite.mock, err = sqlmock.New(
+	var err error
+	config.PostgresPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
-
 	suite.roleRepo = repoSql.NewRoleSQLRepository()
 }
 
@@ -92,7 +89,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Find_ExpectedSuccess() 
 	q += "WHERE roles.id = $1 GROUP BY roles.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(role)
-	res, err := suite.roleRepo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.roleRepo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -107,13 +104,13 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Find_ExpectedError() {
 	q += "WHERE roles.id = $1 GROUP BY roles.id LIMIT 1"
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(role)
-	res, err := suite.roleRepo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.roleRepo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
 
 func (suite *roleRepositoryTestSuite) TestRoleRepository_Create_ExpectedSuccess() {
-	role := &domain.Role{ID: 1, Name: "test", Description: "test"}
+	role := &model.Role{ID: 1, Name: "test", Description: "test"}
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "description"}).
 		AddRow(1, "test", "test 1")
@@ -128,7 +125,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Create_ExpectedSuccess(
 }
 
 func (suite *roleRepositoryTestSuite) TestRoleRepository_Create_ExpectedError() {
-	role := &domain.Role{ID: 1, Name: "test", Description: "test"}
+	role := &model.Role{ID: 1, Name: "test", Description: "test"}
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "description"}).
 		AddRow(1, nil, nil)
@@ -143,7 +140,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Create_ExpectedError() 
 }
 
 func (suite *roleRepositoryTestSuite) TestRoleRepository_Update_ExpectedSuccess() {
-	role := &domain.Role{ID: 1, Name: "test", Description: "test"}
+	role := &model.Role{ID: 1, Name: "test", Description: "test"}
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "description"}).
 		AddRow(1, "test", "test")
@@ -158,7 +155,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Update_ExpectedSuccess(
 }
 
 func (suite *roleRepositoryTestSuite) TestRoleRepository_Update_ExpectedError() {
-	role := &domain.Role{ID: 1, Name: "test", Description: "test"}
+	role := &model.Role{ID: 1, Name: "test", Description: "test"}
 	rows := suite.mock.
 		NewRows([]string{"id", "name", "description"}).
 		AddRow(1, nil, nil)
@@ -177,7 +174,7 @@ func (suite *roleRepositoryTestSuite) TestRoleRepository_Delete_ExpectedSuccess(
 	suite.mock.ExpectExec(expectedQuery).
 		WithArgs(1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	role := &domain.Role{ID: 1, Name: "test", Description: "test"}
+	role := &model.Role{ID: 1, Name: "test", Description: "test"}
 	err := suite.roleRepo.Delete(context.TODO(), role)
 	require.Nil(suite.T(), err)
 }

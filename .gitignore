@@ -17,6 +17,6 @@ bin/
 build/
 coverage.txt
 oryxBuildBinary
-.idea
 .env
 .DS_Store
+temps/

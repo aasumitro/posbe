@@ -4,113 +4,135 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"github.com/aasumitro/posbe/commons"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"errors"
 	"net/http"
 	"time"
+
+	"github.com/aasumitro/posbe/common"
+	"github.com/aasumitro/posbe/config"
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/pkg/utils"
 )
 
 type accountService struct {
-	ctx      context.Context
-	roleRepo domain.ICRUDRepository[domain.Role]
-	userRepo domain.ICRUDRepository[domain.User]
+	roleRepo model.ICRUDRepository[model.Role]
+	userRepo model.ICRUDRepository[model.User]
 	pwd      utils.IPassword
 }
 
-var (
-	roleCacheKey = "roles"
-)
+var roleCacheKey = "roles"
 
-func (service accountService) RoleList() (roles []*domain.Role, errorData *utils.ServiceError) {
-	helper := utils.RedisCache{Ctx: service.ctx, RdpConn: configs.RedisPool}
+func (service accountService) RoleList(
+	ctx context.Context,
+) (
+	roles []*model.Role,
+	errorData *utils.ServiceError,
+) {
+	helper := utils.RedisCache{Ctx: ctx, RdpConn: config.RedisPool}
 	data, err := helper.CacheFirstData(&utils.CacheDataSupplied{
 		Key: roleCacheKey,
 		TTL: time.Hour * 1,
 		CbF: func() (data any, err error) {
-			return service.roleRepo.All(service.ctx)
+			return service.roleRepo.All(ctx)
 		},
 	})
-
-	if data, ok := data.([]*domain.Role); ok {
+	if data, ok := data.([]*model.Role); ok {
 		roles = data
 	}
-
 	if data, ok := data.(string); ok {
-		var r []*domain.Role
+		var r []*model.Role
 		_ = json.Unmarshal([]byte(data), &r)
 		roles = r
 	}
-
-	return utils.ValidateDataRows[domain.Role](roles, err)
+	return utils.ValidateDataRows[model.Role](roles, err)
 }
 
-func (service accountService) AddRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
-	data, err := service.roleRepo.Create(service.ctx, data)
-
-	configs.RedisPool.Del(service.ctx, roleCacheKey)
-
-	return utils.ValidateDataRow[domain.Role](data, err)
+func (service accountService) AddRole(
+	ctx context.Context,
+	item *model.Role,
+) (
+	role *model.Role,
+	errorData *utils.ServiceError,
+) {
+	data, err := service.roleRepo.Create(ctx, item)
+	config.RedisPool.Del(ctx, roleCacheKey)
+	return utils.ValidateDataRow[model.Role](data, err)
 }
 
-func (service accountService) EditRole(data *domain.Role) (role *domain.Role, errorData *utils.ServiceError) {
-	data, err := service.roleRepo.Update(service.ctx, data)
-
-	configs.RedisPool.Del(service.ctx, roleCacheKey)
-
-	return utils.ValidateDataRow[domain.Role](data, err)
+func (service accountService) EditRole(
+	ctx context.Context,
+	item *model.Role,
+) (
+	role *model.Role,
+	errorData *utils.ServiceError,
+) {
+	data, err := service.roleRepo.Update(ctx, item)
+	config.RedisPool.Del(ctx, roleCacheKey)
+	return utils.ValidateDataRow[model.Role](data, err)
 }
 
-func (service accountService) DeleteRole(data *domain.Role) *utils.ServiceError {
-	role, err := service.roleRepo.Find(service.ctx, domain.FindWithID, data.ID)
+func (service accountService) DeleteRole(
+	ctx context.Context,
+	data *model.Role,
+) *utils.ServiceError {
+	role, err := service.roleRepo.Find(ctx, model.FindWithID, data.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
 			}
 		}
-
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	if role.Usage >= 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusForbidden,
-			Message: commons.ErrorUnableToDelete,
+			Message: common.ErrorUnableToDelete,
 		}
 	}
-
-	err = service.roleRepo.Delete(service.ctx, role)
+	err = service.roleRepo.Delete(ctx, role)
 	if err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
-	configs.RedisPool.Del(service.ctx, roleCacheKey)
-
+	config.RedisPool.Del(ctx, roleCacheKey)
 	return nil
 }
 
-func (service accountService) UserList() (users []*domain.User, errorData *utils.ServiceError) {
-	data, err := service.userRepo.All(service.ctx)
-
-	return utils.ValidateDataRows[domain.User](data, err)
+func (service accountService) UserList(
+	ctx context.Context,
+) (
+	users []*model.User,
+	errorData *utils.ServiceError,
+) {
+	data, err := service.userRepo.All(ctx)
+	return utils.ValidateDataRows[model.User](data, err)
 }
 
-func (service accountService) ShowUser(id int) (user *domain.User, errorData *utils.ServiceError) {
-	data, err := service.userRepo.Find(service.ctx, domain.FindWithID, id)
-
-	return utils.ValidateDataRow[domain.User](data, err)
+func (service accountService) ShowUser(
+	ctx context.Context,
+	id int,
+) (
+	user *model.User,
+	errorData *utils.ServiceError,
+) {
+	data, err := service.userRepo.Find(ctx, model.FindWithID, id)
+	return utils.ValidateDataRow[model.User](data, err)
 }
 
-func (service accountService) AddUser(data *domain.User) (user *domain.User, errorData *utils.ServiceError) {
+func (service accountService) AddUser(
+	ctx context.Context,
+	data *model.User,
+) (
+	user *model.User,
+	errorData *utils.ServiceError,
+) {
 	password := data.Password
 	if password != "" {
 		u := utils.Password{Stored: "", Supplied: password}
@@ -124,16 +146,19 @@ func (service accountService) AddUser(data *domain.User) (user *domain.User, err
 				Message: err.Error(),
 			}
 		}
-
 		data.Password = pwd
 	}
-
-	data, err := service.userRepo.Create(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.User](data, err)
+	data, err := service.userRepo.Create(ctx, data)
+	return utils.ValidateDataRow[model.User](data, err)
 }
 
-func (service accountService) EditUser(data *domain.User) (user *domain.User, errorData *utils.ServiceError) {
+func (service accountService) EditUser(
+	ctx context.Context,
+	data *model.User,
+) (
+	user *model.User,
+	errorData *utils.ServiceError,
+) {
 	password := data.Password
 	if password != "" {
 		u := utils.Password{Stored: "", Supplied: password}
@@ -147,58 +172,59 @@ func (service accountService) EditUser(data *domain.User) (user *domain.User, er
 				Message: err.Error(),
 			}
 		}
-
 		data.Password = pwd
 	}
-
-	data, err := service.userRepo.Update(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.User](data, err)
+	data, err := service.userRepo.Update(ctx, data)
+	return utils.ValidateDataRow[model.User](data, err)
 }
 
-func (service accountService) DeleteUser(data *domain.User) *utils.ServiceError {
-	user, err := service.userRepo.Find(service.ctx, domain.FindWithID, data.ID)
+func (service accountService) DeleteUser(
+	ctx context.Context,
+	data *model.User,
+) *utils.ServiceError {
+	user, err := service.userRepo.Find(ctx, model.FindWithID, data.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
 			}
 		}
-
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
-	err = service.userRepo.Delete(service.ctx, user)
+	err = service.userRepo.Delete(ctx, user)
 	if err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	return nil
 }
 
-func (service accountService) VerifyUserCredentials(username, password string) (data any, errorData *utils.ServiceError) {
-	user, err := service.userRepo.Find(service.ctx, domain.FindWithUsername, username)
+func (service accountService) VerifyUserCredentials(
+	ctx context.Context,
+	username, password string,
+) (
+	data any,
+	errorData *utils.ServiceError,
+) {
+	user, err := service.userRepo.Find(ctx, model.FindWithUsername, username)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
 			}
 		}
-
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	u := utils.Password{Stored: user.Password, Supplied: password}
 	ok, err := u.ComparePasswords()
 	if service.pwd != nil {
@@ -210,26 +236,21 @@ func (service accountService) VerifyUserCredentials(username, password string) (
 			Message: err.Error(),
 		}
 	}
-
 	if !ok {
 		return nil, &utils.ServiceError{
 			Code:    http.StatusUnprocessableEntity,
 			Message: "Password Not Match",
 		}
 	}
-
 	user.Password = ""
-
 	return user, nil
 }
 
 func NewAccountService(
-	ctx context.Context,
-	roleRepo domain.ICRUDRepository[domain.Role],
-	userRepo domain.ICRUDRepository[domain.User],
-) domain.IAccountService {
+	roleRepo model.ICRUDRepository[model.Role],
+	userRepo model.ICRUDRepository[model.User],
+) model.IAccountService {
 	return &accountService{
-		ctx:      ctx,
 		roleRepo: roleRepo,
 		userRepo: userRepo,
 	}
@@ -237,13 +258,11 @@ func NewAccountService(
 
 // NewAccountServiceTest for testing purpose
 func NewAccountServiceTest(
-	ctx context.Context,
-	roleRepo domain.ICRUDRepository[domain.Role],
-	userRepo domain.ICRUDRepository[domain.User],
+	roleRepo model.ICRUDRepository[model.Role],
+	userRepo model.ICRUDRepository[model.User],
 	pwd utils.IPassword,
-) domain.IAccountService {
+) model.IAccountService {
 	return &accountService{
-		ctx:      ctx,
 		roleRepo: roleRepo,
 		userRepo: userRepo,
 		pwd:      pwd,

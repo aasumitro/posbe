@@ -4,15 +4,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
+
+	"github.com/aasumitro/posbe/config"
+	"github.com/aasumitro/posbe/pkg/model"
 )
 
 type ProductSQLRepository struct {
 	Db *sql.DB
 }
 
-func (repo ProductSQLRepository) Search(ctx context.Context, keys []domain.FindWith, values []any) (data []*domain.Product, err error) {
+func (repo ProductSQLRepository) Search(ctx context.Context, keys []model.FindWith, values []any) (data []*model.Product, err error) {
 	q := "SELECT * FROM products "
 	var whereClause string
 	if len(keys) > 0 {
@@ -20,18 +21,20 @@ func (repo ProductSQLRepository) Search(ctx context.Context, keys []domain.FindW
 
 		for i, key := range keys {
 			switch key {
-			case domain.FindWithSKU:
+			case model.FindWithSKU:
 				data := values[i].(string)
 				whereClause += fmt.Sprintf("sku = '%s' ", data)
-			case domain.FindWithCategoryID:
+			case model.FindWithCategoryID:
 				data := values[i].(int)
 				whereClause += fmt.Sprintf("category_id = %d ", data)
-			case domain.FindWithSubcategoryID:
+			case model.FindWithSubcategoryID:
 				data := values[i].(int)
 				whereClause += fmt.Sprintf("subcategory_id = %d ", data)
-			case domain.FindWithPriceInRange:
+			case model.FindWithPriceInRange:
 				data := values[i].([]float32)
 				whereClause += fmt.Sprintf("price BETWEEN %f AND %f ", data[0], data[1])
+			default:
+				panic("unhandled default case")
 			}
 
 			if i != (len(keys) - 1) {
@@ -49,7 +52,7 @@ func (repo ProductSQLRepository) Search(ctx context.Context, keys []domain.FindW
 	defer func(rows *sql.Rows) { _ = rows.Close() }(rows)
 
 	for rows.Next() {
-		var product domain.Product
+		var product model.Product
 
 		if err := rows.Scan(
 			&product.ID, &product.CategoryID, &product.SubcategoryID,
@@ -65,7 +68,7 @@ func (repo ProductSQLRepository) Search(ctx context.Context, keys []domain.FindW
 	return data, nil
 }
 
-func (repo ProductSQLRepository) All(ctx context.Context) (data []*domain.Product, err error) {
+func (repo ProductSQLRepository) All(ctx context.Context) (data []*model.Product, err error) {
 	q := "SELECT * FROM products"
 	rows, err := repo.Db.QueryContext(ctx, q)
 	if err != nil {
@@ -74,7 +77,7 @@ func (repo ProductSQLRepository) All(ctx context.Context) (data []*domain.Produc
 	defer func(rows *sql.Rows) { _ = rows.Close() }(rows)
 
 	for rows.Next() {
-		var product domain.Product
+		var product model.Product
 
 		if err := rows.Scan(
 			&product.ID, &product.CategoryID, &product.SubcategoryID,
@@ -90,11 +93,11 @@ func (repo ProductSQLRepository) All(ctx context.Context) (data []*domain.Produc
 	return data, nil
 }
 
-func (repo ProductSQLRepository) Find(ctx context.Context, _ domain.FindWith, val any) (data *domain.Product, err error) {
+func (repo ProductSQLRepository) Find(ctx context.Context, _ model.FindWith, val any) (data *model.Product, err error) {
 	q := "SELECT * FROM products WHERE id = $1 LIMIT 1"
 	row := repo.Db.QueryRowContext(ctx, q, val)
 
-	data = &domain.Product{}
+	data = &model.Product{}
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
@@ -106,7 +109,7 @@ func (repo ProductSQLRepository) Find(ctx context.Context, _ domain.FindWith, va
 	return data, nil
 }
 
-func (repo ProductSQLRepository) Create(ctx context.Context, params *domain.Product) (data *domain.Product, err error) {
+func (repo ProductSQLRepository) Create(ctx context.Context, params *model.Product) (data *model.Product, err error) {
 	q := "INSERT INTO products "
 	q += "(category_id, subcategory_id, sku, image, gallery, name, description, price) "
 	q += "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
@@ -114,7 +117,7 @@ func (repo ProductSQLRepository) Create(ctx context.Context, params *domain.Prod
 		params.Sku, params.Image, params.Gallery, params.Name,
 		params.Description, params.Price)
 
-	data = &domain.Product{}
+	data = &model.Product{}
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
@@ -126,14 +129,14 @@ func (repo ProductSQLRepository) Create(ctx context.Context, params *domain.Prod
 	return data, nil
 }
 
-func (repo ProductSQLRepository) Update(ctx context.Context, params *domain.Product) (data *domain.Product, err error) {
+func (repo ProductSQLRepository) Update(ctx context.Context, params *model.Product) (data *model.Product, err error) {
 	q := "UPDATE products SET category_id = $1, subcategory_id = $2, sku = $3, image = $4, "
 	q += "gallery = $5, name = $6, description = $7, price = $8 WHERE id = $9 RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.SubcategoryID,
 		params.Sku, params.Image, params.Gallery, params.Name,
 		params.Description, params.Price, params.ID)
 
-	data = &domain.Product{}
+	data = &model.Product{}
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
@@ -145,12 +148,12 @@ func (repo ProductSQLRepository) Update(ctx context.Context, params *domain.Prod
 	return data, nil
 }
 
-func (repo ProductSQLRepository) Delete(ctx context.Context, params *domain.Product) error {
+func (repo ProductSQLRepository) Delete(ctx context.Context, params *model.Product) error {
 	q := "DELETE FROM products WHERE id = $1"
 	_, err := repo.Db.ExecContext(ctx, q, params.ID)
 	return err
 }
 
-func NewProductSQLRepository() domain.ICRUDWithSearchRepository[domain.Product] {
-	return &ProductSQLRepository{Db: configs.DbPool}
+func NewProductSQLRepository() model.ICRUDWithSearchRepository[model.Product] {
+	return &ProductSQLRepository{Db: config.PostgresPool}
 }

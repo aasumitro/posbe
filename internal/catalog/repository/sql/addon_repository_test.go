@@ -3,32 +3,29 @@ package sql_test
 import (
 	"context"
 	"errors"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/aasumitro/posbe/configs"
-	"github.com/aasumitro/posbe/domain"
-	repoSql "github.com/aasumitro/posbe/internal/catalog/repository/sql"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 	"regexp"
 	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/aasumitro/posbe/config"
+	repoSql "github.com/aasumitro/posbe/internal/catalog/repository/sql"
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 )
 
 type addonRepositoryTestSuite struct {
 	suite.Suite
 	mock sqlmock.Sqlmock
-	repo domain.ICRUDRepository[domain.Addon]
+	repo model.ICRUDRepository[model.Addon]
 }
 
 func (suite *addonRepositoryTestSuite) SetupSuite() {
-	var (
-		err error
-	)
-
-	configs.DbPool, suite.mock, err = sqlmock.New(
+	var err error
+	config.PostgresPool, suite.mock, err = sqlmock.New(
 		sqlmock.QueryMatcherOption(
 			sqlmock.QueryMatcherRegexp))
 	require.NoError(suite.T(), err)
-
 	suite.repo = repoSql.NewAddonSQLRepository()
 }
 
@@ -79,7 +76,7 @@ func (suite *addonRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() {
 	query := "SELECT * FROM addons WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
-	res, err := suite.repo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), err)
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
@@ -92,13 +89,13 @@ func (suite *addonRepositoryTestSuite) TestRepository_Find_ExpectReturnError() {
 	query := "SELECT * FROM addons WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
-	res, err := suite.repo.Find(context.TODO(), domain.FindWithID, 1)
+	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)
 	require.Nil(suite.T(), res)
 	require.NotNil(suite.T(), err)
 }
 
 func (suite *addonRepositoryTestSuite) TestRepository_Created_ExpectSuccess() {
-	addon := &domain.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
+	addon := &model.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
 	data := suite.mock.
 		NewRows([]string{"id", "name", "description", "price"}).
 		AddRow(1, "test", "test", 1)
@@ -114,7 +111,7 @@ func (suite *addonRepositoryTestSuite) TestRepository_Created_ExpectSuccess() {
 }
 
 func (suite *addonRepositoryTestSuite) TestRepository_Created_ExpectError() {
-	addon := &domain.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
+	addon := &model.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
 	data := suite.mock.
 		NewRows([]string{"id", "name", "description", "price"}).
 		AddRow(1, nil, nil, nil)
@@ -130,7 +127,7 @@ func (suite *addonRepositoryTestSuite) TestRepository_Created_ExpectError() {
 }
 
 func (suite *addonRepositoryTestSuite) TestRepository_Updated_ExpectSuccess() {
-	addon := &domain.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
+	addon := &model.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
 	data := suite.mock.
 		NewRows([]string{"id", "name", "description", "price"}).
 		AddRow(1, "test", "test", 1)
@@ -146,7 +143,7 @@ func (suite *addonRepositoryTestSuite) TestRepository_Updated_ExpectSuccess() {
 }
 
 func (suite *addonRepositoryTestSuite) TestRepository_Updated_ExpectError() {
-	addon := &domain.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
+	addon := &model.Addon{ID: 1, Name: "test", Description: "test", Price: 1}
 	data := suite.mock.
 		NewRows([]string{"id", "name", "description", "price"}).
 		AddRow(1, nil, nil, nil)
@@ -166,7 +163,7 @@ func (suite *addonRepositoryTestSuite) TestRepository_Delete_ExpectSuccess() {
 	suite.mock.ExpectExec(expectedQuery).
 		WithArgs(1).
 		WillReturnResult(sqlmock.NewResult(0, 1))
-	data := &domain.Addon{ID: 1}
+	data := &model.Addon{ID: 1}
 	err := suite.repo.Delete(context.TODO(), data)
 	require.Nil(suite.T(), err)
 }

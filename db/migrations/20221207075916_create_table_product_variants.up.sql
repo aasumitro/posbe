@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS product_variants(
     type VARIANT_TYPES DEFAULT 'none',
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    price FLOAT
+    price FLOAT,
+    created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
+    updated_at BIGINT
 );
 
 ALTER TABLE product_variants ADD CONSTRAINT fk_products_product_variants

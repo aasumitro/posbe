@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 )
 
@@ -12,22 +13,19 @@ type ServiceError struct {
 
 func ValidateDataRow[T any](data *T, err error) (valueData *T, errData *ServiceError) {
 	errData = checkError(err)
-
 	return data, errData
 }
 
 func ValidateDataRows[T any](data []*T, err error) (valueData []*T, errData *ServiceError) {
 	errData = checkError(err)
-
 	return data, errData
 }
 
 func checkError(err error) *ServiceError {
 	var errData *ServiceError
-
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
 			errData = &ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
@@ -39,6 +37,5 @@ func checkError(err error) *ServiceError {
 			}
 		}
 	}
-
 	return errData
 }

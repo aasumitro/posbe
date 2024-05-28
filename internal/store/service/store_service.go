@@ -3,94 +3,107 @@ package service
 import (
 	"context"
 	"database/sql"
-	"github.com/aasumitro/posbe/commons"
-	"github.com/aasumitro/posbe/domain"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"errors"
 	"net/http"
 	"reflect"
+
+	"github.com/aasumitro/posbe/common"
+	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/pkg/utils"
 )
 
 type storeService struct {
-	ctx       context.Context
-	floorRepo domain.ICRUDRepository[domain.Floor]
-	tableRepo domain.ICRUDAddOnRepository[domain.Table]
-	roomRepo  domain.ICRUDAddOnRepository[domain.Room]
+	floorRepo model.ICRUDRepository[model.Floor]
+	tableRepo model.ICRUDAddOnRepository[model.Table]
+	roomRepo  model.ICRUDAddOnRepository[model.Room]
 }
 
-func (service storeService) FloorList() (floors []*domain.Floor, errData *utils.ServiceError) {
-	data, err := service.floorRepo.All(service.ctx)
-
-	return utils.ValidateDataRows[domain.Floor](data, err)
+func (service storeService) FloorList(
+	ctx context.Context,
+) (floors []*model.Floor, errData *utils.ServiceError) {
+	data, err := service.floorRepo.All(ctx)
+	return utils.ValidateDataRows[model.Floor](data, err)
 }
 
-func (service storeService) AddFloor(data *domain.Floor) (floor *domain.Floor, errData *utils.ServiceError) {
-	data, err := service.floorRepo.Create(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.Floor](data, err)
+func (service storeService) AddFloor(
+	ctx context.Context,
+	item *model.Floor,
+) (floor *model.Floor, errData *utils.ServiceError) {
+	data, err := service.floorRepo.Create(ctx, item)
+	return utils.ValidateDataRow[model.Floor](data, err)
 }
 
-func (service storeService) EditFloor(data *domain.Floor) (floor *domain.Floor, errData *utils.ServiceError) {
-	data, err := service.floorRepo.Update(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.Floor](data, err)
+func (service storeService) EditFloor(
+	ctx context.Context,
+	item *model.Floor,
+) (floor *model.Floor, errData *utils.ServiceError) {
+	data, err := service.floorRepo.Update(ctx, item)
+	return utils.ValidateDataRow[model.Floor](data, err)
 }
 
-func (service storeService) DeleteFloor(data *domain.Floor) *utils.ServiceError {
-	floor, err := service.floorRepo.Find(service.ctx, domain.FindWithID, data.ID)
+func (service storeService) DeleteFloor(
+	ctx context.Context,
+	data *model.Floor,
+) *utils.ServiceError {
+	floor, err := service.floorRepo.Find(
+		ctx, model.FindWithID, data.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
 			}
 		}
-
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	if floor.TotalTables >= 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusForbidden,
-			Message: commons.ErrorUnableToDelete,
+			Message: common.ErrorUnableToDelete,
 		}
 	}
-
-	err = service.floorRepo.Delete(service.ctx, floor)
-	if err != nil {
+	if err := service.floorRepo.Delete(ctx, floor); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	return nil
 }
 
-func (service storeService) TableList() (table []*domain.Table, errData *utils.ServiceError) {
-	data, err := service.tableRepo.All(service.ctx)
-
-	return utils.ValidateDataRows[domain.Table](data, err)
+func (service storeService) TableList(
+	ctx context.Context,
+) (table []*model.Table, errData *utils.ServiceError) {
+	data, err := service.tableRepo.All(ctx)
+	return utils.ValidateDataRows[model.Table](data, err)
 }
 
-func (service storeService) AddTable(data *domain.Table) (table *domain.Table, errData *utils.ServiceError) {
-	data, err := service.tableRepo.Create(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.Table](data, err)
+func (service storeService) AddTable(
+	ctx context.Context,
+	item *model.Table,
+) (table *model.Table, errData *utils.ServiceError) {
+	data, err := service.tableRepo.Create(ctx, item)
+	return utils.ValidateDataRow[model.Table](data, err)
 }
 
-func (service storeService) EditTable(data *domain.Table) (table *domain.Table, errData *utils.ServiceError) {
-	data, err := service.tableRepo.Update(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.Table](data, err)
+func (service storeService) EditTable(
+	ctx context.Context,
+	item *model.Table,
+) (table *model.Table, errData *utils.ServiceError) {
+	data, err := service.tableRepo.Update(ctx, item)
+	return utils.ValidateDataRow[model.Table](data, err)
 }
 
-func (service storeService) DeleteTable(data *domain.Table) *utils.ServiceError {
-	table, err := service.tableRepo.Find(service.ctx, domain.FindWithID, data.ID)
+func (service storeService) DeleteTable(
+	ctx context.Context,
+	data *model.Table,
+) *utils.ServiceError {
+	table, err := service.tableRepo.Find(ctx, model.FindWithID, data.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
@@ -103,8 +116,7 @@ func (service storeService) DeleteTable(data *domain.Table) *utils.ServiceError 
 		}
 	}
 
-	err = service.tableRepo.Delete(service.ctx, table)
-	if err != nil {
+	if err := service.tableRepo.Delete(ctx, table); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -114,28 +126,37 @@ func (service storeService) DeleteTable(data *domain.Table) *utils.ServiceError 
 	return nil
 }
 
-func (service storeService) RoomList() (rooms []*domain.Room, errData *utils.ServiceError) {
-	data, err := service.roomRepo.All(service.ctx)
-
-	return utils.ValidateDataRows[domain.Room](data, err)
+func (service storeService) RoomList(
+	ctx context.Context,
+) (rooms []*model.Room, errData *utils.ServiceError) {
+	data, err := service.roomRepo.All(ctx)
+	return utils.ValidateDataRows[model.Room](data, err)
 }
 
-func (service storeService) AddRoom(data *domain.Room) (room *domain.Room, errData *utils.ServiceError) {
-	data, err := service.roomRepo.Create(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.Room](data, err)
+func (service storeService) AddRoom(
+	ctx context.Context,
+	item *model.Room,
+) (room *model.Room, errData *utils.ServiceError) {
+	data, err := service.roomRepo.Create(ctx, item)
+	return utils.ValidateDataRow[model.Room](data, err)
 }
 
-func (service storeService) EditRoom(data *domain.Room) (room *domain.Room, errData *utils.ServiceError) {
-	data, err := service.roomRepo.Update(service.ctx, data)
-
-	return utils.ValidateDataRow[domain.Room](data, err)
+func (service storeService) EditRoom(
+	ctx context.Context,
+	item *model.Room,
+) (room *model.Room, errData *utils.ServiceError) {
+	data, err := service.roomRepo.Update(ctx, item)
+	return utils.ValidateDataRow[model.Room](data, err)
 }
 
-func (service storeService) DeleteRoom(data *domain.Room) *utils.ServiceError {
-	room, err := service.roomRepo.Find(service.ctx, domain.FindWithID, data.ID)
+func (service storeService) DeleteRoom(
+	ctx context.Context,
+	data *model.Room,
+) *utils.ServiceError {
+	room, err := service.roomRepo.Find(
+		ctx, model.FindWithID, data.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return &utils.ServiceError{
 				Code:    http.StatusNotFound,
 				Message: err.Error(),
@@ -148,8 +169,7 @@ func (service storeService) DeleteRoom(data *domain.Room) *utils.ServiceError {
 		}
 	}
 
-	err = service.roomRepo.Delete(service.ctx, room)
-	if err != nil {
+	if err := service.roomRepo.Delete(ctx, room); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -159,8 +179,10 @@ func (service storeService) DeleteRoom(data *domain.Room) *utils.ServiceError {
 	return nil
 }
 
-func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *utils.ServiceError) {
-	data, err := service.floorRepo.All(service.ctx)
+func (service storeService) FloorsWith(
+	ctx context.Context,
+	s any) (floors []*model.Floor, errData *utils.ServiceError) {
+	data, err := service.floorRepo.All(ctx)
 	if err != nil {
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
@@ -169,14 +191,14 @@ func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *
 	}
 
 	sName := reflect.TypeOf(s).Name()
-	var fa []*domain.Floor
+	var fa []*model.Floor
 	for _, floor := range data {
 		if sName == "Table" && floor.TotalTables >= 1 {
 			f := floor
 
 			if tables, err := service.tableRepo.AllWhere(
-				service.ctx,
-				domain.FindWithRelationID,
+				ctx,
+				model.FindWithRelationID,
 				floor.ID,
 			); err != nil {
 				f.Tables = nil
@@ -191,8 +213,8 @@ func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *
 			f := floor
 
 			if rooms, err := service.roomRepo.AllWhere(
-				service.ctx,
-				domain.FindWithRelationID,
+				ctx,
+				model.FindWithRelationID,
 				floor.ID,
 			); err != nil {
 				f.Rooms = nil
@@ -208,13 +230,11 @@ func (service storeService) FloorsWith(s any) (floors []*domain.Floor, errData *
 }
 
 func NewStoreService(
-	ctx context.Context,
-	floorRepo domain.ICRUDRepository[domain.Floor],
-	tableRepo domain.ICRUDAddOnRepository[domain.Table],
-	roomRepo domain.ICRUDAddOnRepository[domain.Room],
-) domain.IStoreService {
+	floorRepo model.ICRUDRepository[model.Floor],
+	tableRepo model.ICRUDAddOnRepository[model.Table],
+	roomRepo model.ICRUDAddOnRepository[model.Room],
+) model.IStoreService {
 	return &storeService{
-		ctx:       ctx,
 		tableRepo: tableRepo,
 		floorRepo: floorRepo,
 		roomRepo:  roomRepo,
