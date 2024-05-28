@@ -61,3 +61,7 @@ run-app:
 	cd ./web && npm run build && cd ..
 	go mod tidy -compat=1.22
 	go run ./cmd/api/main.go
+
+build-fe:
+	@ echo "Build Frontend"
+	@ cd web && npm install && npm run build
