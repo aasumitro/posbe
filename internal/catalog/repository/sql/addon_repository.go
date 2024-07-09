@@ -13,7 +13,7 @@ type AddonSQLRepository struct {
 }
 
 func (repo AddonSQLRepository) All(ctx context.Context) (data []*model.Addon, err error) {
-	q := "SELECT * FROM addons"
+	q := "SELECT id, name, description, price FROM addons"
 	rows, err := repo.Db.QueryContext(ctx, q)
 	if err != nil {
 		return nil, err

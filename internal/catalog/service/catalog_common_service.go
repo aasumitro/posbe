@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/aasumitro/posbe/common"
 	"github.com/aasumitro/posbe/pkg/model"
 	"github.com/aasumitro/posbe/pkg/utils"
 )
@@ -66,6 +67,12 @@ func (service catalogCommonService) DeleteUnit(
 			Message: err.Error(),
 		}
 	}
+	if data.Usage >= 1 {
+		return &utils.ServiceError{
+			Code:    http.StatusForbidden,
+			Message: common.ErrorUnableToDelete,
+		}
+	}
 	if err := service.unitRepo.Delete(ctx, data); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
@@ -124,6 +131,12 @@ func (service catalogCommonService) DeleteCategory(
 			Message: err.Error(),
 		}
 	}
+	if data.Usage >= 1 {
+		return &utils.ServiceError{
+			Code:    http.StatusForbidden,
+			Message: common.ErrorUnableToDelete,
+		}
+	}
 	if err := service.categoryRepo.Delete(ctx, data); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
@@ -174,13 +187,18 @@ func (service catalogCommonService) DeleteSubcategory(
 			Message: err.Error(),
 		}
 	}
+	if data.Usage >= 1 {
+		return &utils.ServiceError{
+			Code:    http.StatusForbidden,
+			Message: common.ErrorUnableToDelete,
+		}
+	}
 	if err := service.subcategoryRepo.Delete(ctx, data); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	return nil
 }
 
@@ -224,14 +242,13 @@ func (service catalogCommonService) DeleteAddon(
 			Message: err.Error(),
 		}
 	}
-
+	// find usage, maybe in a transaction/order product collection?
 	if err := service.addonRepo.Delete(ctx, data); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-
 	return nil
 }
 

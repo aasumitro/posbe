@@ -12,12 +12,14 @@ type (
 		ID          int            `json:"id"`
 		Name        string         `json:"name" form:"name" binding:"required"`
 		Subcategory []*Subcategory `json:"subcategories,omitempty" binding:"-"`
+		Usage       int            `json:"usage,omitempty"`
 	}
 
 	Subcategory struct {
 		ID         int    `json:"id"`
 		CategoryID int    `json:"category_id" form:"category_id" binding:"required"`
 		Name       string `json:"name" form:"name" binding:"required"`
+		Usage      int    `json:"usage,omitempty"`
 	}
 
 	Unit struct {
@@ -25,6 +27,7 @@ type (
 		Magnitude string `json:"magnitude" form:"magnitude" binding:"required"` // e.g: mass [length, time]
 		Name      string `json:"name" form:"name" binding:"required"`           // e.g: kilogram [metre, second]
 		Symbol    string `json:"symbol" form:"symbol" binding:"required"`       // e.g: kg [m, s]
+		Usage     int    `json:"usage,omitempty"`
 	}
 
 	Addon struct {

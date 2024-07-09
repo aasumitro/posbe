@@ -37,13 +37,15 @@ func (repo CategorySQLRepository) All(ctx context.Context) (data []*model.Catego
 }
 
 func (repo CategorySQLRepository) Find(ctx context.Context, _ model.FindWith, val any) (data *model.Category, err error) {
-	q := "SELECT * FROM categories WHERE id = $1 LIMIT 1"
+	q := "SELECT categories.id, categories.name, COUNT(products.category_id) as usage "
+	q += "FROM categories LEFT OUTER JOIN products ON categories.id = products.category_id WHERE id = $1 LIMIT 1"
 	row := repo.Db.QueryRowContext(ctx, q, val)
 
 	data = &model.Category{}
 	if err := row.Scan(
 		&data.ID,
 		&data.Name,
+		&data.Usage,
 	); err != nil {
 		return nil, err
 	}

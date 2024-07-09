@@ -73,9 +73,10 @@ func (suite *categoryRepositoryTestSuite) TestRepository_All_ExpectReturnErrorFr
 
 func (suite *categoryRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() {
 	data := suite.mock.
-		NewRows([]string{"id", "name"}).
-		AddRow(1, "test")
-	query := "SELECT * FROM categories WHERE id = $1 LIMIT 1"
+		NewRows([]string{"id", "name", "usage"}).
+		AddRow(1, "test", 0)
+	query := "SELECT categories.id, categories.name, COUNT(products.category_id) as usage "
+	query += "FROM categories LEFT OUTER JOIN products ON categories.id = products.category_id WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
 	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)
@@ -86,9 +87,10 @@ func (suite *categoryRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() 
 
 func (suite *categoryRepositoryTestSuite) TestRepository_Find_ExpectReturnError() {
 	data := suite.mock.
-		NewRows([]string{"id", "name"}).
-		AddRow(nil, nil)
-	query := "SELECT * FROM categories WHERE id = $1 LIMIT 1"
+		NewRows([]string{"id", "name", "usage"}).
+		AddRow(nil, nil, nil)
+	query := "SELECT categories.id, categories.name, COUNT(products.category_id) as usage "
+	query += "FROM categories LEFT OUTER JOIN products ON categories.id = products.category_id WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
 	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)

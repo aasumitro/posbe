@@ -18,6 +18,7 @@ import (
 
 var allowOrigins = []string{
 	"http://localhost:3000",
+	"http://localhost:5173",
 }
 
 var allowHeaders = []string{

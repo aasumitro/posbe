@@ -10,8 +10,25 @@ import {File, ListFilter, MoreHorizontal, PlusCircle} from "lucide-react";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
+import {Endpoint, get} from "@/lib/api.ts";
+import {useEffect, useState} from "react";
 
 export function Product() {
+  const [addons, setAddons] = useState([]);
+
+  useEffect(() => {
+    getAddons()
+  }, [])
+
+  const getAddons = () => {
+    get(Endpoint.Catalog.Addon).then((resp) => {
+      if (resp.error) {
+        return
+      }
+      setAddons(resp.data)
+    }).catch((error) => alert(error.message))
+  }
+
   return (<>
       <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
         <Tabs defaultValue="all">
@@ -400,7 +417,6 @@ export function Product() {
                     <span className="sr-only">Image</span>
                   </TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead className="hidden md:table-cell">
                     Price
                   </TableHead>
@@ -416,141 +432,50 @@ export function Product() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="hidden sm:table-cell">
-                    <img
-                      alt="Product image"
-                      className="aspect-square rounded-md object-cover"
-                      height="64"
-                      src="/placeholder.svg"
-                      width="64"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    Laser Lemonade Machine
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Draft</Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    $499.99
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    25
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    2023-07-12 10:42 AM
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MoreHorizontal className="h-4 w-4"/>
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="hidden sm:table-cell">
-                    <img
-                      alt="Product image"
-                      className="aspect-square rounded-md object-cover"
-                      height="64"
-                      src="/placeholder.svg"
-                      width="64"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    Hypernova Headphones
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Active</Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    $129.99
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    100
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    2023-10-18 03:21 PM
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MoreHorizontal className="h-4 w-4"/>
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="hidden sm:table-cell">
-                    <img
-                      alt="Product image"
-                      className="aspect-square rounded-md object-cover"
-                      height="64"
-                      src="/placeholder.svg"
-                      width="64"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    AeroGlow Desk Lamp
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Active</Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    $39.99
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    50
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    2023-11-29 08:15 AM
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MoreHorizontal className="h-4 w-4"/>
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+                {addons.map((addon, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="hidden sm:table-cell">
+                      <img
+                        alt="Product image"
+                        className="aspect-square rounded-md object-cover"
+                        height="64"
+                        src="https://placehold.jp/150x150.png"
+                        width="64"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {addon?.name}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      ${addon?.price}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      0
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      2023-07-12 10:42 AM
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MoreHorizontal className="h-4 w-4"/>
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </CardContent>

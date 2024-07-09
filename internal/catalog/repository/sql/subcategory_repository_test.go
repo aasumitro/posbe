@@ -73,9 +73,10 @@ func (suite *subcategoryRepositoryTestSuite) TestRepository_All_ExpectReturnErro
 
 func (suite *subcategoryRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() {
 	data := suite.mock.
-		NewRows([]string{"id", "category_id", "name"}).
-		AddRow(1, 1, "test")
-	query := "SELECT * FROM subcategories WHERE id = $1 LIMIT 1"
+		NewRows([]string{"id", "category_id", "name", "usage"}).
+		AddRow(1, 1, "test", 0)
+	query := "SELECT subcategories.id, subcategories.category_id, subcategories.name, COUNT(products.subcategory_id) as usage "
+	query += "FROM subcategories LEFT OUTER JOIN products ON subcategories.id = products.subcategory_id WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
 	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)
@@ -86,9 +87,10 @@ func (suite *subcategoryRepositoryTestSuite) TestRepository_Find_ExpectReturnRow
 
 func (suite *subcategoryRepositoryTestSuite) TestRepository_Find_ExpectReturnError() {
 	data := suite.mock.
-		NewRows([]string{"id", "category_id", "name"}).
+		NewRows([]string{"id", "category_id", "name", "usage"}).
 		AddRow(nil, nil, nil)
-	query := "SELECT * FROM subcategories WHERE id = $1 LIMIT 1"
+	query := "SELECT subcategories.id, subcategories.category_id, subcategories.name, COUNT(products.subcategory_id) as usage "
+	query += "FROM subcategories LEFT OUTER JOIN products ON subcategories.id = products.subcategory_id WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
 	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)

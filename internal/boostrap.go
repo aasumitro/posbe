@@ -14,10 +14,7 @@ import (
 
 	"github.com/aasumitro/posbe/common"
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/internal/account"
 	"github.com/aasumitro/posbe/internal/catalog"
-	"github.com/aasumitro/posbe/internal/store"
-	"github.com/aasumitro/posbe/internal/transaction"
 	"github.com/aasumitro/posbe/web"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -104,22 +101,23 @@ func registerPublicRoutes(
 	})
 	// no route handler
 	router.NoRoute(func(ctx *gin.Context) {
-		if !strings.Contains(ctx.FullPath(), "/fe/") {
+		if !strings.Contains(ctx.FullPath(), "/fe/") ||
+			strings.Contains(ctx.FullPath(), "/api/") {
 			ctx.String(http.StatusNotFound,
 				"route that you are looking for is not found")
 			return
 		}
-		file, err := web.SPAAssets().Open("index.html")
+		file, err := web.SPAAssets().Open("index.html") // replace with 404.html
 		if err != nil {
 			ctx.String(http.StatusInternalServerError,
-				"failed to open spa file: ", err.Error())
+				"failed to open file: ", err.Error())
 			return
 		}
 		defer func() { _ = file.Close() }()
 		fileInfo, err := file.Stat()
 		if err != nil {
 			ctx.String(http.StatusInternalServerError,
-				"failed to get spa file info: ", err.Error())
+				"failed to get file info: ", err.Error())
 			return
 		}
 		http.ServeContent(
@@ -151,8 +149,8 @@ func registerPublicRoutes(
 
 func registerAPIModuleV1(engine *gin.Engine) {
 	routerGroup := engine.Group("api/v1")
-	account.NewAccountModuleProvider(routerGroup)
-	store.NewStoreModuleProvider(routerGroup)
+	//account.NewAccountModuleProvider(routerGroup)
+	//store.NewStoreModuleProvider(routerGroup)
 	catalog.NewCatalogModuleProvider(routerGroup)
-	transaction.NewTransactionModuleProvider(routerGroup)
+	//transaction.NewTransactionModuleProvider(routerGroup)
 }
