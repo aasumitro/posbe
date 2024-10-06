@@ -3,8 +3,9 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255),
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) UNIQUE,
-    phone BIGINT UNIQUE,
+    phone VARCHAR(255) UNIQUE,
     password VARCHAR(255) NOT NULL,
     created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
-    updated_at BIGINT
+    updated_at BIGINT,
+    deleted_at BIGINT
 );

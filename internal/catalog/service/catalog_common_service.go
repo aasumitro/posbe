@@ -6,9 +6,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/aasumitro/posbe/common"
-	"github.com/aasumitro/posbe/pkg/model"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/aasumitro/posbe/internal/common"
+	"github.com/aasumitro/posbe/internal/model"
+	"github.com/aasumitro/posbe/internal/utils"
 )
 
 type catalogCommonService struct {
@@ -18,7 +18,7 @@ type catalogCommonService struct {
 	addonRepo       model.ICRUDRepository[model.Addon]
 }
 
-func (service catalogCommonService) UnitList(
+func (service *catalogCommonService) UnitList(
 	ctx context.Context,
 ) (
 	units []*model.Unit,
@@ -28,7 +28,7 @@ func (service catalogCommonService) UnitList(
 	return utils.ValidateDataRows[model.Unit](data, err)
 }
 
-func (service catalogCommonService) AddUnit(
+func (service *catalogCommonService) AddUnit(
 	ctx context.Context,
 	item *model.Unit,
 ) (
@@ -39,7 +39,7 @@ func (service catalogCommonService) AddUnit(
 	return utils.ValidateDataRow[model.Unit](data, err)
 }
 
-func (service catalogCommonService) EditUnit(
+func (service *catalogCommonService) EditUnit(
 	ctx context.Context,
 	item *model.Unit,
 ) (
@@ -50,7 +50,7 @@ func (service catalogCommonService) EditUnit(
 	return utils.ValidateDataRow[model.Unit](data, err)
 }
 
-func (service catalogCommonService) DeleteUnit(
+func (service *catalogCommonService) DeleteUnit(
 	ctx context.Context,
 	item *model.Unit,
 ) *utils.ServiceError {
@@ -82,7 +82,7 @@ func (service catalogCommonService) DeleteUnit(
 	return nil
 }
 
-func (service catalogCommonService) CategoryList(
+func (service *catalogCommonService) CategoryList(
 	ctx context.Context,
 ) (
 	units []*model.Category,
@@ -92,7 +92,7 @@ func (service catalogCommonService) CategoryList(
 	return utils.ValidateDataRows[model.Category](data, err)
 }
 
-func (service catalogCommonService) AddCategory(
+func (service *catalogCommonService) AddCategory(
 	ctx context.Context,
 	item *model.Category,
 ) (
@@ -103,7 +103,7 @@ func (service catalogCommonService) AddCategory(
 	return utils.ValidateDataRow[model.Category](data, err)
 }
 
-func (service catalogCommonService) EditCategory(
+func (service *catalogCommonService) EditCategory(
 	ctx context.Context,
 	item *model.Category,
 ) (
@@ -114,7 +114,7 @@ func (service catalogCommonService) EditCategory(
 	return utils.ValidateDataRow[model.Category](data, err)
 }
 
-func (service catalogCommonService) DeleteCategory(
+func (service *catalogCommonService) DeleteCategory(
 	ctx context.Context,
 	item *model.Category,
 ) *utils.ServiceError {
@@ -146,14 +146,14 @@ func (service catalogCommonService) DeleteCategory(
 	return nil
 }
 
-func (service catalogCommonService) SubcategoryList(
+func (service *catalogCommonService) SubcategoryList(
 	ctx context.Context,
 ) (units []*model.Subcategory, errData *utils.ServiceError) {
 	data, err := service.subcategoryRepo.All(ctx)
 	return utils.ValidateDataRows[model.Subcategory](data, err)
 }
 
-func (service catalogCommonService) AddSubcategory(
+func (service *catalogCommonService) AddSubcategory(
 	ctx context.Context,
 	item *model.Subcategory,
 ) (units *model.Subcategory, errData *utils.ServiceError) {
@@ -161,7 +161,7 @@ func (service catalogCommonService) AddSubcategory(
 	return utils.ValidateDataRow[model.Subcategory](data, err)
 }
 
-func (service catalogCommonService) EditSubcategory(
+func (service *catalogCommonService) EditSubcategory(
 	ctx context.Context,
 	item *model.Subcategory,
 ) (units *model.Subcategory, errData *utils.ServiceError) {
@@ -169,7 +169,7 @@ func (service catalogCommonService) EditSubcategory(
 	return utils.ValidateDataRow[model.Subcategory](data, err)
 }
 
-func (service catalogCommonService) DeleteSubcategory(
+func (service *catalogCommonService) DeleteSubcategory(
 	ctx context.Context,
 	item *model.Subcategory,
 ) *utils.ServiceError {
@@ -202,14 +202,14 @@ func (service catalogCommonService) DeleteSubcategory(
 	return nil
 }
 
-func (service catalogCommonService) AddonList(
+func (service *catalogCommonService) AddonList(
 	ctx context.Context,
 ) (units []*model.Addon, errData *utils.ServiceError) {
 	data, err := service.addonRepo.All(ctx)
 	return utils.ValidateDataRows[model.Addon](data, err)
 }
 
-func (service catalogCommonService) AddAddon(
+func (service *catalogCommonService) AddAddon(
 	ctx context.Context,
 	item *model.Addon,
 ) (units *model.Addon, errData *utils.ServiceError) {
@@ -217,7 +217,7 @@ func (service catalogCommonService) AddAddon(
 	return utils.ValidateDataRow[model.Addon](data, err)
 }
 
-func (service catalogCommonService) EditAddon(
+func (service *catalogCommonService) EditAddon(
 	ctx context.Context,
 	item *model.Addon,
 ) (units *model.Addon, errData *utils.ServiceError) {
@@ -225,7 +225,7 @@ func (service catalogCommonService) EditAddon(
 	return utils.ValidateDataRow[model.Addon](data, err)
 }
 
-func (service catalogCommonService) DeleteAddon(
+func (service *catalogCommonService) DeleteAddon(
 	ctx context.Context,
 	item *model.Addon,
 ) *utils.ServiceError {

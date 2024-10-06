@@ -3,9 +3,15 @@ package config
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	// postgresql
 	_ "github.com/lib/pq"
+)
+
+const (
+	maxOpenConn = 50
+	maxIdleConn = 10
 )
 
 func PostgresConnection() Option {
@@ -19,6 +25,9 @@ func PostgresConnection() Option {
 				log.Fatalf("DATABASE_ERROR: %s\n",
 					err.Error())
 			}
+			conn.SetMaxOpenConns(maxOpenConn)
+			conn.SetMaxIdleConns(maxIdleConn)
+			conn.SetConnMaxLifetime(time.Hour)
 			PostgresPool = conn
 			if err := PostgresPool.Ping(); err != nil {
 				log.Fatalf("DATABASE_ERROR: %s\n",

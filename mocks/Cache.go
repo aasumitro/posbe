@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	utils "github.com/aasumitro/posbe/pkg/utils"
+	utils "github.com/aasumitro/posbe/internal/utils"
 	mock "github.com/stretchr/testify/mock"
 )
 

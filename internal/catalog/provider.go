@@ -4,6 +4,7 @@ import (
 	"github.com/aasumitro/posbe/internal/catalog/handler/http"
 	repository "github.com/aasumitro/posbe/internal/catalog/repository/sql"
 	"github.com/aasumitro/posbe/internal/catalog/service"
+	"github.com/aasumitro/posbe/internal/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,9 +19,7 @@ func NewCatalogModuleProvider(router *gin.RouterGroup) {
 		categoryRepository, subcategoryRepository, addonRepository)
 	productCommonService := service.NewCatalogProductService(
 		productRepository, productVariantRepository)
-	protectedRouter := router // .
-	//Use(middleware.Auth()).
-	//Use(middleware.AcceptedRoles([]string{"*"}))
+	protectedRouter := router.Use(middleware.Auth())
 	http.NewUnitHandler(catalogCommonService, protectedRouter)
 	http.NewCategoryHandler(catalogCommonService, protectedRouter)
 	http.NewSubcategoryHandler(catalogCommonService, protectedRouter)

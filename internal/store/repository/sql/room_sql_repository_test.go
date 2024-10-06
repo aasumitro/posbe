@@ -9,8 +9,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aasumitro/posbe/config"
+	"github.com/aasumitro/posbe/internal/model"
 	repoSql "github.com/aasumitro/posbe/internal/store/repository/sql"
-	"github.com/aasumitro/posbe/pkg/model"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/internal/model"
 )
 
 type ProductSQLRepository struct {
@@ -57,7 +57,7 @@ func (repo ProductSQLRepository) Search(ctx context.Context, keys []model.FindWi
 		if err := rows.Scan(
 			&product.ID, &product.CategoryID, &product.SubcategoryID,
 			&product.Sku, &product.Image, &product.Gallery, &product.Name,
-			&product.Description, &product.Price,
+			&product.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -82,7 +82,7 @@ func (repo ProductSQLRepository) All(ctx context.Context) (data []*model.Product
 		if err := rows.Scan(
 			&product.ID, &product.CategoryID, &product.SubcategoryID,
 			&product.Sku, &product.Image, &product.Gallery, &product.Name,
-			&product.Description, &product.Price,
+			&product.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -101,7 +101,7 @@ func (repo ProductSQLRepository) Find(ctx context.Context, _ model.FindWith, val
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
-		&data.Description, &data.Price,
+		&data.Description,
 	); err != nil {
 		return nil, err
 	}
@@ -115,13 +115,13 @@ func (repo ProductSQLRepository) Create(ctx context.Context, params *model.Produ
 	q += "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.SubcategoryID,
 		params.Sku, params.Image, params.Gallery, params.Name,
-		params.Description, params.Price)
+		params.Description)
 
 	data = &model.Product{}
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
-		&data.Description, &data.Price,
+		&data.Description,
 	); err != nil {
 		return nil, err
 	}
@@ -134,13 +134,13 @@ func (repo ProductSQLRepository) Update(ctx context.Context, params *model.Produ
 	q += "gallery = $5, name = $6, description = $7, price = $8 WHERE id = $9 RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.SubcategoryID,
 		params.Sku, params.Image, params.Gallery, params.Name,
-		params.Description, params.Price, params.ID)
+		params.Description, params.ID)
 
 	data = &model.Product{}
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
 		&data.Sku, &data.Image, &data.Gallery, &data.Name,
-		&data.Description, &data.Price,
+		&data.Description,
 	); err != nil {
 		return nil, err
 	}

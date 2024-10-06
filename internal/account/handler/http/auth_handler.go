@@ -6,9 +6,9 @@ import (
 
 	"github.com/aasumitro/posbe/config"
 
-	"github.com/aasumitro/posbe/pkg/http/middleware"
-	"github.com/aasumitro/posbe/pkg/model"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/aasumitro/posbe/internal/middleware"
+	"github.com/aasumitro/posbe/internal/model"
+	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -56,7 +56,10 @@ func (handler authHandler) login(ctx *gin.Context) {
 		// Secure:   true,
 		HttpOnly: true,
 	})
-	utils.NewHTTPRespond(ctx, http.StatusCreated, data)
+	utils.NewHTTPRespond(ctx, http.StatusCreated, map[string]interface{}{
+		"user":  data,
+		"token": token,
+	})
 }
 
 // logout godoc

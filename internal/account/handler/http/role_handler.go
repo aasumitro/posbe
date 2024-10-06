@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/aasumitro/posbe/pkg/http/middleware"
-	"github.com/aasumitro/posbe/pkg/model"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/aasumitro/posbe/internal/middleware"
+	"github.com/aasumitro/posbe/internal/model"
+	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -135,9 +135,10 @@ func (handler roleHandler) destroy(ctx *gin.Context) {
 func NewRoleHandler(accountService model.IAccountService, router gin.IRoutes) {
 	handler := roleHandler{svc: accountService}
 	router.GET("/roles", handler.fetch)
-	protectedRoute := router.Use(middleware.
-		AcceptedRoles([]string{"admin"}))
-	protectedRoute.POST("/roles", handler.store)
-	protectedRoute.PUT("/roles/:id", handler.update)
-	protectedRoute.DELETE("/roles/:id", handler.destroy)
+	router.POST("/roles", middleware.
+		AcceptedRoles([]string{"admin"}), handler.store)
+	router.PUT("/roles/:id", middleware.
+		AcceptedRoles([]string{"admin"}), handler.update)
+	router.DELETE("/roles/:id", middleware.
+		AcceptedRoles([]string{"admin"}), handler.destroy)
 }

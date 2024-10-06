@@ -29,6 +29,7 @@ type Config struct {
 	AppPort    string `mapstructure:"APP_PORT"`
 	AppDebug   bool   `mapstructure:"APP_DEBUG"`
 	AppVersion string `mapstructure:"APP_VERSION"`
+	APILimiter string `mapstructure:"API_LIMITER"`
 
 	PostgresDsnURL string `mapstructure:"POSTGRES_DSN_URL"`
 	RedisDsnURL    string `mapstructure:"REDIS_DSN_URL"`

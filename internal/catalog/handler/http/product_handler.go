@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/internal/model"
 	"github.com/gin-gonic/gin"
 )
 

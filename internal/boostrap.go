@@ -12,9 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/aasumitro/posbe/common"
 	"github.com/aasumitro/posbe/config"
+	"github.com/aasumitro/posbe/internal/account"
 	"github.com/aasumitro/posbe/internal/catalog"
+	"github.com/aasumitro/posbe/internal/common"
+	"github.com/aasumitro/posbe/internal/store"
+	"github.com/aasumitro/posbe/internal/transaction"
 	"github.com/aasumitro/posbe/web"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -130,6 +133,7 @@ func registerPublicRoutes(
 	})
 	// client (web ui) route handler
 	router.StaticFS("/fe", http.FS(web.SPAAssets()))
+	router.Static("/assets", "./uploads")
 	// swagger docs routes
 	router.GET("/api-specs/*any",
 		ginSwagger.WrapHandler(swaggerFiles.Handler,
@@ -149,8 +153,8 @@ func registerPublicRoutes(
 
 func registerAPIModuleV1(engine *gin.Engine) {
 	routerGroup := engine.Group("api/v1")
-	//account.NewAccountModuleProvider(routerGroup)
-	//store.NewStoreModuleProvider(routerGroup)
+	account.NewAccountModuleProvider(routerGroup)
+	store.NewStoreModuleProvider(routerGroup)
 	catalog.NewCatalogModuleProvider(routerGroup)
-	//transaction.NewTransactionModuleProvider(routerGroup)
+	transaction.NewTransactionModuleProvider(routerGroup)
 }
