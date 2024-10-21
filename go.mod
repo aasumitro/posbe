@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
-	github.com/swaggo/swag v1.16.3
+	github.com/swaggo/swag v1.16.4
 	github.com/tavsec/gin-healthcheck v1.6.1
 	github.com/ulule/limiter/v3 v3.11.2
 	golang.org/x/crypto v0.26.0
