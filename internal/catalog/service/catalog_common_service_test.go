@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/aasumitro/posbe/internal/catalog/service"
+	"github.com/aasumitro/posbe/internal/model"
+	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/aasumitro/posbe/mocks"
-	"github.com/aasumitro/posbe/pkg/model"
-	"github.com/aasumitro/posbe/pkg/utils"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"

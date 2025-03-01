@@ -12,10 +12,10 @@ CREATE TABLE IF NOT EXISTS store_shifts(
     shift_id BIGINT NOT NULL,
     open_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
     open_by BIGINT NOT NULL,
-    open_cash BIGINT NOT NULL,
+    open_cash NUMERIC NOT NULL,
     close_at BIGINT,
     close_by BIGINT,
-    close_cash BIGINT,
+    close_cash NUMERIC,
     created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
     updated_at BIGINT
 );

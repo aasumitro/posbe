@@ -6,8 +6,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/aasumitro/posbe/pkg/model"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/aasumitro/posbe/internal/model"
+	"github.com/aasumitro/posbe/internal/utils"
 )
 
 type catalogProductService struct {
@@ -15,7 +15,7 @@ type catalogProductService struct {
 	productVariantRepo model.ICRUDRepository[model.ProductVariant]
 }
 
-func (service catalogProductService) ProductSearch(
+func (service *catalogProductService) ProductSearch(
 	ctx context.Context,
 	keys []model.FindWith,
 	values []any,
@@ -24,14 +24,14 @@ func (service catalogProductService) ProductSearch(
 	return utils.ValidateDataRows[model.Product](data, err)
 }
 
-func (service catalogProductService) ProductList(
+func (service *catalogProductService) ProductList(
 	ctx context.Context,
 ) (products []*model.Product, errData *utils.ServiceError) {
 	data, err := service.productRepo.All(ctx)
 	return utils.ValidateDataRows[model.Product](data, err)
 }
 
-func (service catalogProductService) ProductDetail(
+func (service *catalogProductService) ProductDetail(
 	ctx context.Context,
 	id int,
 ) (product *model.Product, errData *utils.ServiceError) {
@@ -39,7 +39,7 @@ func (service catalogProductService) ProductDetail(
 	return utils.ValidateDataRow[model.Product](data, err)
 }
 
-func (service catalogProductService) AddProduct(
+func (service *catalogProductService) AddProduct(
 	ctx context.Context,
 	item *model.Product,
 ) (product *model.Product, errData *utils.ServiceError) {
@@ -60,7 +60,7 @@ func (service catalogProductService) AddProduct(
 	return utils.ValidateDataRow[model.Product](data, err)
 }
 
-func (service catalogProductService) EditProduct(
+func (service *catalogProductService) EditProduct(
 	ctx context.Context,
 	item *model.Product,
 ) (product *model.Product, errData *utils.ServiceError) {
@@ -68,7 +68,7 @@ func (service catalogProductService) EditProduct(
 	return utils.ValidateDataRow[model.Product](data, err)
 }
 
-func (service catalogProductService) DeleteProduct(
+func (service *catalogProductService) DeleteProduct(
 	ctx context.Context,
 	item *model.Product,
 ) *utils.ServiceError {
@@ -94,7 +94,7 @@ func (service catalogProductService) DeleteProduct(
 	return nil
 }
 
-func (service catalogProductService) AddProductVariant(
+func (service *catalogProductService) AddProductVariant(
 	ctx context.Context,
 	item *model.ProductVariant,
 ) (units *model.ProductVariant, errData *utils.ServiceError) {
@@ -102,7 +102,7 @@ func (service catalogProductService) AddProductVariant(
 	return utils.ValidateDataRow[model.ProductVariant](data, err)
 }
 
-func (service catalogProductService) EditProductVariant(
+func (service *catalogProductService) EditProductVariant(
 	ctx context.Context,
 	item *model.ProductVariant,
 ) (units *model.ProductVariant, errData *utils.ServiceError) {
@@ -110,7 +110,7 @@ func (service catalogProductService) EditProductVariant(
 	return utils.ValidateDataRow[model.ProductVariant](data, err)
 }
 
-func (service catalogProductService) DeleteProductVariant(
+func (service *catalogProductService) DeleteProductVariant(
 	ctx context.Context,
 	item *model.ProductVariant,
 ) *utils.ServiceError {

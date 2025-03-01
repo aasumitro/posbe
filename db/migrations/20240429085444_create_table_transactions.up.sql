@@ -1,20 +1,82 @@
-status: check_in, order_placement, print_bill, paid, cancel
-order (
-    id, cashier_id, shift_id, table_id, room_id,
-    date, time_open, time_close, customer,
-    brutto, discount, netto, tax, total,
-    type, payment, change,
-    notes, status, cancel_reason,
-    created_at, updated_at
-)
-order_products (
-    id, order_id, product_id, category_id,
-    subcategory_id, variant_id,
-    name, quantity, price, netto
-    notes, created_at, updated_at
-)
-order_product_addons (
-    id, order_id, order_product_id, addon_id
-   name, quantity, price, netto,
-   notes, created_at, updated_at
-)
+CREATE TYPE order_status AS ENUM ('none', 'booking', 'order', 'bill', 'paid', 'cancel');
+
+CREATE TABLE IF NOT EXISTS orders (
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    cashier_id BIGINT,
+    shift_id BIGINT,
+    table_id BIGINT,
+    room_id BIGINT,
+    time_open BIGINT,
+    time_close BIGINT,
+    customer VARCHAR(255),
+    brutto NUMERIC,
+    discount NUMERIC,
+    netto NUMERIC,
+    tax NUMERIC,
+    total NUMERIC,
+    type VARCHAR(255),
+    payment NUMERIC,
+    change NUMERIC,
+    notes TEXT,
+    cancel_reason TEXT,
+    status order_status DEFAULT 'none',
+    created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
+    updated_at BIGINT
+);
+
+ALTER TABLE orders ADD CONSTRAINT fk_order_cashier
+    FOREIGN KEY (cashier_id) REFERENCES users(id);
+ALTER TABLE orders ADD CONSTRAINT fk_order_shift
+    FOREIGN KEY (shift_id) REFERENCES store_shifts(id);
+ALTER TABLE orders ADD CONSTRAINT fk_order_table
+    FOREIGN KEY (table_id) REFERENCES tables(id);
+ALTER TABLE orders ADD CONSTRAINT fk_order_room
+    FOREIGN KEY (room_id) REFERENCES rooms(id);
+
+CREATE TABLE IF NOT EXISTS order_products (
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    order_id BIGINT,
+    product_id BIGINT,
+    category_id BIGINT,
+    subcategory_id BIGINT,
+    variant_id BIGINT,
+    name VARCHAR(255),
+    quantity INT DEFAULT 1,
+    price NUMERIC,
+    netto NUMERIC,
+    notes TEXT,
+    created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
+    updated_at BIGINT
+);
+
+ALTER TABLE order_products ADD CONSTRAINT fk_order_product_order
+    FOREIGN KEY (order_id) REFERENCES orders(id);
+ALTER TABLE order_products ADD CONSTRAINT fk_order_product_product
+    FOREIGN KEY (product_id) REFERENCES products(id);
+ALTER TABLE order_products ADD CONSTRAINT fk_order_product_category
+    FOREIGN KEY (category_id) REFERENCES categories(id);
+ALTER TABLE order_products ADD CONSTRAINT fk_order_product_subcategory
+    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id);
+ALTER TABLE order_products ADD CONSTRAINT fk_order_product_variant
+    FOREIGN KEY (variant_id) REFERENCES product_variants(id);
+
+CREATE TABLE IF NOT EXISTS order_product_addons (
+    id BIGSERIAL PRIMARY KEY NOT NULL,
+    order_id BIGINT,
+    order_product_id BIGINT,
+    addon_id BIGINT,
+    name VARCHAR(255),
+    quantity INT DEFAULT 1,
+    price NUMERIC,
+    netto NUMERIC,
+    notes TEXT,
+    created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
+    updated_at BIGINT
+);
+
+ALTER TABLE order_product_addons ADD CONSTRAINT fk_order_product_addons_order
+    FOREIGN KEY (order_id) REFERENCES orders(id);
+ALTER TABLE order_product_addons ADD CONSTRAINT fk_order_product_addons_product
+    FOREIGN KEY (order_product_id) REFERENCES order_products(id);
+ALTER TABLE order_product_addons ADD CONSTRAINT fk_order_product_addons_addon
+    FOREIGN KEY (addon_id) REFERENCES addons(id);

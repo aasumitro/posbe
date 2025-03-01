@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	domain "github.com/aasumitro/posbe/pkg/model"
+	domain "github.com/aasumitro/posbe/internal/model"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -1,4 +1,4 @@
-CREATE TYPE variant_types AS ENUM ('none', 'size');
+CREATE TYPE variant_types AS ENUM ('none', 'size', 'portion');
 
 CREATE TABLE IF NOT EXISTS product_variants(
     id BIGSERIAL PRIMARY KEY NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS product_variants(
     type VARIANT_TYPES DEFAULT 'none',
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    price FLOAT,
+    price NUMERIC,
     created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
     updated_at BIGINT
 );

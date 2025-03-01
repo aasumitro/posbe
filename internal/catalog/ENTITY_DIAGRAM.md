@@ -46,7 +46,6 @@ erDiagram
         json gallery
         string name
         string description
-        int price
     }
  
     CATEGORIES ||--|{ SUBCATEGORIES: has_many
@@ -70,6 +69,7 @@ e.g:
 #### CATEGORY
 1. Beverage
 2. Foods
+3. Desert
 
 #### SUBCATEGORY:
 1. Beverage:
@@ -95,3 +95,6 @@ e.g:
    3. Dairy
    4. Starchy food
    5. Fruit and vegetables
+
+3. Desert
+   1. Puding

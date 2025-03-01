@@ -9,8 +9,8 @@ import (
 	"github.com/aasumitro/posbe/internal/account/handler/http"
 	repository "github.com/aasumitro/posbe/internal/account/repository/sql"
 	"github.com/aasumitro/posbe/internal/account/service"
-	"github.com/aasumitro/posbe/pkg/http/middleware"
-	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/internal/middleware"
+	"github.com/aasumitro/posbe/internal/model"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
@@ -27,9 +27,7 @@ func NewAccountModuleProvider(router *gin.RouterGroup) {
 		roleRepository, userRepository)
 	shouldCacheData(context.Background())
 	http.NewAuthHandler(accountService, router)
-	protectedRouter := router.
-		Use(middleware.Auth()).
-		Use(middleware.ActivityObserver())
+	protectedRouter := router.Use(middleware.Auth())
 	http.NewRoleHandler(accountService, protectedRouter)
 	http.NewUserHandler(accountService, protectedRouter)
 }

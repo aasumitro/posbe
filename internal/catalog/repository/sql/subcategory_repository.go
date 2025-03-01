@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/internal/model"
 )
 
 type SubcategorySQLRepository struct {
@@ -38,7 +38,8 @@ func (repo SubcategorySQLRepository) All(ctx context.Context) (data []*model.Sub
 }
 
 func (repo SubcategorySQLRepository) Find(ctx context.Context, _ model.FindWith, val any) (data *model.Subcategory, err error) {
-	q := "SELECT * FROM subcategories WHERE id = $1 LIMIT 1"
+	q := "SELECT subcategories.id, subcategories.category_id, subcategories.name, COUNT(products.subcategory_id) as usage "
+	q += "FROM subcategories LEFT OUTER JOIN products ON subcategories.id = products.subcategory_id WHERE id = $1 LIMIT 1"
 	row := repo.Db.QueryRowContext(ctx, q, val)
 
 	data = &model.Subcategory{}
@@ -46,6 +47,7 @@ func (repo SubcategorySQLRepository) Find(ctx context.Context, _ model.FindWith,
 		&data.ID,
 		&data.CategoryID,
 		&data.Name,
+		&data.Usage,
 	); err != nil {
 		return nil, err
 	}

@@ -3,9 +3,10 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/internal/model"
 )
 
 type UserSQLRepository struct {
@@ -13,8 +14,8 @@ type UserSQLRepository struct {
 }
 
 func (repo UserSQLRepository) All(ctx context.Context) (users []*model.User, err error) {
-	q := `SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, 
-		r.id as role_id, r.name as role_name, r.description FROM users as u 
+	q := `SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone,
+		r.id as role_id, r.name as role_name, r.description, u.created_at FROM users as u
 		JOIN roles as r ON r.id = u.role_id`
 	rows, err := repo.Db.QueryContext(ctx, q)
 	if err != nil {
@@ -29,6 +30,7 @@ func (repo UserSQLRepository) All(ctx context.Context) (users []*model.User, err
 			&user.Email, &user.Phone,
 			&user.Role.ID, &user.Role.Name,
 			&user.Role.Description,
+			&user.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -38,6 +40,7 @@ func (repo UserSQLRepository) All(ctx context.Context) (users []*model.User, err
 				ID: user.Role.ID, Name: user.Role.Name,
 				Description: user.Role.Description,
 			},
+			CreatedAt: user.CreatedAt,
 		})
 	}
 	return users, nil
@@ -45,8 +48,8 @@ func (repo UserSQLRepository) All(ctx context.Context) (users []*model.User, err
 
 func (repo UserSQLRepository) Find(ctx context.Context, key model.FindWith, val any) (user *model.User, err error) {
 	q := `
-		SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, u.password, 
-		r.id as role_id, r.name as role_name, r.description FROM users as u 
+		SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, u.password,
+		r.id as role_id, r.name as role_name, r.description FROM users as u
 		JOIN roles as r ON r.id = u.role_id WHERE
 	`
 	//goland:noinspection GoSwitchMissingCasesForIotaConsts
@@ -68,27 +71,27 @@ func (repo UserSQLRepository) Find(ctx context.Context, key model.FindWith, val 
 }
 
 func (repo UserSQLRepository) Create(ctx context.Context, params *model.User) (user *model.User, err error) {
-	q := "WITH u AS (INSERT INTO users(role_id, name, username, email, phone, password) "
-	q += "values ($1, $2, $3, $4, $5, $6) RETURNING *) "
+	q := "WITH u AS (INSERT INTO users(role_id, name, username, email, phone, password, created_at) "
+	q += "values ($1, $2, $3, $4, $5, $6, $7) RETURNING *) "
 	q += "SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, u.password, "
 	q += "r.id as role_id, r.name as role_name, r.description FROM u "
 	q += "JOIN roles as r ON r.id = u.role_id"
 	row := repo.Db.QueryRowContext(
 		ctx, q, params.RoleID, params.Name,
 		params.Username, params.Email, params.Phone,
-		params.Password)
+		params.Password, time.Now().Unix())
 	return scanData(row)
 }
 
 func (repo UserSQLRepository) Update(ctx context.Context, params *model.User) (user *model.User, err error) {
 	q := "WITH u AS (UPDATE users SET role_id = $1, name = $2, username = $3, email = $4, "
-	q += "phone = $5, password = $6 WHERE id = $7 RETURNING *) "
+	q += "phone = $5 WHERE id = $6 RETURNING *) "
 	q += "SELECT u.id, u.role_id, u.name, u.username, u.email, u.phone, u.password, "
 	q += "r.id as role_id, r.name as role_name, r.description FROM u "
 	q += "JOIN roles as r ON r.id = u.role_id"
 	row := repo.Db.QueryRowContext(
 		ctx, q, params.RoleID, params.Name, params.Username,
-		params.Email, params.Phone, params.Password, params.ID)
+		params.Email, params.Phone, params.ID)
 	return scanData(row)
 }
 

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/internal/model"
 )
 
 type RoomSQLRepository struct {

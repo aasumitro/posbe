@@ -8,29 +8,32 @@ import (
 	"strconv"
 
 	"github.com/aasumitro/posbe/config"
+	"github.com/aasumitro/posbe/internal/middleware"
+	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/store/handler/http"
 	repository "github.com/aasumitro/posbe/internal/store/repository/sql"
 	"github.com/aasumitro/posbe/internal/store/service"
-	"github.com/aasumitro/posbe/pkg/http/middleware"
-	"github.com/aasumitro/posbe/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
 
 var (
-	floorRepo     model.ICRUDRepository[model.Floor]
-	tableRepo     model.ICRUDAddOnRepository[model.Table]
-	roomRepo      model.ICRUDAddOnRepository[model.Room]
-	storePrefRepo model.IStorePrefRepository
+	floorRepo      model.ICRUDRepository[model.Floor]
+	tableRepo      model.ICRUDAddOnRepository[model.Table]
+	roomRepo       model.ICRUDAddOnRepository[model.Room]
+	storePrefRepo  model.IStorePrefRepository
+	storeShiftRepo model.IStoreShiftRepository
 )
 
 func NewStoreModuleProvider(router *gin.RouterGroup) {
 	floorRepo = repository.NewFloorSQLRepository()
 	tableRepo = repository.NewTableSQLRepository()
 	roomRepo = repository.NewRoomSQLRepository()
-	storePrefRepo = repository.NewStorePrefSQLRepository()
+	storePrefRepo = repository.NewPrefSQLRepository()
+	storeShiftRepo = repository.NewShiftSQLRepository()
 	storeService := service.NewStoreService(floorRepo, tableRepo, roomRepo)
-	storePrefService := service.NewStorePrefService(storePrefRepo)
+	storePrefService := service.NewPreferenceService(storePrefRepo)
+	storeShiftService := service.NewStoreShiftService(storeShiftRepo)
 	shouldCacheData(context.Background())
 	protectedRouter := router.
 		Use(middleware.Auth()).
@@ -38,7 +41,8 @@ func NewStoreModuleProvider(router *gin.RouterGroup) {
 	http.NewFloorHandler(storeService, protectedRouter)
 	http.NewTableHandler(storeService, protectedRouter)
 	http.NewRoomHandler(storeService, protectedRouter)
-	http.NewStorePrefHandler(storePrefService, protectedRouter)
+	http.NewPreferenceHandler(storePrefService, protectedRouter)
+	http.NewShiftHandler(storeShiftService, protectedRouter)
 }
 
 func shouldCacheData(ctx context.Context) {

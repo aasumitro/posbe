@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/internal/model"
 )
 
 type UnitSQLRepository struct {
@@ -37,13 +37,14 @@ func (repo UnitSQLRepository) All(ctx context.Context) (data []*model.Unit, err 
 }
 
 func (repo UnitSQLRepository) Find(ctx context.Context, _ model.FindWith, val any) (data *model.Unit, err error) {
-	q := "SELECT * FROM units WHERE id = $1 LIMIT 1"
+	q := "SELECT units.id, units.magnitude, units.name, units.symbol, COUNT(product_variants.unit_id) as usage "
+	q += "FROM units LEFT OUTER JOIN product_variants ON units.id = product_variants.unit_id WHERE id = $1 LIMIT 1"
 	row := repo.Db.QueryRowContext(ctx, q, val)
 
 	data = &model.Unit{}
 	if err := row.Scan(
 		&data.ID, &data.Magnitude,
-		&data.Name, &data.Symbol,
+		&data.Name, &data.Symbol, &data.Usage,
 	); err != nil {
 		return nil, err
 	}

@@ -16,7 +16,7 @@ linters:
   enable:
     - errcheck
     - dogsled
-    - exportloopref
+    - copyloopvar
     - gocritic
     - gocyclo
     - gofmt
@@ -47,6 +47,9 @@ issues:
         - dupl
         - goconst
         - lll
+    - path: _repository\.go
+      linters:
+        - goconst
 run:
   timeout: 5m
   go: "1.22"

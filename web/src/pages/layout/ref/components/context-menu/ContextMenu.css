@@ -1,0 +1,12 @@
+#contextMenu {
+    display: none;
+    position: absolute;
+    min-width: 200px;
+    background-color: white;
+    box-shadow: 0 0 5px grey;
+    border-radius: 3px;
+}
+
+.modal-body.booking {
+    text-align: left;
+}

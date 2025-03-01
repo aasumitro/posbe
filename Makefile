@@ -14,7 +14,7 @@ deps:
 	@ echo "Required Tools Are Available"
 
 .Phony: build-binary
-build-binary: api-docs
+build-binary: api-specs
 	@ echo "Build Binary"
 	@ mkdir ./build
 	@ cp .example.env ./build/.env
@@ -23,8 +23,15 @@ build-binary: api-docs
 	@ GOOS=windows GOARCH=amd64 go build -o ./build/posbe.exe ./cmd/api/main.go
 	@ echo "generate binary done"
 
-.Phony: api-docs
-api-docs: run-tests
+.Phony: just-api-specs
+just-api-specs: run-lint
+	@ echo "Re-generate Swagger File (API Spec docs)"
+	@ swag init --parseDependency --parseInternal \
+		--parseDepth 4 -g ./cmd/api/main.go
+	@ echo "generate swagger file done"
+
+.Phony: api-specs
+api-specs: run-tests
 	@ echo "Re-generate Swagger File (API Spec docs)"
 	@ swag init --parseDependency --parseInternal \
 		--parseDepth 4 -g ./cmd/api/main.go

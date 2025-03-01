@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS products (
     gallery TEXT,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    price FLOAT NOT NULL,
+    -- we don't need it (price), let's put this item into variant
+    -- by default when user create new item we will add new base variant
+    -- price NUMERIC NOT NULL,
     created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
     updated_at BIGINT
 );

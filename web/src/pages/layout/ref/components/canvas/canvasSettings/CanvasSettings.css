@@ -1,0 +1,24 @@
+#canvasSettings {
+    min-width: 500px;
+}
+
+.nav-item label {
+    margin-bottom: 5px;
+}
+
+.nav-item {
+    text-align: center;
+}
+
+.nav-item button, .nav-item input {
+    margin-right: 10px;
+}
+
+#canvasNavBar {
+    background: white;
+}
+
+.mode-wrapper {
+    width: 160px;
+    padding: 10px; 
+}

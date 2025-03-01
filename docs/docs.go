@@ -38,7 +38,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -46,7 +46,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Addon"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Addon"
                                             }
                                         }
                                     }
@@ -57,13 +57,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -109,13 +109,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Addon"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Addon"
                                         }
                                     }
                                 }
@@ -125,19 +125,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -192,13 +192,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Addon"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Addon"
                                         }
                                     }
                                 }
@@ -208,25 +208,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -259,19 +259,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -296,7 +296,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -304,7 +304,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Category"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Category"
                                             }
                                         }
                                     }
@@ -315,13 +315,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -353,13 +353,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Category"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Category"
                                         }
                                     }
                                 }
@@ -369,19 +369,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -422,13 +422,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Category"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Category"
                                         }
                                     }
                                 }
@@ -438,25 +438,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -489,19 +489,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -526,7 +526,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -534,7 +534,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Floor"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Floor"
                                             }
                                         }
                                     }
@@ -545,13 +545,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -583,13 +583,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Floor"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Floor"
                                         }
                                     }
                                 }
@@ -599,19 +599,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -652,13 +652,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Floor"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Floor"
                                         }
                                     }
                                 }
@@ -668,25 +668,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -719,19 +719,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -769,13 +769,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Floor"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Floor"
                                         }
                                     }
                                 }
@@ -785,13 +785,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -832,7 +832,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -848,19 +848,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD_REQUEST_RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE_ENTITY_RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL_SERVER_ERROR_RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -883,7 +883,7 @@ const docTemplate = `{
                     "200": {
                         "description": "CREATED_RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                         }
                     }
                 }
@@ -962,13 +962,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.ProductVariant"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.ProductVariant"
                                         }
                                     }
                                 }
@@ -978,25 +978,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1082,13 +1082,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.ProductVariant"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.ProductVariant"
                                         }
                                     }
                                 }
@@ -1098,25 +1098,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1149,19 +1149,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1186,7 +1186,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -1194,7 +1194,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Role"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Role"
                                             }
                                         }
                                     }
@@ -1205,13 +1205,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1250,13 +1250,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Role"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Role"
                                         }
                                     }
                                 }
@@ -1266,19 +1266,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1326,13 +1326,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Role"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Role"
                                         }
                                     }
                                 }
@@ -1342,25 +1342,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1393,19 +1393,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1430,7 +1430,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -1438,7 +1438,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Room"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Room"
                                             }
                                         }
                                     }
@@ -1449,13 +1449,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1536,13 +1536,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Room"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Room"
                                         }
                                     }
                                 }
@@ -1552,19 +1552,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1654,13 +1654,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Room"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Room"
                                         }
                                     }
                                 }
@@ -1670,25 +1670,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1721,19 +1721,128 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shifts": {
+            "get": {
+                "description": "Get Shift List.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shifts"
+                ],
+                "summary": "Shift List",
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Table"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/shifts/{id}": {
+            "get": {
+                "description": "Get Shift Detail.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Shifts"
+                ],
+                "summary": "Shift Detail",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "table id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Table"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1758,7 +1867,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -1766,7 +1875,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.StoreSetting"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.StoreSetting"
                                             }
                                         }
                                     }
@@ -1777,13 +1886,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1822,13 +1931,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.StoreSetting"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.StoreSetting"
                                         }
                                     }
                                 }
@@ -1838,19 +1947,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1875,7 +1984,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -1883,7 +1992,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Subcategory"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Subcategory"
                                             }
                                         }
                                     }
@@ -1894,13 +2003,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -1939,13 +2048,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Subcategory"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Subcategory"
                                         }
                                     }
                                 }
@@ -1955,19 +2064,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2015,13 +2124,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Subcategory"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Subcategory"
                                         }
                                     }
                                 }
@@ -2031,25 +2140,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2082,19 +2191,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2119,7 +2228,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -2127,7 +2236,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Table"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Table"
                                             }
                                         }
                                     }
@@ -2138,13 +2247,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2225,13 +2334,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Table"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Table"
                                         }
                                     }
                                 }
@@ -2241,19 +2350,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2343,13 +2452,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Table"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Table"
                                         }
                                     }
                                 }
@@ -2359,25 +2468,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2410,19 +2519,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2447,7 +2556,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -2455,7 +2564,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Unit"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Unit"
                                             }
                                         }
                                     }
@@ -2466,13 +2575,13 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2518,13 +2627,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Unit"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Unit"
                                         }
                                     }
                                 }
@@ -2534,19 +2643,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2601,13 +2710,13 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Unit"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Unit"
                                         }
                                     }
                                 }
@@ -2617,25 +2726,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2668,19 +2777,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2705,7 +2814,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -2724,13 +2833,108 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Self Update User Profile",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Self Update User Profile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "role id",
+                        "name": "role_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "full name",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "email address",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "phone number",
+                        "name": "phone",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "password",
+                        "name": "password",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.User"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2795,7 +2999,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -2811,19 +3015,19 @@ const docTemplate = `{
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2857,7 +3061,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -2873,19 +3077,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -2953,7 +3157,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.SuccessRespond"
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
                                 },
                                 {
                                     "type": "object",
@@ -2969,25 +3173,25 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "422": {
                         "description": "UNPROCESSABLE ENTITY RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -3020,19 +3224,19 @@ const docTemplate = `{
                     "400": {
                         "description": "BAD REQUEST RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
                         "description": "UNAUTHORIZED RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "500": {
                         "description": "INTERNAL SERVER ERROR RESPOND",
                         "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_utils.ErrorRespond"
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     }
                 }
@@ -3073,7 +3277,7 @@ const docTemplate = `{
                 "UserStatusInactive"
             ]
         },
-        "github_com_aasumitro_posbe_pkg_model.Addon": {
+        "github_com_aasumitro_posbe_internal_model.Addon": {
             "type": "object",
             "required": [
                 "description",
@@ -3095,7 +3299,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_model.Category": {
+        "github_com_aasumitro_posbe_internal_model.Category": {
             "type": "object",
             "required": [
                 "name"
@@ -3110,12 +3314,15 @@ const docTemplate = `{
                 "subcategories": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Subcategory"
+                        "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Subcategory"
                     }
+                },
+                "usage": {
+                    "type": "integer"
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_model.Floor": {
+        "github_com_aasumitro_posbe_internal_model.Floor": {
             "type": "object",
             "required": [
                 "name"
@@ -3133,13 +3340,13 @@ const docTemplate = `{
                 "rooms": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Room"
+                        "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Room"
                     }
                 },
                 "tables": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Table"
+                        "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Table"
                     }
                 },
                 "total_rooms": {
@@ -3153,7 +3360,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_model.ProductVariant": {
+        "github_com_aasumitro_posbe_internal_model.ProductVariant": {
             "type": "object",
             "required": [
                 "name",
@@ -3183,7 +3390,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "unit": {
-                    "$ref": "#/definitions/github_com_aasumitro_posbe_pkg_model.Unit"
+                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Unit"
                 },
                 "unit_id": {
                     "type": "integer"
@@ -3193,7 +3400,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_model.Role": {
+        "github_com_aasumitro_posbe_internal_model.Role": {
             "type": "object",
             "required": [
                 "description",
@@ -3214,7 +3421,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_model.Room": {
+        "github_com_aasumitro_posbe_internal_model.Room": {
             "type": "object",
             "required": [
                 "capacity",
@@ -3262,11 +3469,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_model.StoreSetting": {
+        "github_com_aasumitro_posbe_internal_model.StoreSetting": {
             "type": "object",
             "additionalProperties": true
         },
-        "github_com_aasumitro_posbe_pkg_model.Subcategory": {
+        "github_com_aasumitro_posbe_internal_model.Subcategory": {
             "type": "object",
             "required": [
                 "category_id",
@@ -3281,10 +3488,13 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "usage": {
+                    "type": "integer"
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_model.Table": {
+        "github_com_aasumitro_posbe_internal_model.Table": {
             "type": "object",
             "required": [
                 "capacity",
@@ -3331,7 +3541,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_model.Unit": {
+        "github_com_aasumitro_posbe_internal_model.Unit": {
             "type": "object",
             "required": [
                 "magnitude",
@@ -3353,10 +3563,13 @@ const docTemplate = `{
                 "symbol": {
                     "description": "e.g: kg [m, s]",
                     "type": "string"
+                },
+                "usage": {
+                    "type": "integer"
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_utils.ErrorRespond": {
+        "github_com_aasumitro_posbe_internal_utils.ErrorRespond": {
             "type": "object",
             "properties": {
                 "code": {
@@ -3370,7 +3583,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_utils.SuccessRespond": {
+        "github_com_aasumitro_posbe_internal_utils.SuccessRespond": {
             "type": "object",
             "properties": {
                 "code": {
@@ -3382,7 +3595,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_aasumitro_posbe_pkg_utils.ValidationErrorRespond": {
+        "github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond": {
             "type": "object",
             "properties": {
                 "code": {

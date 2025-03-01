@@ -9,7 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/aasumitro/posbe/config"
 	repoSql "github.com/aasumitro/posbe/internal/catalog/repository/sql"
-	"github.com/aasumitro/posbe/pkg/model"
+	"github.com/aasumitro/posbe/internal/model"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -73,9 +73,10 @@ func (suite *unitRepositoryTestSuite) TestRepository_All_ExpectReturnErrorFromSc
 
 func (suite *unitRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() {
 	data := suite.mock.
-		NewRows([]string{"id", "magnitude", "name", "symbol"}).
-		AddRow(1, "test", "test", "test")
-	query := "SELECT * FROM units WHERE id = $1 LIMIT 1"
+		NewRows([]string{"id", "magnitude", "name", "symbol", "usage"}).
+		AddRow(1, "test", "test", "test", 0)
+	query := "SELECT units.id, units.magnitude, units.name, units.symbol, COUNT(product_variants.unit_id) as usage "
+	query += "FROM units LEFT OUTER JOIN product_variants ON units.id = product_variants.unit_id WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
 	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)
@@ -86,9 +87,10 @@ func (suite *unitRepositoryTestSuite) TestRepository_Find_ExpectReturnRow() {
 
 func (suite *unitRepositoryTestSuite) TestRepository_Find_ExpectReturnError() {
 	data := suite.mock.
-		NewRows([]string{"id", "magnitude", "name", "symbol"}).
-		AddRow(nil, nil, nil, nil)
-	query := "SELECT * FROM units WHERE id = $1 LIMIT 1"
+		NewRows([]string{"id", "magnitude", "name", "symbol", "usage"}).
+		AddRow(nil, nil, nil, nil, nil)
+	query := "SELECT units.id, units.magnitude, units.name, units.symbol, COUNT(product_variants.unit_id) as usage "
+	query += "FROM units LEFT OUTER JOIN product_variants ON units.id = product_variants.unit_id WHERE id = $1 LIMIT 1"
 	meta := regexp.QuoteMeta(query)
 	suite.mock.ExpectQuery(meta).WillReturnRows(data)
 	res, err := suite.repo.Find(context.TODO(), model.FindWithID, 1)

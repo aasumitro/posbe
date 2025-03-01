@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/aasumitro/posbe/common"
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/pkg/model"
-	"github.com/aasumitro/posbe/pkg/utils"
+	"github.com/aasumitro/posbe/internal/common"
+	"github.com/aasumitro/posbe/internal/model"
+	"github.com/aasumitro/posbe/internal/utils"
 )
 
 type accountService struct {
@@ -159,21 +159,6 @@ func (service accountService) EditUser(
 	user *model.User,
 	errorData *utils.ServiceError,
 ) {
-	password := data.Password
-	if password != "" {
-		u := utils.Password{Stored: "", Supplied: password}
-		pwd, err := u.HashPassword()
-		if service.pwd != nil {
-			pwd, err = service.pwd.HashPassword()
-		}
-		if err != nil {
-			return nil, &utils.ServiceError{
-				Code:    http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-		}
-		data.Password = pwd
-	}
 	data, err := service.userRepo.Update(ctx, data)
 	return utils.ValidateDataRow[model.User](data, err)
 }
