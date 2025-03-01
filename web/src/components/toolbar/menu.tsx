@@ -1,4 +1,4 @@
-import {Home,  Layers3, Package, ShoppingCart, StoreIcon} from "lucide-react";
+import {Home,  Layers3, Package, ShoppingCart} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {useNavigate} from "react-router-dom";
 import {isCurrentRoute} from "@/lib/path-validation.ts";
@@ -30,12 +30,6 @@ const menu = [
     access: ["admin"],
     icon: <Package className="h-4 w-4"/>
   },
-  {
-    name: "Store",
-    route: "/store",
-    access: ["admin"],
-    icon:  <StoreIcon className="h-4 w-4"/>
-  }
 ]
 
 export const MainNavigationMenu = () => {

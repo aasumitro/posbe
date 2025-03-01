@@ -1,10 +1,11 @@
 package utils_test
 
 import (
-	"github.com/aasumitro/posbe/internal/utils"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/aasumitro/posbe/internal/utils"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestJSONWebToken_ClaimJWTToken(t *testing.T) {

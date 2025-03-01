@@ -182,7 +182,7 @@ export const UserDetailSheet = ()=> {
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>
-            Edit profile
+            {editMode ? "Edit" : ""} User profile
             <Toggle
               className="mt-4 ml-4"
               size="sm"
@@ -198,7 +198,10 @@ export const UserDetailSheet = ()=> {
             </Toggle>
           </SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you're done.
+            {editMode
+              ? "Make changes to your profile here. Click save when you're done."
+              : "Current selected user data (credentials & contact)."
+            }
           </SheetDescription>
         </SheetHeader>
 

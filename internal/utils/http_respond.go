@@ -1,25 +1,23 @@
 package utils
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-// SuccessRespond message
 type SuccessRespond struct {
 	Code   int         `json:"code"`
 	Status string      `json:"status"`
 	Data   interface{} `json:"data"`
 }
 
-// ErrorRespond message
 type ErrorRespond struct {
 	Code   int    `json:"code"`
 	Status string `json:"status"`
 	Data   string `json:"data"`
 }
 
-// ValidationErrorRespond message
 type ValidationErrorRespond struct {
 	Code   int         `json:"code"`
 	Status string      `json:"status"`

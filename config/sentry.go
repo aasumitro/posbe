@@ -17,11 +17,10 @@ func SentryConnection() Option {
 		crashReportingCollectorName := "sentry"
 		sampleRatio := 0.25
 		if err := sentry.Init(sentry.ClientOptions{
-			Dsn:                cfg.SentryDsnURL,
-			EnableTracing:      true,
-			TracesSampleRate:   1.0,
-			ProfilesSampleRate: sampleRatio,
-			SampleRate:         sampleRatio,
+			Dsn:              cfg.SentryDsnURL,
+			EnableTracing:    true,
+			TracesSampleRate: 1.0,
+			SampleRate:       sampleRatio,
 			Environment: func() string {
 				if cfg.AppDebug {
 					return "development"

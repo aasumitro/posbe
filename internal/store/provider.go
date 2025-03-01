@@ -18,10 +18,11 @@ import (
 )
 
 var (
-	floorRepo     model.ICRUDRepository[model.Floor]
-	tableRepo     model.ICRUDAddOnRepository[model.Table]
-	roomRepo      model.ICRUDAddOnRepository[model.Room]
-	storePrefRepo model.IStorePrefRepository
+	floorRepo      model.ICRUDRepository[model.Floor]
+	tableRepo      model.ICRUDAddOnRepository[model.Table]
+	roomRepo       model.ICRUDAddOnRepository[model.Room]
+	storePrefRepo  model.IStorePrefRepository
+	storeShiftRepo model.IStoreShiftRepository
 )
 
 func NewStoreModuleProvider(router *gin.RouterGroup) {
@@ -29,8 +30,10 @@ func NewStoreModuleProvider(router *gin.RouterGroup) {
 	tableRepo = repository.NewTableSQLRepository()
 	roomRepo = repository.NewRoomSQLRepository()
 	storePrefRepo = repository.NewPrefSQLRepository()
+	storeShiftRepo = repository.NewShiftSQLRepository()
 	storeService := service.NewStoreService(floorRepo, tableRepo, roomRepo)
 	storePrefService := service.NewPreferenceService(storePrefRepo)
+	storeShiftService := service.NewStoreShiftService(storeShiftRepo)
 	shouldCacheData(context.Background())
 	protectedRouter := router.
 		Use(middleware.Auth()).
@@ -39,6 +42,7 @@ func NewStoreModuleProvider(router *gin.RouterGroup) {
 	http.NewTableHandler(storeService, protectedRouter)
 	http.NewRoomHandler(storeService, protectedRouter)
 	http.NewPreferenceHandler(storePrefService, protectedRouter)
+	http.NewShiftHandler(storeShiftService, protectedRouter)
 }
 
 func shouldCacheData(ctx context.Context) {

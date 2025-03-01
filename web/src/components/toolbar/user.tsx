@@ -42,10 +42,14 @@ export const UserNavigationMenu = () => {
             </div>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-44 gap-2" align="end" forceMount>
+        <DropdownMenuContent className="w-56 gap-2" align="end" forceMount>
           <DropdownMenuItem onClick={openProfileSheet}>
             <UserIcon className="mr-2 h-4 w-4" />
             <span>Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <UserIcon className="mr-2 h-4 w-4" />
+            <span>Update Password</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={openLogoutDialog}>

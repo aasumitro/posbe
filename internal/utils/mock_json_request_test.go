@@ -3,12 +3,13 @@ package utils_test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/aasumitro/posbe/internal/utils"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/aasumitro/posbe/internal/utils"
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMockJsonRequest(t *testing.T) {

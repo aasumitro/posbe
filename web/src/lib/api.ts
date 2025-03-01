@@ -16,6 +16,9 @@ export const Endpoint = {
   },
   Store: {
     Pref: `${API_URL}/store/prefs`,
+  },
+  Shift: {
+    Base: `${API_URL}/shifts`,
   }
 }
 

@@ -51,13 +51,15 @@ type (
 
 	// Shift is reference section data for store
 	Shift struct {
-		ID           int           `json:"id"`
-		Name         string        `json:"name"`
-		StartTime    int64         `json:"start_time"`
-		EndTime      int64         `json:"end_time"`
-		CreatedAt    sql.NullInt64 `json:"created_at"`
-		UpdatedAt    sql.NullInt64 `json:"updated_at,omitempty"`
-		CurrentShift *StoreShift   `json:"current_shift,omitempty" binding:"-"`
+		ID               int           `json:"id"`
+		Name             string        `json:"name"`
+		StartTime        int64         `json:"start_time"`
+		EndTime          int64         `json:"end_time"`
+		CreatedAt        sql.NullInt64 `json:"created_at"`
+		UpdatedAt        sql.NullInt64 `json:"updated_at,omitempty"`
+		CurrentShift     *StoreShift   `json:"current_shift,omitempty" binding:"-"`
+		TotalUsage       int64         `json:"total_usage" binding:"-"`
+		TotalTransaction int64         `json:"total_transaction" binding:"-"`
 	}
 
 	// StorePref store setting
@@ -71,7 +73,7 @@ type (
 	StoreShift struct {
 		ID        int           `json:"id"`
 		ShiftID   int           `json:"shift_id"`
-		OpenAt    int64         `json:"open_at"`
+		OpenAt    sql.NullInt64 `json:"open_at"`
 		OpenBy    sql.NullInt64 `json:"open_by"`
 		OpenCash  sql.NullInt64 `json:"open_cash"`
 		CloseAt   sql.NullInt64 `json:"close_at"`
@@ -130,5 +132,10 @@ type (
 		ICRUDRepository[Shift]
 		OpenShift(ctx context.Context, form *StoreShiftForm) error
 		CloseShift(ctx context.Context, form *StoreShiftForm) error
+	}
+
+	IStoreShiftService interface {
+		ShiftList(ctx context.Context) (shifts []*Shift, errData *utils.ServiceError)
+		ShiftDetail(ctx context.Context, id int) (shift *Shift, errData *utils.ServiceError)
 	}
 )

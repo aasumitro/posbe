@@ -18,6 +18,8 @@ export const ProductList = () => {
         "flex flex-row flex-wrap mt-6 gap-4",
         // {"justify-between": products.length > 2}
       )}>
+        {/*display new product card only if store doesnt have any product*/}
+        {/*if store has product then hide it move the add button into product fitler*/}
         <NewProductCard/>
         {products.map((index) => (
           <ProductItem key={index} />

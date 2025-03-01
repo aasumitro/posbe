@@ -28,7 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <BrowserRouter basename="fe">
+        <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage/>}/>
             <Route element={<BackofficeLayout />}>

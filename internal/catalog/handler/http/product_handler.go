@@ -9,15 +9,15 @@ type productHandler struct {
 	svc model.ICatalogProductService
 }
 
-func (handler productHandler) fetch(ctx *gin.Context) {}
+func (handler productHandler) fetch(_ *gin.Context) {}
 
-func (handler productHandler) show(ctx *gin.Context) {}
+func (handler productHandler) show(_ *gin.Context) {}
 
-func (handler productHandler) store(ctx *gin.Context) {}
+func (handler productHandler) store(_ *gin.Context) {}
 
-func (handler productHandler) update(ctx *gin.Context) {}
+func (handler productHandler) update(_ *gin.Context) {}
 
-func (handler productHandler) destroy(ctx *gin.Context) {}
+func (handler productHandler) destroy(_ *gin.Context) {}
 
 func NewProductHandler(svc model.ICatalogProductService, router gin.IRouter) {
 	handler := productHandler{svc: svc}

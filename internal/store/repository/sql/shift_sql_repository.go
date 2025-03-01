@@ -19,31 +19,69 @@ func (repo ShiftSQLRepository) All(
 ) (data []*model.Shift, err error) {
 	// TODO: join with store_shift and validate
 	// if today and current time is open/close or not
-	q := "SELECT * FROM shifts"
+	// q := "SELECT s.id, s.name, s.start_time, s.end_time, "
+	// q += "s.created_at, s.updated_at FROM shifts as s"
+
+	q := `
+SELECT s.id, s.name, s.start_time, s.end_time,
+    s.created_at, s.updated_at,
+    (SELECT COUNT(*) FROM store_shifts AS ss2
+        WHERE ss2.shift_id = s.id
+    ) AS total_usages,
+    COALESCE(t.id, 0) AS total_transactions,
+    COALESCE(ss.id, 0) as last_shift_id, ss.open_at as last_shift_open,
+    ss.close_at as last_shift_close
+FROM shifts AS s
+    LEFT JOIN (
+    SELECT ss1.*
+    FROM store_shifts AS ss1
+    WHERE ss1.id = ( SELECT id FROM store_shifts
+        WHERE shift_id = ss1.shift_id ORDER BY created_at DESC
+    LIMIT 1)
+) AS ss ON ss.shift_id = s.id LEFT JOIN orders AS t ON t.shift_id = ss.id
+`
 	rows, err := repo.Db.QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
 		var s model.Shift
+		var st model.StoreShift
 		if err := rows.Scan(
 			&s.ID, &s.Name, &s.StartTime,
 			&s.EndTime, &s.CreatedAt, &s.UpdatedAt,
+			&s.TotalUsage, &s.TotalTransaction,
+			&st.ID, &st.OpenAt, &st.CloseAt,
 		); err != nil {
 			return nil, err
+		}
+		if st.ID != 0 {
+			s.CurrentShift = &st
 		}
 		data = append(data, &s)
 	}
 	return data, nil
 }
 
-// Find will not impl
 func (repo ShiftSQLRepository) Find(
-	_ context.Context,
-	_ model.FindWith, _ any,
-) (data *model.Shift, err error) {
-	// TODO implement me
-	panic("implement me")
+	ctx context.Context,
+	key model.FindWith, val any,
+) (shift *model.Shift, err error) {
+	q := "SELECT * FROM shifts WHERE "
+	//goland:noinspection ALL
+	if key == model.FindWithID {
+		q += "id = $1 "
+	}
+	q += "LIMIT 1"
+	row := repo.Db.QueryRowContext(ctx, q, val)
+	shift = &model.Shift{}
+	if err := row.Scan(
+		&shift.ID, &shift.Name, &shift.StartTime,
+		&shift.EndTime, &shift.CreatedAt, &shift.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+	return shift, nil
 }
 
 func (repo ShiftSQLRepository) Create(

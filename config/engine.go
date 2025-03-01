@@ -28,7 +28,7 @@ var (
 
 	corsMaxAge         = 12 * time.Hour
 	corsAllowedOrigins = []string{
-		"http://localhost:5173",
+		"http://localhost:3000",
 		"http://localhost:8000",
 	}
 	corsAllowedHeaders = []string{
@@ -112,7 +112,7 @@ func logger() gin.HandlerFunc {
 				}()),
 			)
 
-		// store log - TODO: impl like fiber hook after endpoint called
+		// store log
 		go func() {
 			uid, ok := ctx.Get("user_id")
 			if !ok {

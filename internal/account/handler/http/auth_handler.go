@@ -45,7 +45,7 @@ func (handler authHandler) login(ctx *gin.Context) {
 	}
 	token, claimErr := handler.jwt.ClaimJWTToken(data)
 	if claimErr != nil {
-		utils.NewHTTPRespond(ctx, http.StatusInternalServerError, claimErr.Error())
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, claimErr.Error())
 		return
 	}
 	http.SetCookie(ctx.Writer, &http.Cookie{

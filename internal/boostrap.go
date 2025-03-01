@@ -144,7 +144,7 @@ func registerPublicRoutes(
 	healthConfig := healthcheckconfig.DefaultConfig()
 	healthConfig.HealthPath = "/health"
 	_ = healthcheck.New(router, healthConfig, []checks.Check{
-		&redisCheck, checks.NewContextCheck(sgCtx, "signals"),
+		redisCheck, checks.NewContextCheck(sgCtx, "signals"),
 		checks.NewPingCheck("https://www.google.com",
 			"GET", common.HealthCheckPingTimeout, nil, nil),
 		checks.SqlCheck{Sql: config.PostgresPool},

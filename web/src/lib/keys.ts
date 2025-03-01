@@ -7,4 +7,6 @@ export const KEYS = {
   DISPLAY_SESSION_EXPIRED_MODAL: "display_session_expired_dialog",
   DISPLAY_REMOVE_EMPLOYEE_CONFIRMATION_MODAL: "display_remove_employee_confirm_dialog",
   DISPLAY_NEW_EMPLOYEE_MODAL: "display_new_employee_dialog",
+  DISPLAY_NEW_SHIFT_MODAL: "display_new_shift_dialog",
+  DISPLAY_SHIFT_DETAIL_SHEET: "display_shift_detail_sheet",
 }
