@@ -244,8 +244,8 @@ github.com/swaggo/gin-swagger v1.6.0 h1:y8sxvQ3E20/RCyrXeFfg60r6H0Z+SwpTjMYsMm+z
 github.com/swaggo/gin-swagger v1.6.0/go.mod h1:BG00cCEy294xtVpyIAHG6+e2Qzj/xKlRdOqDkvq0uzo=
 github.com/swaggo/swag v1.16.4 h1:clWJtd9LStiG3VeijiCfOVODP6VpHtKdQy9ELFG3s1A=
 github.com/swaggo/swag v1.16.4/go.mod h1:VBsHJRsDvfYvqoiMKnsdwhNV9LEMHgEDZcyVYX0sxPg=
-github.com/tavsec/gin-healthcheck v1.7.3 h1:zQoyciiZK1cp/xHlWzuC5qPnHSzCJHBALbwhgSNWGys=
-github.com/tavsec/gin-healthcheck v1.7.3/go.mod h1:PRAyEygtMSsNfIHAi6NefOn/wcalUfN/rlhBVvdc3cI=
+github.com/tavsec/gin-healthcheck v1.7.4 h1:ONotZ6ROnKGLCVL5IHFnK+uI1ujXcnv87FPD3inb6xU=
+github.com/tavsec/gin-healthcheck v1.7.4/go.mod h1:ylvccnCr1s5RZxM/85mG70l49aqdU2Zr1FNV534eTPQ=
 github.com/testcontainers/testcontainers-go v0.35.0 h1:uADsZpTKFAtp8SLK+hMwSaa+X+JiERHtd4sQAFmXeMo=
 github.com/testcontainers/testcontainers-go v0.35.0/go.mod h1:oEVBj5zrfJTrgjwONs1SsRbnBtH9OKl+IGl3UMcr2B4=
 github.com/testcontainers/testcontainers-go/modules/rabbitmq v0.35.0 h1:nFxuSjhASdDOIcXwasRfI9ZQOIfzsw3+VLOWr521OVg=
