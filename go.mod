@@ -23,7 +23,7 @@ require (
 	github.com/swaggo/swag v1.16.4
 	github.com/tavsec/gin-healthcheck v1.7.3
 	github.com/ulule/limiter/v3 v3.11.2
-	golang.org/x/crypto v0.34.0
+	golang.org/x/crypto v0.35.0
 )
 
 require (
