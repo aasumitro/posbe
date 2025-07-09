@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS products (
     subcategory_id BIGINT NOT NULL,
     sku VARCHAR(255) UNIQUE NOT NULL,
     image VARCHAR(255),
+    gallery TEXT,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     -- we don't need it (price), let's put this item into variant

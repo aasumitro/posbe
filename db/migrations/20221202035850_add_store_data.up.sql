@@ -15,10 +15,10 @@ VALUES
     ('email', 'lorem@store.id'),
     ('phone', '+62872222'),
     ('logo', '/lorem.png'),
-    ('tax_rate', '10'), -- in percentage or fixed amount
-    ('tax_category', 'standard'), -- standard (percentage) | nominal (fixed)
-    ('service_rate', '5'), -- in percentage or fixed amount
-    ('service_category', 'standard'),  -- standard (percentage) | nominal (fixed)
+    ('tax_rate', '10'), -- in percentage
+    ('tax_category', 'standard'),
+    ('service_rate', '5'), -- in percentage
+    ('service_category', 'standard'),
     ('pos_type', 'restaurant'), -- restaurant, bar, coffee, store, karaoke
     ('feature_floor', '1'),  -- true or false
     ('feature_room', '0'),  -- true or false
@@ -27,4 +27,5 @@ VALUES
     ('fe_theme', 'light'),  -- dark or light
     ('fe_lang', 'en_US'),  -- en_US or id_ID
     ('fe_locale', 'Asia/Makassar'), -- Asia/Jayapura, Asia/Makassar, Asia/Jakarta
-    ('currency', 'IDR');, -- IDR/USD
+    ('currency', 'IDR'), -- IDR/USD
+    ('currency_rate', '16200'); -- TO USD

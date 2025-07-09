@@ -30,6 +30,9 @@ func (repo ProductSQLRepository) Search(ctx context.Context, keys []model.FindWi
 			case model.FindWithSubcategoryID:
 				data := values[i].(int)
 				whereClause += fmt.Sprintf("subcategory_id = %d ", data)
+			case model.FindWithPriceInRange:
+				data := values[i].([]float32)
+				whereClause += fmt.Sprintf("price BETWEEN %f AND %f ", data[0], data[1])
 			default:
 				panic("unhandled default case")
 			}
@@ -53,7 +56,7 @@ func (repo ProductSQLRepository) Search(ctx context.Context, keys []model.FindWi
 
 		if err := rows.Scan(
 			&product.ID, &product.CategoryID, &product.SubcategoryID,
-			&product.Sku, &product.Image, &product.Name,
+			&product.Sku, &product.Image, &product.Gallery, &product.Name,
 			&product.Description,
 		); err != nil {
 			return nil, err
@@ -78,7 +81,8 @@ func (repo ProductSQLRepository) All(ctx context.Context) (data []*model.Product
 
 		if err := rows.Scan(
 			&product.ID, &product.CategoryID, &product.SubcategoryID,
-			&product.Sku, &product.Image, &product.Name, &product.Description,
+			&product.Sku, &product.Image, &product.Gallery, &product.Name,
+			&product.Description,
 		); err != nil {
 			return nil, err
 		}
@@ -96,7 +100,8 @@ func (repo ProductSQLRepository) Find(ctx context.Context, _ model.FindWith, val
 	data = &model.Product{}
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
-		&data.Sku, &data.Image, &data.Name, &data.Description,
+		&data.Sku, &data.Image, &data.Gallery, &data.Name,
+		&data.Description,
 	); err != nil {
 		return nil, err
 	}
@@ -106,15 +111,17 @@ func (repo ProductSQLRepository) Find(ctx context.Context, _ model.FindWith, val
 
 func (repo ProductSQLRepository) Create(ctx context.Context, params *model.Product) (data *model.Product, err error) {
 	q := "INSERT INTO products "
-	q += "(category_id, subcategory_id, sku, image, name, description) "
-	q += "VALUES ($1, $2, $3, $4, $5, $6) RETURNING *"
+	q += "(category_id, subcategory_id, sku, image, gallery, name, description, price) "
+	q += "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.SubcategoryID,
-		params.Sku, params.Image, params.Name, params.Description)
+		params.Sku, params.Image, params.Gallery, params.Name,
+		params.Description)
 
 	data = &model.Product{}
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
-		&data.Sku, &data.Image, &data.Name, &data.Description,
+		&data.Sku, &data.Image, &data.Gallery, &data.Name,
+		&data.Description,
 	); err != nil {
 		return nil, err
 	}
@@ -124,14 +131,15 @@ func (repo ProductSQLRepository) Create(ctx context.Context, params *model.Produ
 
 func (repo ProductSQLRepository) Update(ctx context.Context, params *model.Product) (data *model.Product, err error) {
 	q := "UPDATE products SET category_id = $1, subcategory_id = $2, sku = $3, image = $4, "
-	q += "name = $5, description = $6 WHERE id = $7 RETURNING *"
+	q += "gallery = $5, name = $6, description = $7, price = $8 WHERE id = $9 RETURNING *"
 	row := repo.Db.QueryRowContext(ctx, q, params.CategoryID, params.SubcategoryID,
-		params.Sku, params.Image, params.Name, params.Description, params.ID)
+		params.Sku, params.Image, params.Gallery, params.Name,
+		params.Description, params.ID)
 
 	data = &model.Product{}
 	if err := row.Scan(
 		&data.ID, &data.CategoryID, &data.SubcategoryID,
-		&data.Sku, &data.Image, &data.Name,
+		&data.Sku, &data.Image, &data.Gallery, &data.Name,
 		&data.Description,
 	); err != nil {
 		return nil, err

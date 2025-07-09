@@ -1,4 +1,4 @@
-CREATE TYPE table_types AS ENUM ('rectangle', 'circle');
+CREATE TYPE table_types AS ENUM ('round', 'square');
 
 CREATE TABLE IF NOT EXISTS tables (
     id BIGSERIAL PRIMARY KEY NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS tables (
     w_size FLOAT,
     h_size FLOAT,
     capacity INT,
-    type TABLE_TYPES DEFAULT 'rectangle',
+    type TABLE_TYPES DEFAULT 'square',
     created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
     updated_at BIGINT
 );

@@ -43,6 +43,7 @@ type (
 		SubcategoryID   int               `json:"subcategory_id" form:"subcategory_id" binding:"required"`
 		Sku             string            `json:"sku" form:"sku" binding:"required"`
 		Image           sql.NullString    `json:"image" form:"image"`
+		Gallery         sql.NullString    `json:"gallery" form:"gallery"`
 		Name            string            `json:"name" form:"name" binding:"required"`
 		Description     sql.NullString    `json:"description" form:"description"`
 		Category        *Category         `json:"category,omitempty" binding:"-"`
