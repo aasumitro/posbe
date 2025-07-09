@@ -1,4 +1,4 @@
-CREATE TYPE variant_types AS ENUM ('none', 'size', 'portion');
+CREATE TYPE variant_types AS ENUM ('none', 'size', 'portion', 'ice', 'sugar');
 
 CREATE TABLE IF NOT EXISTS product_variants(
     id BIGSERIAL PRIMARY KEY NOT NULL,
