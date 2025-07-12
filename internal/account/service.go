@@ -1,4 +1,4 @@
-package service
+package account
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/internal/common"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 )
@@ -45,64 +44,6 @@ func (service accountService) RoleList(
 		roles = r
 	}
 	return utils.ValidateDataRows[model.Role](roles, err)
-}
-
-func (service accountService) AddRole(
-	ctx context.Context,
-	item *model.Role,
-) (
-	role *model.Role,
-	errorData *utils.ServiceError,
-) {
-	data, err := service.roleRepo.Create(ctx, item)
-	config.RedisPool.Del(ctx, roleCacheKey)
-	return utils.ValidateDataRow[model.Role](data, err)
-}
-
-func (service accountService) EditRole(
-	ctx context.Context,
-	item *model.Role,
-) (
-	role *model.Role,
-	errorData *utils.ServiceError,
-) {
-	data, err := service.roleRepo.Update(ctx, item)
-	config.RedisPool.Del(ctx, roleCacheKey)
-	return utils.ValidateDataRow[model.Role](data, err)
-}
-
-func (service accountService) DeleteRole(
-	ctx context.Context,
-	data *model.Role,
-) *utils.ServiceError {
-	role, err := service.roleRepo.Find(ctx, model.FindWithID, data.ID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return &utils.ServiceError{
-				Code:    http.StatusNotFound,
-				Message: err.Error(),
-			}
-		}
-		return &utils.ServiceError{
-			Code:    http.StatusInternalServerError,
-			Message: err.Error(),
-		}
-	}
-	if role.Usage >= 1 {
-		return &utils.ServiceError{
-			Code:    http.StatusForbidden,
-			Message: common.ErrorUnableToDelete,
-		}
-	}
-	err = service.roleRepo.Delete(ctx, role)
-	if err != nil {
-		return &utils.ServiceError{
-			Code:    http.StatusInternalServerError,
-			Message: err.Error(),
-		}
-	}
-	config.RedisPool.Del(ctx, roleCacheKey)
-	return nil
 }
 
 func (service accountService) UserList(

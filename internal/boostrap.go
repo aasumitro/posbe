@@ -3,8 +3,6 @@ package internal
 import (
 	"context"
 	"errors"
-	"io"
-	"io/fs"
 	"log"
 	"net/http"
 	"os/signal"
@@ -18,7 +16,6 @@ import (
 	"github.com/aasumitro/posbe/internal/common"
 	"github.com/aasumitro/posbe/internal/store"
 	"github.com/aasumitro/posbe/internal/transaction"
-	"github.com/aasumitro/posbe/web"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -26,18 +23,6 @@ import (
 	"github.com/tavsec/gin-healthcheck/checks"
 	healthcheckconfig "github.com/tavsec/gin-healthcheck/config"
 )
-
-type embeddedFile struct {
-	fs.File
-}
-
-func (f *embeddedFile) Close() error {
-	return nil
-}
-
-func (f *embeddedFile) Seek(offset int64, whence int) (int64, error) {
-	return f.File.(io.Seeker).Seek(offset, whence)
-}
 
 func RunServer(ctx context.Context) {
 	// Create a context that listens for the interrupt signal from the OS.
@@ -92,10 +77,7 @@ func RunServer(ctx context.Context) {
 	log.Println("Server exiting")
 }
 
-func registerPublicRoutes(
-	sgCtx context.Context,
-	engine *gin.Engine,
-) {
+func registerPublicRoutes(sgCtx context.Context, engine *gin.Engine) {
 	router := engine
 	// no route handler
 	router.NoMethod(func(ctx *gin.Context) {
@@ -104,35 +86,19 @@ func registerPublicRoutes(
 	})
 	// no route handler
 	router.NoRoute(func(ctx *gin.Context) {
-		if !strings.Contains(ctx.FullPath(), "/fe/") ||
-			strings.Contains(ctx.FullPath(), "/api/") {
+		if strings.Contains(ctx.FullPath(), "/api/") {
 			ctx.String(http.StatusNotFound,
 				"route that you are looking for is not found")
 			return
 		}
-		file, err := web.SPAAssets().Open("index.html") // replace with 404.html
-		if err != nil {
-			ctx.String(http.StatusInternalServerError,
-				"failed to open file: ", err.Error())
-			return
-		}
-		defer func() { _ = file.Close() }()
-		fileInfo, err := file.Stat()
-		if err != nil {
-			ctx.String(http.StatusInternalServerError,
-				"failed to get file info: ", err.Error())
-			return
-		}
-		http.ServeContent(
-			ctx.Writer, ctx.Request, fileInfo.Name(),
-			fileInfo.ModTime(), &embeddedFile{file})
 	})
 	// main route handler
 	router.GET(common.EmptyPath, func(ctx *gin.Context) {
-		ctx.Redirect(http.StatusTemporaryRedirect, "/fe")
+		ctx.String(http.StatusOK,
+			"hello world")
+		return
 	})
-	// client (web ui) route handler
-	router.StaticFS("/fe", http.FS(web.SPAAssets()))
+	// asset route
 	router.Static("/assets", "./uploads")
 	// swagger docs routes
 	router.GET("/api-specs/*any",

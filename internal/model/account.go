@@ -36,9 +36,6 @@ type (
 	// IAccountService contract
 	IAccountService interface {
 		RoleList(ctx context.Context) (roles []*Role, errData *utils.ServiceError)
-		AddRole(ctx context.Context, data *Role) (role *Role, errData *utils.ServiceError)
-		EditRole(ctx context.Context, data *Role) (role *Role, errData *utils.ServiceError)
-		DeleteRole(ctx context.Context, data *Role) *utils.ServiceError
 
 		UserList(ctx context.Context) (users []*User, errData *utils.ServiceError)
 		ShowUser(ctx context.Context, id int) (user *User, errData *utils.ServiceError)

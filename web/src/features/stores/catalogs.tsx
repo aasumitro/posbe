@@ -13,7 +13,10 @@ import {Button} from "@/components/ui/button";
 import {File, ListFilter, Plus} from "lucide-react";
 import {useActionState} from "@/states/action-state";
 import {useNavigate} from "@tanstack/react-router";
-import {AddonActionAddModalState} from "@/features/stores/components/catalog/addon-action-add";
+import {AddonActionAdd, AddonActionAddModalState} from "@/features/stores/components/catalog/addon-action-add";
+import {ProductActionDeleteModal} from "@/features/stores/components/catalog/product-action-delete";
+import {AddonActionEdit} from "@/features/stores/components/catalog/addon-action-edit";
+import {AddonActionDelete} from "@/features/stores/components/catalog/addon-action-delete";
 
 export function ProductCatalogPage() {
   const { setBoolState } = useActionState();
@@ -116,9 +119,13 @@ export function ProductCatalogPage() {
           </div>
           <TabsContent value="products">
             <ProductContainer />
+            <ProductActionDeleteModal />
           </TabsContent>
           <TabsContent value="addons">
             <AddonContainer />
+            <AddonActionAdd />
+            <AddonActionEdit />
+            <AddonActionDelete />
           </TabsContent>
         </Tabs>
       </aside>

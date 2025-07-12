@@ -6,9 +6,7 @@ import (
 	"errors"
 
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/internal/account/handler/http"
 	repository "github.com/aasumitro/posbe/internal/account/repository/sql"
-	"github.com/aasumitro/posbe/internal/account/service"
 	"github.com/aasumitro/posbe/internal/middleware"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/gin-gonic/gin"
@@ -23,13 +21,13 @@ var (
 func NewAccountModuleProvider(router *gin.RouterGroup) {
 	userRepository = repository.NewUserSQLRepository()
 	roleRepository = repository.NewRoleSQLRepository()
-	accountService := service.NewAccountService(
+	as := NewAccountService(
 		roleRepository, userRepository)
 	shouldCacheData(context.Background())
-	http.NewAuthHandler(accountService, router)
+	NewAuthHandler(as, router)
 	protectedRouter := router.Use(middleware.Auth())
-	http.NewRoleHandler(accountService, protectedRouter)
-	http.NewUserHandler(accountService, protectedRouter)
+	NewRoleHandler(as, protectedRouter)
+	NewUserHandler(as, protectedRouter)
 }
 
 func shouldCacheData(ctx context.Context) {
