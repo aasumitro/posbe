@@ -5,7 +5,7 @@ export function FloorPanel() {
   return (
     <div
       className={cn(
-        "absolute top-14 right-3.5 select-none px-4 py-2 flex items-center justify-between",
+        "absolute top-14 right-3 select-none px-4 py-2 flex items-center justify-between w-28",
         "rounded-lg text-muted-foreground bg-gray-100 font-mono text-[10px] cursor-not-allowed gap-2",
       )}
       onClick={(e) => {

@@ -2,8 +2,9 @@
 
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
-import type { DraggableTableItem } from "@/components/table"
+import type {DraggableTableItem} from "@/components/table"
 import { Table } from "@/components/table";
+import {TableMenu} from "@/features/stores/components/floor/table-menu";
 
 interface DraggableTableProps {
   item: DraggableTableItem
@@ -80,6 +81,9 @@ export function DraggableTable({
         status={item.status}
         customers={item.customers}
         config={item.config}
+        menu={
+          <TableMenu shape={item.config.shape} />
+        }
       />
     </div>
   )
