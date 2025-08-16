@@ -70,85 +70,89 @@ func init() {
 
 func logger() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var zll zerolog.Level
 		start := time.Now()
-		path := ctx.Request.URL.Path
-		raw := ctx.Request.URL.RawQuery
 		ctx.Next()
-		if raw != "" {
-			path = path + "?" + raw
+
+		path := ctx.Request.URL.Path
+		if raw := ctx.Request.URL.RawQuery; raw != "" {
+			path += "?" + raw
 		}
 		statusCode := ctx.Writer.Status()
-		switch {
-		case statusCode >= http.StatusInternalServerError:
-			zll = zerolog.ErrorLevel
-		case statusCode >= http.StatusBadRequest:
-			zll = zerolog.WarnLevel
-		default:
-			zll = zerolog.InfoLevel
+		logLevel := determineLogLevel(statusCode)
+		userID := 0
+		if val, exists := ctx.Get("user_id"); exists {
+			if f64, ok := val.(float64); ok {
+				userID = int(f64)
+			}
 		}
-		mtd := ctx.Request.Method
-		rid := requestid.Get(ctx)
+		roleName := "-"
+		if val, exists := ctx.Get("role_name"); exists {
+			if rn, ok := val.(string); ok {
+				roleName = rn
+			}
+		}
+		method := ctx.Request.Method
+		requestID := requestid.Get(ctx)
+		userAgent := ctx.Request.UserAgent()
+		clientIP := ctx.ClientIP()
+		protocol := ctx.Request.Proto
+		bodySize := ctx.Writer.Size()
+		latency := time.Since(start).String()
+		errorMsg := ctx.Errors.ByType(gin.ErrorTypePrivate).String()
+		logMsg := fmt.Sprintf("HTTPAccessLog | %7s | %3d | %s | rid: %s, uid: %d ",
+			method, statusCode, path, requestID, userID)
 
 		// print log
-		go global.Logger.WithLevel(zll).
-			Str("client_ip", ctx.ClientIP()).
-			Str("request_id", rid).
-			Str("protocol", ctx.Request.Proto).
-			Str("agent", ctx.Request.UserAgent()).
-			Str("method", mtd).
+		go global.Logger.WithLevel(logLevel).
+			Str("client_ip", clientIP).
+			Str("request_id", requestID).
+			Str("protocol", protocol).
+			Str("agent", userAgent).
+			Str("method", method).
 			Int("status_code", statusCode).
-			Int("body_size", ctx.Writer.Size()).
+			Int("body_size", bodySize).
 			Str("path", path).
-			Str("latency", time.Since(start).String()).
-			Str("error", ctx.Errors.ByType(gin.ErrorTypePrivate).String()).
-			Msg(fmt.Sprintf("HTTPAccessLog | %7s | %3d | %s | rid: %s, uid: %s ",
-				mtd, statusCode, path, rid, func() string {
-					uid, ok := ctx.Get("user_id")
-					if !ok {
-						return "-"
-					}
-					return fmt.Sprintf("%0d", int(uid.(float64)))
-				}()),
-			)
+			Str("latency", latency).
+			Str("error", errorMsg).
+			Msg(logMsg)
 
 		// store log
 		go func() {
-			uid, ok := ctx.Get("user_id")
-			if !ok {
-				log.Println("failed to get user_id")
+			if userID == 0 || roleName == "-" {
 				ctx.Next()
 				return
 			}
-			rn, ok := ctx.Get("role_name")
-			if !ok {
-				log.Println("failed to get role name")
-				ctx.Next()
-				return
-			}
-			if _, err := PostgresPool.ExecContext(ctx,
-				"INSERT INTO activity_logs (user_id, role, description, created_at) values ($1, $2, $3, $4)",
-				int(uid.(float64)), rn.(string), fmt.Sprintf(
-					"HTTPAccessLog | %7s | %3d | %s | rid: %s, uid: %d ",
-					mtd, statusCode, path, rid, int(uid.(float64)),
-				), time.Now().Unix(),
-			); err != nil {
+
+			stmt := "INSERT INTO activity_logs (user_id, role, description, created_at) values ($1, $2, $3, EXTRACT(EPOCH FROM NOW())::BIGINT)"
+			if _, err := PgxPool.Exec(ctx, stmt, userID, roleName, logMsg); err != nil {
 				log.Println("failed to store activity log", err.Error())
 				ctx.Next()
 				return
 			}
+
 			ctx.Next()
 		}()
 	}
 }
 
+func determineLogLevel(status int) zerolog.Level {
+	switch {
+	case status >= http.StatusInternalServerError:
+		return zerolog.ErrorLevel
+	case status >= http.StatusBadRequest:
+		return zerolog.WarnLevel
+	default:
+		return zerolog.InfoLevel
+	}
+}
+
 func cors() gin.HandlerFunc {
 	return gincors.New(gincors.Config{
+		MaxAge:           corsMaxAge,
 		AllowOrigins:     corsAllowedOrigins,
 		AllowMethods:     corsAllowedMethods,
 		AllowHeaders:     corsAllowedHeaders,
 		AllowCredentials: true,
-		MaxAge:           corsMaxAge,
 	})
 }
 
@@ -160,8 +164,7 @@ func limiter(
 	if err != nil {
 		log.Fatalf("RATELIMITER_ERROR: %s\n", err.Error())
 	}
-	store, err := lsredis.NewStoreWithOptions(RedisPool,
-		lm.StoreOptions{Prefix: serverName})
+	store, err := lsredis.NewStoreWithOptions(RdpPool, lm.StoreOptions{Prefix: serverName})
 	if err != nil {
 		log.Fatalf("RATELIMITER_ERROR: %s\n", err.Error())
 	}
@@ -170,8 +173,7 @@ func limiter(
 
 func ServerEngine() Option {
 	return func(cfg *Config) {
-		engineOnce.Do(func() {
-			log.Printf("Init router engine [GIN Framework %s]\n", gin.Version)
+		engineSingleton.Do(func() {
 			gin.SetMode(gin.ReleaseMode)
 			if cfg.AppDebug {
 				gin.SetMode(gin.DebugMode)
@@ -198,6 +200,7 @@ func ServerEngine() Option {
 				engine.Use(limiter(cfg.APILimiter, serverInitial))
 			}
 			GinEngine = engine
+			log.Println("Gin engine ready!")
 		})
 	}
 }

@@ -1,60 +1,80 @@
 package utils
 
 import (
-	"crypto/rand"
+	cryptoRand "crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"strings"
 
-	"github.com/aasumitro/posbe/internal/common"
 	"golang.org/x/crypto/scrypt"
 )
 
-type IPassword interface {
-	HashPassword() (string, error)
-	ComparePasswords() (bool, error)
-}
+const (
+	// CPU/memory cost parameter
+	cost = 32768
+	// The block mixing parameter.
+	// This controls the amount of memory used by
+	// the algorithm and the degree of parallelism.
+	mixing = 8
+	// The Parallelization parameter.
+	// This controls the number of independent memory blocks
+	// that are processed in parallel.
+	Parallelization = 1
+	keyLen          = 32
+	maxSplit        = 2
+	byteSize        = 32
+)
 
-type Password struct {
-	Stored   string
-	Supplied string
-}
+var (
+	ErrorPasswordHashNotValid   = fmt.Errorf("password hash not valid")
+	ErrorPasswordUnableToVerify = fmt.Errorf("unable to verify password")
+)
 
-const cost, r, p, k = 32768, 8, 1, 32
-const maxSplit = 2
-const byteSize = 32
+func MakePassword(par int, supplied string) (string, error) {
+	var scryptHash []byte
+	var err error
 
-func (pwd *Password) HashPassword() (string, error) {
 	salt := make([]byte, byteSize)
-	if _, err := rand.Read(salt); err != nil {
+	if _, err = cryptoRand.Read(salt); err != nil {
 		return "", err
 	}
 
-	shash, err := scrypt.Key([]byte(pwd.Supplied), salt, cost, r, p, k)
-	if err != nil {
+	if scryptHash, err = scrypt.Key(
+		[]byte(supplied),
+		salt, cost, mixing,
+		par, keyLen,
+	); err != nil {
 		return "", err
 	}
 
-	hashedPW := fmt.Sprintf("%s.%s", hex.EncodeToString(shash), hex.EncodeToString(salt))
-
-	return hashedPW, nil
+	return fmt.Sprintf(
+		"%s.%s",
+		hex.EncodeToString(scryptHash),
+		hex.EncodeToString(salt),
+	), nil
 }
 
-func (pwd *Password) ComparePasswords() (bool, error) {
-	pwsalt := strings.Split(pwd.Stored, ".")
-	if len(pwsalt) < maxSplit {
-		return false, common.ErrorPasswordNotProvideValidHash
+func ComparePassword(par int, stored, supplied string) (bool, error) {
+	var scryptHash []byte
+	var salt []byte
+	var err error
+
+	pwdSalt := strings.Split(stored, ".")
+	if len(pwdSalt) < maxSplit {
+		return false, ErrorPasswordHashNotValid
 	}
 
-	salt, err := hex.DecodeString(pwsalt[1])
-	if err != nil {
-		return false, common.ErrorPasswordUnableToVerify
+	if salt, err = hex.DecodeString(pwdSalt[1]); err != nil {
+		return false, ErrorPasswordUnableToVerify
 	}
 
-	shash, err := scrypt.Key([]byte(pwd.Supplied), salt, cost, r, p, k)
-	if err != nil {
-		return false, common.ErrorPasswordUnableToVerify
+	if scryptHash, err = scrypt.Key(
+		[]byte(supplied),
+		salt, cost, mixing,
+		par, keyLen,
+	); err != nil {
+		return false, ErrorPasswordUnableToVerify
 	}
 
-	return hex.EncodeToString(shash) == pwsalt[0], nil
+	return hex.EncodeToString(scryptHash) == pwdSalt[0], nil
 }

@@ -12,16 +12,10 @@ import (
 
 	"github.com/aasumitro/posbe/config"
 	"github.com/aasumitro/posbe/internal/account"
-	"github.com/aasumitro/posbe/internal/catalog"
-	"github.com/aasumitro/posbe/internal/common"
-	"github.com/aasumitro/posbe/internal/store"
-	"github.com/aasumitro/posbe/internal/transaction"
+	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	healthcheck "github.com/tavsec/gin-healthcheck"
-	"github.com/tavsec/gin-healthcheck/checks"
-	healthcheckconfig "github.com/tavsec/gin-healthcheck/config"
 )
 
 func RunServer(ctx context.Context) {
@@ -39,7 +33,7 @@ func RunServer(ctx context.Context) {
 	server := &http.Server{
 		Addr:              config.Instance.AppPort,
 		Handler:           routerEngine,
-		ReadHeaderTimeout: time.Second * common.ServerReadTimeout,
+		ReadHeaderTimeout: time.Second * utils.ServerReadTimeout,
 	}
 	// Initializing the server in a goroutine so that
 	// it won't block the graceful shutdown handling below
@@ -66,11 +60,9 @@ func RunServer(ctx context.Context) {
 		log.Printf("Server forced to shutdown: %s\n", err)
 	}
 	// Close database connections
-	if err := config.PostgresPool.Close(); err != nil {
-		log.Printf("Error disconnect mongodb connection: %v\n", err)
-	}
+	config.PgxPool.Close()
 	// Close redis connections
-	if err := config.RedisPool.Close(); err != nil {
+	if err := config.RdpPool.Close(); err != nil {
 		log.Printf("Error shutting down redis connection: %v\n", err)
 	}
 	// notify user of shutdown
@@ -93,7 +85,7 @@ func registerPublicRoutes(sgCtx context.Context, engine *gin.Engine) {
 		}
 	})
 	// main route handler
-	router.GET(common.EmptyPath, func(ctx *gin.Context) {
+	router.GET(utils.EmptyPath, func(ctx *gin.Context) {
 		ctx.String(http.StatusOK,
 			"hello world")
 		return
@@ -104,23 +96,13 @@ func registerPublicRoutes(sgCtx context.Context, engine *gin.Engine) {
 	router.GET("/api-specs/*any",
 		ginSwagger.WrapHandler(swaggerFiles.Handler,
 			ginSwagger.DefaultModelsExpandDepth(
-				common.SwaggerDefaultModelsExpandDepth)))
-	// health check routes
-	redisCheck := checks.NewRedisCheck(config.RedisPool)
-	healthConfig := healthcheckconfig.DefaultConfig()
-	healthConfig.HealthPath = "/health"
-	_ = healthcheck.New(router, healthConfig, []checks.Check{
-		redisCheck, checks.NewContextCheck(sgCtx, "signals"),
-		checks.NewPingCheck("https://www.google.com",
-			"GET", common.HealthCheckPingTimeout, nil, nil),
-		checks.SqlCheck{Sql: config.PostgresPool},
-	})
+				utils.SwaggerDefaultModelsExpandDepth)))
 }
 
 func registerAPIModuleV1(engine *gin.Engine) {
 	routerGroup := engine.Group("api/v1")
 	account.NewAccountModuleProvider(routerGroup)
-	store.NewStoreModuleProvider(routerGroup)
-	catalog.NewCatalogModuleProvider(routerGroup)
-	transaction.NewTransactionModuleProvider(routerGroup)
+	// store.NewStoreModuleProvider(routerGroup)
+	// catalog.NewCatalogModuleProvider(routerGroup)
+	// transaction.NewTransactionModuleProvider(routerGroup)
 }

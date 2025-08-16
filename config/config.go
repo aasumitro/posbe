@@ -2,24 +2,23 @@ package config
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"log"
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 )
 
 var (
-	configSingleton, postgresSingleton,
-	redisSingleton, engineOnce sync.Once
+	configSingleton sync.Once
 
-	Instance     *Config
-	PostgresPool *sql.DB
-	RedisPool    *redis.Client
-	GinEngine    *gin.Engine
+	Instance  *Config
+	PgxPool   *pgxpool.Pool
+	RdpPool   *redis.Client
+	GinEngine *gin.Engine
 )
 
 type Config struct {
@@ -36,7 +35,6 @@ type Config struct {
 	SentryDsnURL   string `mapstructure:"SENTRY_DSN_URL"`
 
 	JWTSecretKey string `mapstructure:"JWT_SECRET_KEY"`
-	JWTLifetime  int    `mapstructure:"JWT_LIFETIME"`
 }
 
 type Option func(cfg *Config)

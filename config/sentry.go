@@ -13,14 +13,12 @@ func SentryConnection() Option {
 			log.Println("Sentry is disabled in localhost . . . .")
 			return
 		}
-		log.Println("Trying to initialize crash reporting handler . . . .")
-		crashReportingCollectorName := "sentry"
-		sampleRatio := 0.25
+
 		if err := sentry.Init(sentry.ClientOptions{
 			Dsn:              cfg.SentryDsnURL,
 			EnableTracing:    true,
 			TracesSampleRate: 1.0,
-			SampleRate:       sampleRatio,
+			SampleRate:       0.25,
 			Environment: func() string {
 				if cfg.AppDebug {
 					return "development"
@@ -33,7 +31,7 @@ func SentryConnection() Option {
 		}); err != nil {
 			log.Fatalf("Sentry initialization failed: %v\n", err)
 		}
-		log.Printf("Crash reporting set to %s . . . .",
-			crashReportingCollectorName)
+
+		log.Println("Sentry connection ready!")
 	}
 }

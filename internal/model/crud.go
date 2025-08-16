@@ -7,11 +7,9 @@ type FindWith int64
 const (
 	FindWithID FindWith = iota
 	FindWithRelationID
-	FindWithName
 
 	FindWithUsername
 	FindWithEmail
-	FindWithPhone
 
 	FindWithSKU
 	FindWithCategoryID

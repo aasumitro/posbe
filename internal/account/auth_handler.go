@@ -4,17 +4,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/aasumitro/posbe/config"
-
-	"github.com/aasumitro/posbe/internal/middleware"
-	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type authHandler struct {
-	svc model.IAccountService
-	jwt utils.IJSONWebToken
+	svc IAccountService
 }
 
 // login godoc
@@ -32,34 +27,36 @@ type authHandler struct {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL_SERVER_ERROR_RESPOND"
 // @Router /api/v1/login [POST]
 func (handler authHandler) login(ctx *gin.Context) {
-	var form model.LoginForm
+	var form LoginForm
+
+	// bind user input
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
-	data, err := handler.svc.VerifyUserCredentials(
-		ctx, form.Username, form.Password)
+
+	// validate user input in advance
+	if val := form.Validate(ctx); val != nil {
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
+		return
+	}
+	
+	// verify user credentials
+	user, token, err := handler.svc.AuthenticateUser(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
-	token, claimErr := handler.jwt.ClaimJWTToken(data)
-	if claimErr != nil {
-		utils.NewHTTPRespond(ctx, http.StatusBadRequest, claimErr.Error())
-		return
-	}
+
+	// set cookie
 	http.SetCookie(ctx.Writer, &http.Cookie{
-		Name:   "jwt",
-		Value:  token,
-		MaxAge: 0,
-		Path:   "/",
-		// Secure:   true,
-		HttpOnly: true,
+		Name: "authn", Value: token, MaxAge: 0,
+		Path: "/", HttpOnly: true, // Secure:   true,
 	})
-	utils.NewHTTPRespond(ctx, http.StatusCreated, map[string]interface{}{
-		"user":  data,
-		"token": token,
-	})
+
+	// return data to users
+	utils.NewHTTPRespond(ctx, http.StatusCreated,
+		map[string]interface{}{"user": user, "token": token})
 }
 
 // logout godoc
@@ -73,23 +70,16 @@ func (handler authHandler) login(ctx *gin.Context) {
 // @Router /api/v1/logout [POST]
 func (handler authHandler) logout(ctx *gin.Context) {
 	http.SetCookie(ctx.Writer, &http.Cookie{
-		Name:    "jwt",
-		Value:   "",
-		MaxAge:  0,
-		Path:    "/",
+		Name: "authn", Value: "", MaxAge: 0, Path: "/", // Secure: true,
 		Expires: time.Now().Add(-time.Hour),
 	})
-	utils.NewHTTPRespond(ctx, http.StatusOK, "LOGGED_OUT")
+
+	utils.NewHTTPRespond(ctx, http.StatusUnauthorized, "LOGGED_OUT")
 }
 
-func NewAuthHandler(accountService model.IAccountService, router *gin.RouterGroup) {
-	handler := authHandler{svc: accountService, jwt: &utils.JSONWebToken{
-		Issuer:    config.Instance.AppName,
-		SecretKey: []byte(config.Instance.JWTSecretKey),
-		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(time.Duration(config.Instance.JWTLifetime) * time.Hour),
-	}}
+func NewAuthHandler(accountService IAccountService, router *gin.RouterGroup) {
+	handler := authHandler{svc: accountService}
 	router.POST("/login", handler.login)
-	protectedRouter := router.Use(middleware.Auth())
-	protectedRouter.POST("/logout", handler.logout)
+	authn := router.Use(utils.AuthN())
+	authn.POST("/logout", handler.logout)
 }

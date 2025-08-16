@@ -8,11 +8,11 @@ import (
 	"strconv"
 
 	"github.com/aasumitro/posbe/config"
-	"github.com/aasumitro/posbe/internal/middleware"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/store/handler/http"
 	repository "github.com/aasumitro/posbe/internal/store/repository/sql"
 	"github.com/aasumitro/posbe/internal/store/service"
+	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
@@ -35,9 +35,7 @@ func NewStoreModuleProvider(router *gin.RouterGroup) {
 	storePrefService := service.NewPreferenceService(storePrefRepo)
 	storeShiftService := service.NewStoreShiftService(storeShiftRepo)
 	shouldCacheData(context.Background())
-	protectedRouter := router.
-		Use(middleware.Auth()).
-		Use(middleware.AcceptedRoles([]string{"*"}))
+	protectedRouter := router.Use(utils.AuthN()).Use(utils.AuthZ([]string{"*"}))
 	http.NewFloorHandler(storeService, protectedRouter)
 	http.NewTableHandler(storeService, protectedRouter)
 	http.NewRoomHandler(storeService, protectedRouter)

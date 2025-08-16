@@ -3,194 +3,234 @@ package account
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"net/http"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/aasumitro/posbe/config"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type accountService struct {
-	roleRepo model.ICRUDRepository[model.Role]
-	userRepo model.ICRUDRepository[model.User]
-	pwd      utils.IPassword
+	repository IAccountRepository
 }
 
-var roleCacheKey = "roles"
-
-func (service accountService) RoleList(
+func (service accountService) Roles(
 	ctx context.Context,
-) (
-	roles []*model.Role,
-	errorData *utils.ServiceError,
-) {
-	helper := utils.RedisCache{Ctx: ctx, RdpConn: config.RedisPool}
-	data, err := helper.CacheFirstData(&utils.CacheDataSupplied{
-		Key: roleCacheKey,
-		TTL: time.Hour * 1,
-		CbF: func() (data any, err error) {
-			return service.roleRepo.All(ctx)
+) ([]*model.Role, *utils.ServiceError) {
+	data, err := utils.CacheFirstData(ctx, config.RdpPool,
+		&utils.CacheDataSupplied[[]*model.Role]{
+			Key: model.RolesCacheKey, TTL: time.Hour * 1,
+			CbF: func() ([]*model.Role, error) {
+				return service.repository.GetAllRoles(ctx)
+			},
 		},
-	})
-	if data, ok := data.([]*model.Role); ok {
-		roles = data
-	}
-	if data, ok := data.(string); ok {
-		var r []*model.Role
-		_ = json.Unmarshal([]byte(data), &r)
-		roles = r
-	}
-	return utils.ValidateDataRows[model.Role](roles, err)
+	)
+
+	return utils.ValidateDataRows[model.Role]("roles", data, err)
 }
 
-func (service accountService) UserList(
+func (service accountService) Users(
 	ctx context.Context,
-) (
-	users []*model.User,
-	errorData *utils.ServiceError,
-) {
-	data, err := service.userRepo.All(ctx)
-	return utils.ValidateDataRows[model.User](data, err)
+) ([]*model.User, *utils.ServiceError) {
+	data, err := utils.CacheFirstData(ctx, config.RdpPool,
+		&utils.CacheDataSupplied[[]*model.User]{
+			Key: model.UsersCacheKey, TTL: time.Minute * 30,
+			CbF: func() ([]*model.User, error) {
+				return service.repository.GetAllUsers(ctx)
+			},
+		},
+	)
+
+	return utils.ValidateDataRows[model.User]("users", data, err)
 }
 
-func (service accountService) ShowUser(
-	ctx context.Context,
-	id int,
-) (
-	user *model.User,
-	errorData *utils.ServiceError,
-) {
-	data, err := service.userRepo.Find(ctx, model.FindWithID, id)
-	return utils.ValidateDataRow[model.User](data, err)
+func (service accountService) UserByID(
+	ctx context.Context, id int,
+) (*model.User, *utils.ServiceError) {
+	data, err := service.repository.FindUserBy(ctx, model.FindWithID, id)
+
+	return utils.ValidateDataRow[model.User]("user", data, err)
 }
 
-func (service accountService) AddUser(
-	ctx context.Context,
-	data *model.User,
-) (
-	user *model.User,
-	errorData *utils.ServiceError,
-) {
-	password := data.Password
-	if password != "" {
-		u := utils.Password{Stored: "", Supplied: password}
-		pwd, err := u.HashPassword()
-		if service.pwd != nil {
-			pwd, err = service.pwd.HashPassword()
+func (service accountService) CreateUser(
+	ctx context.Context, data *model.User,
+) (*model.User, *utils.ServiceError) {
+	if strings.TrimSpace(data.Password) == "" {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "Password is required",
 		}
-		if err != nil {
-			return nil, &utils.ServiceError{
-				Code:    http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-		}
-		data.Password = pwd
 	}
-	data, err := service.userRepo.Create(ctx, data)
-	return utils.ValidateDataRow[model.User](data, err)
+
+	pwd, err := utils.MakePassword(runtime.NumCPU(), data.Password)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	data.Password = pwd
+
+	user, err := service.repository.InsertUser(ctx, *data)
+	if err == nil {
+		config.RdpPool.Del(ctx, model.UsersCacheKey)
+	}
+
+	return utils.ValidateDataRow[model.User]("user", user, err)
 }
 
-func (service accountService) EditUser(
-	ctx context.Context,
-	data *model.User,
-) (
-	user *model.User,
-	errorData *utils.ServiceError,
-) {
-	data, err := service.userRepo.Update(ctx, data)
-	return utils.ValidateDataRow[model.User](data, err)
+func (service accountService) UpdateUser(
+	ctx context.Context, data *model.User,
+) (user *model.User, errorData *utils.ServiceError) {
+	data, err := service.repository.UpdateUserByID(ctx, *data)
+
+	if err == nil {
+		config.RdpPool.Del(ctx, model.UsersCacheKey)
+	}
+
+	return utils.ValidateDataRow[model.User]("user", data, err)
 }
 
-func (service accountService) DeleteUser(
-	ctx context.Context,
-	data *model.User,
+func (service accountService) UpdateUserPassword(
+	ctx context.Context, form *UpdatePasswordForm,
 ) *utils.ServiceError {
-	user, err := service.userRepo.Find(ctx, model.FindWithID, data.ID)
+	// get user data from database
+	user, svcErr := service.getUserKV(ctx, model.FindWithID, form.ID)
+	if svcErr != nil {
+		return svcErr
+	}
+
+	// validate password from input
+	valid, err := utils.ComparePassword(runtime.NumCPU(),
+		user.Password, form.OldPassword)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return &utils.ServiceError{
-				Code:    http.StatusNotFound,
-				Message: err.Error(),
-			}
+		return &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
 		}
+	}
+	if !valid {
+		return &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "invalid password",
+		}
+	}
+
+	// generate new password
+	pwd, err := utils.MakePassword(runtime.NumCPU(), form.NewPassword)
+	if err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-	err = service.userRepo.Delete(ctx, user)
-	if err != nil {
+
+	// call repo for update action
+	data := model.User{ID: form.ID, Password: pwd}
+	if _, err := service.repository.UpdateUserByID(ctx, data); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
+
 	return nil
 }
 
-func (service accountService) VerifyUserCredentials(
-	ctx context.Context,
-	username, password string,
-) (
-	data any,
-	errorData *utils.ServiceError,
-) {
-	user, err := service.userRepo.Find(ctx, model.FindWithUsername, username)
+func (service accountService) RemoveUser(
+	ctx context.Context, data *model.User,
+) *utils.ServiceError {
+	// get user data from database
+	user, svcErr := service.getUserKV(ctx, model.FindWithID, data.ID)
+	if svcErr != nil {
+		return svcErr
+	}
+
+	// call repo for delete action
+	if err := service.repository.DeleteUserByID(ctx, *user); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	// clear cache
+	config.RdpPool.Del(ctx, model.UsersCacheKey)
+
+	return nil
+}
+
+func (service accountService) AuthenticateUser(
+	ctx context.Context, form *LoginForm,
+) (user *model.User, token string, errData *utils.ServiceError) {
+	// get user data from database
+	user, svcErr := service.getUserKV(ctx, model.FindWithUsername, form.Username)
+	if svcErr != nil {
+		return nil, "", svcErr
+	}
+
+	// validate password from input
+	valid, err := utils.ComparePassword(runtime.NumCPU(), user.Password, form.Password)
+	if err != nil {
+		return nil, "", &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
+	}
+	if !valid {
+		return nil, "", &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "invalid password",
+		}
+	}
+
+	// generate tokens
+	secretKey := config.Instance.JWTSecretKey
+	claim := jwt.MapClaims{"id": user.ID, "role_id": user.Role.ID, "role_name": user.Role.Name}
+	accessToken, err := utils.NewJWT(claim, secretKey, utils.AccessTokenDurationSecond)
+	if err != nil {
+		return nil, "", &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
+	return user, accessToken, nil
+}
+
+func (service accountService) getUserKV(
+	ctx context.Context, k model.FindWith, v any,
+) (*model.User, *utils.ServiceError) {
+	user, err := service.repository.FindUserBy(ctx, k, v)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, &utils.ServiceError{
 				Code:    http.StatusNotFound,
-				Message: err.Error(),
+				Message: "user not found",
 			}
 		}
+
 		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
-	u := utils.Password{Stored: user.Password, Supplied: password}
-	ok, err := u.ComparePasswords()
-	if service.pwd != nil {
-		ok, err = service.pwd.ComparePasswords()
-	}
-	if err != nil {
+
+	if user == nil {
 		return nil, &utils.ServiceError{
-			Code:    http.StatusInternalServerError,
-			Message: err.Error(),
+			Code:    http.StatusNotFound,
+			Message: "user not found",
 		}
 	}
-	if !ok {
-		return nil, &utils.ServiceError{
-			Code:    http.StatusUnprocessableEntity,
-			Message: "Password Not Match",
-		}
-	}
-	user.Password = ""
+
 	return user, nil
 }
 
-func NewAccountService(
-	roleRepo model.ICRUDRepository[model.Role],
-	userRepo model.ICRUDRepository[model.User],
-) model.IAccountService {
-	return &accountService{
-		roleRepo: roleRepo,
-		userRepo: userRepo,
-	}
-}
-
-// NewAccountServiceTest for testing purpose
-func NewAccountServiceTest(
-	roleRepo model.ICRUDRepository[model.Role],
-	userRepo model.ICRUDRepository[model.User],
-	pwd utils.IPassword,
-) model.IAccountService {
-	return &accountService{
-		roleRepo: roleRepo,
-		userRepo: userRepo,
-		pwd:      pwd,
-	}
+func NewAccountService(repository IAccountRepository) IAccountService {
+	return &accountService{repository: repository}
 }

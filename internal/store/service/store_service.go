@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/aasumitro/posbe/internal/common"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 )
@@ -62,7 +61,7 @@ func (service storeService) DeleteFloor(
 	if floor.TotalTables >= 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusForbidden,
-			Message: common.ErrorUnableToDelete,
+			Message: "unable to delete this data",
 		}
 	}
 	if err := service.floorRepo.Delete(ctx, floor); err != nil {

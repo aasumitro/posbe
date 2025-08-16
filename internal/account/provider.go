@@ -6,41 +6,58 @@ import (
 	"errors"
 
 	"github.com/aasumitro/posbe/config"
-	repository "github.com/aasumitro/posbe/internal/account/repository/sql"
-	"github.com/aasumitro/posbe/internal/middleware"
 	"github.com/aasumitro/posbe/internal/model"
+	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
 
-var (
-	userRepository model.ICRUDRepository[model.User]
-	roleRepository model.ICRUDRepository[model.Role]
-)
-
-func NewAccountModuleProvider(router *gin.RouterGroup) {
-	userRepository = repository.NewUserSQLRepository()
-	roleRepository = repository.NewRoleSQLRepository()
-	as := NewAccountService(
-		roleRepository, userRepository)
-	shouldCacheData(context.Background())
-	NewAuthHandler(as, router)
-	protectedRouter := router.Use(middleware.Auth())
-	NewRoleHandler(as, protectedRouter)
-	NewUserHandler(as, protectedRouter)
+type IAccountRepository interface {
+	GetAllRoles(ctx context.Context) ([]*model.Role, error)
+	GetAllUsers(ctx context.Context) ([]*model.User, error)
+	FindUserBy(ctx context.Context, key model.FindWith, val any) (*model.User, error)
+	InsertUser(ctx context.Context, user model.User) (*model.User, error)
+	UpdateUserByID(ctx context.Context, user model.User) (*model.User, error)
+	DeleteUserByID(ctx context.Context, user model.User) error
 }
 
-func shouldCacheData(ctx context.Context) {
-	// run this at first booting
-	if err := config.RedisPool.
-		Get(ctx, "roles").
-		Err(); errors.Is(err, redis.Nil) && err != nil {
-		if roles, err := roleRepository.All(ctx); err == nil {
-			// encode given data
-			jsonData, _ := json.Marshal(roles)
-			// store data to redis
-			config.RedisPool.Set(ctx,
-				"roles", jsonData, 0)
-		}
+type IAccountService interface {
+	Roles(ctx context.Context) ([]*model.Role, *utils.ServiceError)
+	Users(ctx context.Context) ([]*model.User, *utils.ServiceError)
+	UserByID(ctx context.Context, id int) (*model.User, *utils.ServiceError)
+	CreateUser(ctx context.Context, data *model.User) (*model.User, *utils.ServiceError)
+	UpdateUser(ctx context.Context, data *model.User) (*model.User, *utils.ServiceError)
+	UpdateUserPassword(ctx context.Context, data *UpdatePasswordForm) *utils.ServiceError
+	RemoveUser(ctx context.Context, data *model.User) *utils.ServiceError
+	AuthenticateUser(ctx context.Context, form *LoginForm) (*model.User, string, *utils.ServiceError)
+}
+
+func NewAccountModuleProvider(router *gin.RouterGroup) {
+	repository := NewAccountRepository(config.PgxPool)
+	as := NewAccountService(repository)
+	shouldCacheData(context.Background(), repository)
+	NewAuthHandler(as, router)
+	authn := router.Use(utils.AuthN())
+	NewRoleHandler(as, authn)
+	NewUserHandler(as, authn)
+}
+
+func shouldCacheData(ctx context.Context, repository IAccountRepository) {
+	// at first booting validate roles
+	err := config.RdpPool.Get(ctx, model.RolesCacheKey).Err()
+	if errors.Is(err, redis.Nil) && err != nil {
+		return
 	}
+	// if roles dint found then get data from database
+	roles, err := repository.GetAllRoles(ctx)
+	if err != nil {
+		return
+	}
+	// encode data from storage
+	jsonData, err := json.Marshal(roles)
+	if err != nil {
+		return
+	}
+	// store data to redis
+	config.RdpPool.Set(ctx, model.RolesCacheKey, jsonData, 0)
 }

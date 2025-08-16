@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"testing"
 
-	svcErr "github.com/aasumitro/posbe/internal/common"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/store/service"
 	"github.com/aasumitro/posbe/internal/utils"
@@ -223,7 +222,7 @@ func (suite *storeTestSuite) TestStoreService_DeleteFloor_ShouldErrorHasTables()
 	require.NotNil(suite.T(), err)
 	require.Equal(suite.T(), err, &utils.ServiceError{
 		Code:    http.StatusForbidden,
-		Message: svcErr.ErrorUnableToDelete,
+		Message: "unable to delete this data",
 	})
 	floorRepoMock.AssertExpectations(suite.T())
 }

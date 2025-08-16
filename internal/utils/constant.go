@@ -1,4 +1,4 @@
-package common
+package utils
 
 const (
 	EmptyPath = ""
@@ -10,4 +10,6 @@ const (
 	HealthCheckPingTimeout = 1000
 
 	SwaggerDefaultModelsExpandDepth = 4
+
+	AccessTokenDurationSecond = 3600
 )

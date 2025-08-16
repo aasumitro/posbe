@@ -8,7 +8,6 @@ import {Switch} from "@/components/ui/switch";
 
 const formSchema = z.object({
   feature_floor: z.boolean().default(false).optional(),
-  feature_room: z.boolean().default(false).optional(),
   feature_table: z.boolean().default(false).optional(),
 })
 
@@ -17,7 +16,6 @@ export function FeatureSection() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       feature_floor: false,
-      feature_room: false,
       feature_table: false,
     },
   })
@@ -45,29 +43,6 @@ export function FeatureSection() {
                       </FormLabel>
                       <FormDescription>
                         Enable floor plans to organize tables and rooms by level.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="feature_room"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Room
-                      </FormLabel>
-                      <FormDescription>
-                        Enable room-level grouping for more granular space planning.
                       </FormDescription>
                     </div>
                     <FormControl>

@@ -17,8 +17,8 @@ deps:
 build-binary: api-specs
 	@ echo "Build Binary"
 	@ mkdir ./build
-	@ cp .example.env ./build/.env
-	@ go mod tidy -compat=1.22
+	@ cp ./misc/conf/.example.env ./build/.env
+	@ go mod tidy -compat=1.24
 	@ go build -o ./build/posbe ./cmd/api/main.go
 	@ GOOS=windows GOARCH=amd64 go build -o ./build/posbe.exe ./cmd/api/main.go
 	@ echo "generate binary done"
@@ -54,21 +54,27 @@ run-lint: $(GOLANGCI)
 .Phony: run-api
 run-api:
 	@echo "Run App"
-	go mod tidy -compat=1.22
+	go mod tidy -compat=1.24
 	go run ./cmd/api/main.go
 
 .Phony: run-watch-api
 run-watch-api:
-	go mod tidy -compat=1.22
+	go mod tidy -compat=1.24
 	air
 
 .Phony: run-app
 run-app:
 	@echo "Run App"
 	cd ./web && npm run build && cd ..
-	go mod tidy -compat=1.22
+	go mod tidy -compat=1.24
 	go run ./cmd/api/main.go
 
 build-fe:
 	@ echo "Build Frontend"
 	@ cd web && npm install && npm run build
+
+migrate-up:
+	@  migrate -database "postgresql://postgres:@127.0.0.1:5432/posbe?sslmode=disable" -path db/migrations up
+
+migrate-down:
+	@  migrate -database "postgresql://postgres:@127.0.0.1:5432/posbe?sslmode=disable" -path db/migrations down

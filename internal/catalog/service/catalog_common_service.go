@@ -6,7 +6,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/aasumitro/posbe/internal/common"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 )
@@ -70,7 +69,7 @@ func (service *catalogCommonService) DeleteUnit(
 	if data.Usage >= 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusForbidden,
-			Message: common.ErrorUnableToDelete,
+			Message: "unable to delete this data",
 		}
 	}
 	if err := service.unitRepo.Delete(ctx, data); err != nil {
@@ -134,7 +133,7 @@ func (service *catalogCommonService) DeleteCategory(
 	if data.Usage >= 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusForbidden,
-			Message: common.ErrorUnableToDelete,
+			Message: "unable to delete this data",
 		}
 	}
 	if err := service.categoryRepo.Delete(ctx, data); err != nil {
@@ -190,7 +189,7 @@ func (service *catalogCommonService) DeleteSubcategory(
 	if data.Usage >= 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusForbidden,
-			Message: common.ErrorUnableToDelete,
+			Message: "unable to delete this data",
 		}
 	}
 	if err := service.subcategoryRepo.Delete(ctx, data); err != nil {

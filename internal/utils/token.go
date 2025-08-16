@@ -1,38 +1,33 @@
 package utils
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type IJSONWebToken interface {
-	ClaimJWTToken(payload interface{}) (string, error)
-}
-
-type JWTClaim struct {
-	jwt.RegisteredClaims
-	Payload interface{} `json:"payload"`
-}
-
-type JSONWebToken struct {
-	Issuer    string
-	SecretKey []byte
-	IssuedAt  time.Time
-	ExpiredAt time.Time
-}
-
-// ClaimJWTToken
-// args app name, expiration time, secret key, payload
-func (j *JSONWebToken) ClaimJWTToken(payload interface{}) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, JWTClaim{
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    j.Issuer,
-			IssuedAt:  &jwt.NumericDate{Time: j.IssuedAt},
-			ExpiresAt: &jwt.NumericDate{Time: j.ExpiredAt},
-		},
-		Payload: payload,
+// ParseJWT verifies and parses JWT and returns its claims.
+func ParseJWT(token, verificationKey string) (jwt.MapClaims, error) {
+	parser := jwt.NewParser(jwt.WithValidMethods([]string{"HS256"}))
+	parsedToken, err := parser.Parse(token, func(_ *jwt.Token) (any, error) {
+		return []byte(verificationKey), nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := parsedToken.Claims.(jwt.MapClaims); ok && parsedToken.Valid {
+		return claims, nil
+	}
+	return nil, errors.New("unable to parse token")
+}
 
-	return token.SignedString(j.SecretKey)
+// NewJWT generates and returns new HS256 signed JWT.
+func NewJWT(payload jwt.MapClaims, signingKey string, secondsDuration int64) (string, error) {
+	seconds := time.Duration(secondsDuration) * time.Second
+	claims := jwt.MapClaims{"exp": time.Now().Add(seconds).Unix()}
+	for k, v := range payload {
+		claims[k] = v
+	}
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(signingKey))
 }
