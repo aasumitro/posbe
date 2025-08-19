@@ -44,7 +44,11 @@ import (
 //	     })
 func UploadAsset(name, folder string, fileHeader *multipart.FileHeader) (string, error) {
 	// Clean and build full path relative to project root's ./uploads
-	basePath, err := filepath.Abs(filepath.Join(".", "uploads"))
+	root, err := ProjectRootDir()
+	if err != nil {
+		return "", fmt.Errorf("cannot resolve project root: %w", err)
+	}
+	basePath := filepath.Join(root, "uploads")
 	relativePath := filepath.Clean(folder)
 	uploadPath := filepath.Join(basePath, relativePath)
 
@@ -102,7 +106,11 @@ func UploadAsset(name, folder string, fileHeader *multipart.FileHeader) (string,
 //		    ctx.JSON(http.StatusOK, gin.H{"message": "delete successful"})
 //	    })
 func DeleteAsset(folder, name string) error {
-	basePath := "uploads"
+	root, err := ProjectRootDir()
+	if err != nil {
+		return fmt.Errorf("cannot resolve project root: %w", err)
+	}
+	basePath := filepath.Join(root, "uploads")
 	relativePath := filepath.Clean(folder)
 	filePath := filepath.Join(basePath, relativePath, name)
 
@@ -115,4 +123,21 @@ func DeleteAsset(folder, name string) error {
 	}
 
 	return nil
+}
+
+func ProjectRootDir() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", fmt.Errorf("go.mod not found")
+		}
+		dir = parent
+	}
 }

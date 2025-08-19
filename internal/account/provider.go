@@ -29,7 +29,8 @@ type IAccountService interface {
 	UpdateUser(ctx context.Context, data *model.User) (*model.User, *utils.ServiceError)
 	UpdateUserPassword(ctx context.Context, data *UpdatePasswordForm) *utils.ServiceError
 	RemoveUser(ctx context.Context, data *model.User) *utils.ServiceError
-	AuthenticateUser(ctx context.Context, form *LoginForm) (*model.User, string, *utils.ServiceError)
+	AuthenticateUser(ctx context.Context, form *LoginForm) (*model.User, *utils.ServiceError)
+	RefreshToken(ctx context.Context, token string) (*model.User, *utils.ServiceError)
 }
 
 func NewAccountModuleProvider(router *gin.RouterGroup) {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"testing"
+	"time"
 
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
@@ -15,122 +15,71 @@ import (
 )
 
 func TestRedisCache_CacheFirstData(t *testing.T) {
-	type fields struct {
-		Ctx     context.Context
-		RdpConn *redis.Client
-	}
-	type args struct {
-		i *utils.CacheDataSupplied
-	}
-	testData, _ := json.Marshal(model.Role{ID: 1, Name: "test"})
+	ctx := context.TODO()
+	mr := miniredis.RunT(t)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	// Sample test role
+	testRole := model.Role{ID: 1, Name: "test"}
+
 	tests := []struct {
 		name     string
-		fields   fields
-		args     args
-		wantData any
+		supply   *utils.CacheDataSupplied[model.Role]
+		prepare  func()
+		wantData model.Role
 		wantErr  assert.ErrorAssertionFunc
 	}{
 		{
-			name: "TEST RETURN NIL",
-			fields: fields{
-				Ctx: context.TODO(),
-				RdpConn: redis.NewClient(&redis.Options{
-					Addr: miniredis.RunT(t).Addr(),
-				}),
-			},
-			args: args{
-				&utils.CacheDataSupplied{
-					Key: "lorem",
-					TTL: 0,
-					CbF: func() (data any, err error) {
-						return nil, err
-					},
+			name: "TEST RETURN OBJECT (from callback)",
+			supply: &utils.CacheDataSupplied[model.Role]{
+				Key: "role1",
+				TTL: time.Minute,
+				CbF: func() (model.Role, error) {
+					return testRole, nil
 				},
 			},
-			wantData: nil,
-			wantErr:  assert.NoError,
-		},
-		{
-			name: "TEST RETURN OBJECT",
-			fields: fields{
-				Ctx: context.TODO(),
-				RdpConn: redis.NewClient(&redis.Options{
-					Addr: miniredis.RunT(t).Addr(),
-				}),
-			},
-			args: args{
-				&utils.CacheDataSupplied{
-					Key: "lorem",
-					TTL: 0,
-					CbF: func() (data any, err error) {
-						return model.Role{ID: 1, Name: "test"}, err
-					},
-				},
-			},
-			wantData: model.Role{ID: 1, Name: "test"},
-			wantErr:  assert.NoError,
-		},
-		{
-			name: "TEST RETURN STRING",
-			fields: fields{
-				Ctx: context.TODO(),
-				RdpConn: redis.NewClient(&redis.Options{
-					Addr: miniredis.RunT(t).Addr(),
-				}),
-			},
-			args: args{
-				&utils.CacheDataSupplied{
-					Key: "lorem",
-					TTL: 0,
-					CbF: func() (data any, err error) {
-						return testData, err
-					},
-				},
-			},
-			wantData: testData,
+			prepare:  func() {},
+			wantData: testRole,
 			wantErr:  assert.NoError,
 		},
 		{
 			name: "TEST RETURN ERROR",
-			fields: fields{
-				Ctx: context.TODO(),
-				RdpConn: redis.NewClient(&redis.Options{
-					Addr: miniredis.RunT(t).Addr(),
-				}),
-			},
-			args: args{
-				&utils.CacheDataSupplied{
-					Key: "lorem",
-					TTL: 0,
-					CbF: func() (data any, err error) {
-						return nil, errors.New("lorem ipsum")
-					},
+			supply: &utils.CacheDataSupplied[model.Role]{
+				Key: "role2",
+				TTL: time.Minute,
+				CbF: func() (model.Role, error) {
+					return model.Role{}, errors.New("lorem ipsum")
 				},
 			},
-			wantData: nil,
+			prepare:  func() {},
+			wantData: model.Role{},
 			wantErr:  assert.Error,
+		},
+		{
+			name: "TEST RETURN OBJECT (from redis)",
+			supply: &utils.CacheDataSupplied[model.Role]{
+				Key: "role3",
+				TTL: time.Minute,
+				CbF: func() (model.Role, error) {
+					return model.Role{}, nil // should not be called
+				},
+			},
+			prepare: func() {
+				// manually store in redis
+				b, _ := json.Marshal(testRole)
+				_ = rdb.Set(ctx, "role3", b, 0).Err()
+			},
+			wantData: testRole,
+			wantErr:  assert.NoError,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cache := &utils.RedisCache{
-				Ctx:     tt.fields.Ctx,
-				RdpConn: tt.fields.RdpConn,
-			}
-
-			if tt.name == "TEST RETURN STRING" {
-				cache.RdpConn.Set(cache.Ctx, "lorem", testData, 0)
-			}
-
-			gotData, err := cache.CacheFirstData(tt.args.i)
-			if !tt.wantErr(t, err, fmt.Sprintf("CacheFirstData(%v)", tt.args.i)) {
+			tt.prepare()
+			got, err := utils.CacheFirstData(ctx, rdb, tt.supply)
+			if !tt.wantErr(t, err) {
 				return
 			}
-			if tt.name != "TEST RETURN STRING" {
-				assert.Equalf(t, tt.wantData, gotData, "CacheFirstData(%v)", tt.args.i)
-			} else {
-				assert.Equalf(t, tt.wantData, []byte(gotData.(string)), "CacheFirstData(%v)", tt.args.i)
-			}
+			assert.Equal(t, tt.wantData, got)
 		})
 	}
 }

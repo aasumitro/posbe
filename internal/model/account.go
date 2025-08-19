@@ -10,14 +10,20 @@ const (
 type (
 	User struct {
 		ID        int           `json:"id"`
-		RoleID    int           `json:"role_id,omitempty"`
 		Name      string        `json:"name"`
 		Username  string        `json:"username"`
 		Email     string        `json:"email"`
+		RoleID    int           `json:"-"`
 		Password  string        `json:"-"`
-		Role      Role          `json:"role"`
-		CreatedAt sql.NullInt64 `json:"created_at"`
+		CreatedAt sql.NullInt64 `json:"-"`
 		DeletedAt sql.NullInt64 `json:"-"`
+
+		// embed items
+		Role Role `json:"role"`
+
+		// only for auth (will be stored/validate via cookie)
+		AccessToken  string `json:"-"`
+		RefreshToken string `json:"-"`
 	}
 
 	Role struct {

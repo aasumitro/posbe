@@ -173,34 +173,32 @@ func limiter(
 
 func ServerEngine() Option {
 	return func(cfg *Config) {
-		engineSingleton.Do(func() {
-			gin.SetMode(gin.ReleaseMode)
-			if cfg.AppDebug {
-				gin.SetMode(gin.DebugMode)
-			}
-			// setup basic middleware
-			engine := gin.New()
-			engine.ForwardedByClientIP = true
-			engine.Use(requestid.New(requestid.WithGenerator(func() string {
-				myID := atomic.AddUint64(&reqIDCount, 1)
-				return fmt.Sprintf("%s-%06d", reqIDPrefix, myID)
-			})), logger(), gin.Recovery(), cors())
-			if !cfg.AppDebug {
-				// setup sentry middleware
-				GinEngine.Use(sentrygin.New(sentrygin.Options{Repanic: true}))
-				GinEngine.Use(func(ctx *gin.Context) {
-					if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
-						hub.Scope().SetTag("CurrentServer", fmt.Sprintf(
-							"[%s]%s", cfg.AppName, cfg.AppVersion))
-					}
-					ctx.Next()
-				})
-				// setup rate limit middleware
-				serverInitial := fmt.Sprintf("%s %s", cfg.AppName, cfg.AppVersion)
-				engine.Use(limiter(cfg.APILimiter, serverInitial))
-			}
-			GinEngine = engine
-			log.Println("Gin engine ready!")
-		})
+		gin.SetMode(gin.ReleaseMode)
+		if cfg.AppDebug {
+			gin.SetMode(gin.DebugMode)
+		}
+		// setup basic middleware
+		engine := gin.New()
+		engine.ForwardedByClientIP = true
+		engine.Use(requestid.New(requestid.WithGenerator(func() string {
+			myID := atomic.AddUint64(&reqIDCount, 1)
+			return fmt.Sprintf("%s-%06d", reqIDPrefix, myID)
+		})), logger(), gin.Recovery(), cors())
+		if !cfg.AppDebug {
+			// setup sentry middleware
+			GinEngine.Use(sentrygin.New(sentrygin.Options{Repanic: true}))
+			GinEngine.Use(func(ctx *gin.Context) {
+				if hub := sentrygin.GetHubFromContext(ctx); hub != nil {
+					hub.Scope().SetTag("CurrentServer", fmt.Sprintf(
+						"[%s]%s", cfg.AppName, cfg.AppVersion))
+				}
+				ctx.Next()
+			})
+			// setup rate limit middleware
+			serverInitial := fmt.Sprintf("%s %s", cfg.AppName, cfg.AppVersion)
+			engine.Use(limiter(cfg.APILimiter, serverInitial))
+		}
+		GinEngine = engine
+		log.Println("Gin engine ready!")
 	}
 }

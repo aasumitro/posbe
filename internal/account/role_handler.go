@@ -5,6 +5,8 @@ import (
 
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
+
+	_ "github.com/aasumitro/posbe/internal/model"
 )
 
 type roleHandler struct {
@@ -15,7 +17,7 @@ type roleHandler struct {
 // @Schemes
 // @Summary Role List
 // @Description Get Role List.
-// @Tags Users Roles
+// @Tags Account Module - Users Roles
 // @Accept json
 // @Produce json
 // @Success 200 {object} utils.SuccessRespond{data=[]model.Role} "OK RESPOND"

@@ -2,10 +2,11 @@ package utils_test
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestValidateDataRow(t *testing.T) {
@@ -41,7 +42,7 @@ func TestValidateDataRow(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotValueData, gotErrData := utils.ValidateDataRow(tt.args.data, tt.args.err)
+			gotValueData, gotErrData := utils.HandleSingleResult("test", tt.args.data, tt.args.err)
 			assert.Equalf(t, tt.wantValueData, gotValueData, "ValidateDataRow(%v, %v)", tt.args.data, tt.args.err)
 			assert.Equalf(t, tt.wantErrData, gotErrData, "ValidateDataRow(%v, %v)", tt.args.data, tt.args.err)
 		})
@@ -87,9 +88,9 @@ func TestValidateDataRows(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotValueData, gotErrData := utils.ValidateDataRows(tt.args.data, tt.args.err)
-			assert.Equalf(t, tt.wantValueData, gotValueData, "ValidateDataRows(%v, %v)", tt.args.data, tt.args.err)
-			assert.Equalf(t, tt.wantErrData, gotErrData, "ValidateDataRows(%v, %v)", tt.args.data, tt.args.err)
+			gotValueData, gotErrData := utils.HandleMultipleResults("test", tt.args.data, tt.args.err)
+			assert.Equalf(t, tt.wantValueData, gotValueData, "HandleMultipleResults(%v, %v)", tt.args.data, tt.args.err)
+			assert.Equalf(t, tt.wantErrData, gotErrData, "HandleMultipleResults(%v, %v)", tt.args.data, tt.args.err)
 		})
 	}
 }

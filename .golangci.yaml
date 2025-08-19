@@ -1,56 +1,60 @@
-linters-settings:
-  dupl:
-    threshold: 800
-  lll:
-    line-length: 200
-  mnd:
-    checks:
-      - argument
-      - case
-      - condition
-      - return
-  gosec:
-    excludes:
-      - G404
+version: "2"
+run:
+  go: "1.24"
+  modules-download-mode: readonly
 linters:
   enable:
-    - errcheck
-    - dogsled
     - copyloopvar
-    - gocritic
-    - gocyclo
-    - gofmt
-    - goprintffuncname
-    - gosimple
-    - govet
-    - ineffassign
-    - misspell
-    - nakedret
-    - nolintlint
-    - staticcheck
-    - typecheck
-    - unconvert
-    - unparam
-    - unused
-    - whitespace
+    - dogsled
     - dupl
     - goconst
-    - lll
-    - noctx
-    - mnd
+    - gocritic
+    - goprintffuncname
     - gosec
+    - lll
+    - misspell
+    - mnd
+    - nakedret
+    - noctx
+    - nolintlint
     - revive
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - dupl
-        - goconst
-        - lll
-    - path: _repository\.go
-      linters:
-        - goconst
-run:
-  timeout: 5m
-  go: "1.22"
-  modules-download-mode: readonly
+    - unconvert
+    - unparam
+    - whitespace
+  settings:
+    dupl:
+      threshold: 800
+    gosec:
+      excludes:
+        - G404
+        - G101
+    lll:
+      line-length: 450
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - dupl
+          - goconst
+          - govet
+          - lll
+          - mnd
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

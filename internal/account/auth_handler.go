@@ -6,6 +6,8 @@ import (
 
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
+
+	_ "github.com/aasumitro/posbe/internal/model"
 )
 
 type authHandler struct {
@@ -16,16 +18,16 @@ type authHandler struct {
 // @Schemes
 // @Summary Logged User In
 // @Description Generate Access Token (JWT).
-// @Tags Account Auth
+// @Tags Account Module - Auth
 // @Accept mpfd
 // @Produce json
 // @Param username formData string true "username"
 // @Param password formData string true "password"
-// @Success 201 {object} utils.SuccessRespond{Data=domain.User} "CREATED_RESPOND"
+// @Success 201 {object} utils.SuccessRespond{Data=model.User} "CREATED_RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD_REQUEST_RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE_ENTITY_RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL_SERVER_ERROR_RESPOND"
-// @Router /api/v1/login [POST]
+// @Router /api/v1/auth/login [POST]
 func (handler authHandler) login(ctx *gin.Context) {
 	var form LoginForm
 
@@ -40,9 +42,9 @@ func (handler authHandler) login(ctx *gin.Context) {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
 		return
 	}
-	
+
 	// verify user credentials
-	user, token, err := handler.svc.AuthenticateUser(ctx, &form)
+	user, err := handler.svc.AuthenticateUser(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -50,27 +52,82 @@ func (handler authHandler) login(ctx *gin.Context) {
 
 	// set cookie
 	http.SetCookie(ctx.Writer, &http.Cookie{
-		Name: "authn", Value: token, MaxAge: 0,
+		Name: "access_token", Value: user.AccessToken, MaxAge: 0,
+		Path: "/", HttpOnly: true, // Secure:   true,
+	})
+
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name: "refresh_token", Value: user.RefreshToken, MaxAge: 0,
 		Path: "/", HttpOnly: true, // Secure:   true,
 	})
 
 	// return data to users
-	utils.NewHTTPRespond(ctx, http.StatusCreated,
-		map[string]interface{}{"user": user, "token": token})
+	utils.NewHTTPRespond(ctx, http.StatusCreated, map[string]interface{}{
+		"user": user, "token": map[string]interface{}{
+			"access_token":  user.AccessToken,
+			"refresh_token": user.RefreshToken,
+		},
+	})
+}
+
+// logout godoc
+// @Schemes
+// @Summary Refresh User Access Token
+// @Description Remove JWT Cookie
+// @Tags Account Module - Auth
+// @Accept mpfd
+// @Produce json
+// @Success 201 {object} utils.SuccessRespond "CREATED_RESPOND"
+// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED"
+// @Router /api/v1/auth/refresh [POST]
+func (handler authHandler) refresh(ctx *gin.Context) {
+	tokenCookie, tokenErr := ctx.Request.Cookie("refresh_token")
+	if tokenErr != nil {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, tokenErr.Error())
+		return
+	}
+	if tokenCookie.Value == "" {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, "token cookie is empty")
+	}
+
+	// verify user credentials
+	user, err := handler.svc.RefreshToken(ctx, tokenCookie.Value)
+	if err != nil {
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
+		return
+	}
+
+	// set cookie
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name: "access_token", Value: user.AccessToken, MaxAge: 0,
+		Path: "/", HttpOnly: true, // Secure:   true,
+	})
+
+	// return data to users
+	utils.NewHTTPRespond(ctx, http.StatusCreated, map[string]interface{}{
+		"user": user, "token": map[string]interface{}{
+			"access_token": user.AccessToken,
+		},
+	})
 }
 
 // logout godoc
 // @Schemes
 // @Summary Logged User Out
 // @Description Remove JWT Cookie
-// @Tags Account Auth
+// @Tags Account Module - Auth
 // @Accept mpfd
 // @Produce json
-// @Success 200 {object} utils.SuccessRespond "CREATED_RESPOND"
-// @Router /api/v1/logout [POST]
+// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED"
+// @Router /api/v1/auth/logout [POST]
 func (handler authHandler) logout(ctx *gin.Context) {
 	http.SetCookie(ctx.Writer, &http.Cookie{
-		Name: "authn", Value: "", MaxAge: 0, Path: "/", // Secure: true,
+		Name: "access_token", Value: "", MaxAge: 0, Path: "/", // Secure: true,
+		Expires: time.Now().Add(-time.Hour),
+	})
+
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name: "refresh_token", Value: "", MaxAge: 0, Path: "/", // Secure: true,
 		Expires: time.Now().Add(-time.Hour),
 	})
 
@@ -79,7 +136,9 @@ func (handler authHandler) logout(ctx *gin.Context) {
 
 func NewAuthHandler(accountService IAccountService, router *gin.RouterGroup) {
 	handler := authHandler{svc: accountService}
+	router = router.Group("auth")
 	router.POST("/login", handler.login)
+	router.POST("/refresh", handler.refresh)
 	authn := router.Use(utils.AuthN())
 	authn.POST("/logout", handler.logout)
 }

@@ -8,6 +8,8 @@ import (
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
+
+	_ "github.com/aasumitro/posbe/internal/model"
 )
 
 type userHandler struct {
@@ -18,10 +20,10 @@ type userHandler struct {
 // @Schemes
 // @Summary User List
 // @Description Get User List.
-// @Tags Users
+// @Tags Account Module - Users
 // @Accept json
 // @Produce json
-// @Success 200 {object} utils.SuccessRespond{data=[]domain.User} "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=[]model.User} "OK RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /api/v1/users [GET]
@@ -39,13 +41,13 @@ func (handler userHandler) fetch(ctx *gin.Context) {
 // @Schemes
 // @Summary Self Update User Profile
 // @Description Self Update User Profile
-// @Tags Users
+// @Tags Account Module - Users
 // @Accept mpfd
 // @Produce json
 // @Param name 		formData string false "full name"
 // @Param username 	formData string false "username"
 // @Param email 	formData string false "email address"
-// @Success 200 {object} utils.SuccessRespond{data=domain.User} "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=model.User} "OK RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
@@ -79,12 +81,12 @@ func (handler userHandler) updateProfile(ctx *gin.Context) {
 // @Schemes
 // @Summary Self Update User Password
 // @Description Self Update User Password
-// @Tags Users
+// @Tags Account Module - Users
 // @Accept mpfd
 // @Produce json
 // @Param password 	formData string false "password"
 // @Param new_password 	formData string false "new_password"
-// @Success 200 {object} utils.SuccessRespond{data=domain.User} "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=model.User} "OK RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
@@ -135,11 +137,11 @@ func (handler userHandler) updatePassword(ctx *gin.Context) {
 // @Schemes
 // @Summary Show User
 // @Description Get User By ID.
-// @Tags Users
+// @Tags Account Module - Users
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID"
-// @Success 200 {object} utils.SuccessRespond{data=domain.User} "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=model.User} "OK RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -167,7 +169,7 @@ func (handler userHandler) show(ctx *gin.Context) {
 // @Schemes
 // @Summary Store User Data
 // @Description Create new User.
-// @Tags Users
+// @Tags Account Module - Users
 // @Accept mpfd
 // @Produce json
 // @Param role_id 	formData string true "role id"
@@ -176,7 +178,7 @@ func (handler userHandler) show(ctx *gin.Context) {
 // @Param email 	formData string false "email address"
 // @Param phone 	formData string false "phone number"
 // @Param password 	formData string true "password"
-// @Success 201 {object} utils.SuccessRespond{data=domain.User} "CREATED RESPOND"
+// @Success 201 {object} utils.SuccessRespond{data=model.User} "CREATED RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
@@ -207,7 +209,7 @@ func (handler userHandler) store(ctx *gin.Context) {
 // @Schemes
 // @Summary Update User Data
 // @Description Update Specified User Data by ID.
-// @Tags Users
+// @Tags Account Module - Users
 // @Accept mpfd
 // @Produce json
 // @Param id   		path     int  	true "user id"
@@ -215,7 +217,7 @@ func (handler userHandler) store(ctx *gin.Context) {
 // @Param name 		formData string false "full name"
 // @Param username 	formData string false "username"
 // @Param email 	formData string false "email address"
-// @Success 200 {object} utils.SuccessRespond{data=domain.User} "OK RESPOND"
+// @Success 200 {object} utils.SuccessRespond{data=model.User} "OK RESPOND"
 // @Failure 400 {object} utils.ErrorRespond "BAD REQUEST RESPOND"
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
@@ -251,7 +253,7 @@ func (handler userHandler) update(ctx *gin.Context) {
 // @Schemes
 // @Summary Destroy User Data
 // @Description Delete User By ID.
-// @Tags Users
+// @Tags Account Module - Users
 // @Accept json
 // @Produce json
 // @Param id path int true "user id"

@@ -807,7 +807,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Account Auth"
+                    "Account Module - Auth"
                 ],
                 "summary": "Logged User In",
                 "parameters": [
@@ -838,7 +838,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "Data": {
-                                            "$ref": "#/definitions/domain.User"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.User"
                                         }
                                     }
                                 }
@@ -876,7 +876,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Account Auth"
+                    "Account Module - Auth"
                 ],
                 "summary": "Logged User Out",
                 "responses": {
@@ -1177,7 +1177,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users Roles"
+                    "Account Module - Users Roles"
                 ],
                 "summary": "Role List",
                 "responses": {
@@ -1200,200 +1200,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "401": {
-                        "description": "UNAUTHORIZED RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
-                        }
-                    },
-                    "500": {
-                        "description": "INTERNAL SERVER ERROR RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create new Role.",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users Roles"
-                ],
-                "summary": "Store Role Data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "name",
-                        "name": "name",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "description",
-                        "name": "description",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "CREATED RESPOND",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Role"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "401": {
-                        "description": "UNAUTHORIZED RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
-                        }
-                    },
-                    "422": {
-                        "description": "UNPROCESSABLE ENTITY RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
-                        }
-                    },
-                    "500": {
-                        "description": "INTERNAL SERVER ERROR RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/roles/{id}": {
-            "put": {
-                "description": "Update Role Data by ID.",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users Roles"
-                ],
-                "summary": "Update Role Data",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "role id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "name",
-                        "name": "name",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "description",
-                        "name": "description",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "CREATED RESPOND",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Role"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "BAD REQUEST RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
-                        }
-                    },
-                    "401": {
-                        "description": "UNAUTHORIZED RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
-                        }
-                    },
-                    "422": {
-                        "description": "UNPROCESSABLE ENTITY RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
-                        }
-                    },
-                    "500": {
-                        "description": "INTERNAL SERVER ERROR RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete Role Data by ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users Roles"
-                ],
-                "summary": "Delete Role Data",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "role id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "NO CONTENT RESPOND"
-                    },
-                    "400": {
-                        "description": "BAD REQUEST RESPOND",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
@@ -2805,7 +2611,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Account Module - Users"
                 ],
                 "summary": "User List",
                 "responses": {
@@ -2822,7 +2628,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/domain.User"
+                                                "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.User"
                                             }
                                         }
                                     }
@@ -2853,16 +2659,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Account Module - Users"
                 ],
                 "summary": "Self Update User Profile",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "role id",
-                        "name": "role_id",
-                        "in": "formData"
-                    },
                     {
                         "type": "string",
                         "description": "full name",
@@ -2880,18 +2680,6 @@ const docTemplate = `{
                         "description": "email address",
                         "name": "email",
                         "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "phone number",
-                        "name": "phone",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "password",
-                        "name": "password",
-                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -2906,7 +2694,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/domain.User"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.User"
                                         }
                                     }
                                 }
@@ -2948,7 +2736,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Account Module - Users"
                 ],
                 "summary": "Store User Data",
                 "parameters": [
@@ -3005,11 +2793,82 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/domain.User"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.User"
                                         }
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "401": {
+                        "description": "UNAUTHORIZED RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    },
+                    "422": {
+                        "description": "UNPROCESSABLE ENTITY RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ValidationErrorRespond"
+                        }
+                    },
+                    "500": {
+                        "description": "INTERNAL SERVER ERROR RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Self Update User Password",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Account Module - Users"
+                ],
+                "summary": "Self Update User Password",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "password",
+                        "name": "password",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "new_password",
+                        "name": "new_password",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK RESPOND",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.SuccessRespond"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.User"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "BAD REQUEST RESPOND",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_utils.ErrorRespond"
                         }
                     },
                     "401": {
@@ -3043,7 +2902,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Account Module - Users"
                 ],
                 "summary": "Show User",
                 "parameters": [
@@ -3067,7 +2926,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/domain.User"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.User"
                                         }
                                     }
                                 }
@@ -3103,7 +2962,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Account Module - Users"
                 ],
                 "summary": "Update User Data",
                 "parameters": [
@@ -3137,18 +2996,6 @@ const docTemplate = `{
                         "description": "email address",
                         "name": "email",
                         "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "phone number",
-                        "name": "phone",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "password",
-                        "name": "password",
-                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -3163,7 +3010,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/domain.User"
+                                            "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.User"
                                         }
                                     }
                                 }
@@ -3205,7 +3052,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Users"
+                    "Account Module - Users"
                 ],
                 "summary": "Destroy User Data",
                 "parameters": [
@@ -3244,39 +3091,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "domain.User": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "oauthID": {
-                    "type": "string"
-                },
-                "status": {
-                    "description": "If inactive the user is inactive.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/domain.UserStatus"
-                        }
-                    ]
-                }
-            }
-        },
-        "domain.UserStatus": {
-            "type": "string",
-            "enum": [
-                "active",
-                "inactive"
-            ],
-            "x-enum-varnames": [
-                "UserStatusActive",
-                "UserStatusInactive"
-            ]
-        },
         "github_com_aasumitro_posbe_internal_model.Addon": {
             "type": "object",
             "required": [
@@ -3402,10 +3216,6 @@ const docTemplate = `{
         },
         "github_com_aasumitro_posbe_internal_model.Role": {
             "type": "object",
-            "required": [
-                "description",
-                "name"
-            ],
             "properties": {
                 "description": {
                     "type": "string"
@@ -3566,6 +3376,32 @@ const docTemplate = `{
                 },
                 "usage": {
                     "type": "integer"
+                }
+            }
+        },
+        "github_com_aasumitro_posbe_internal_model.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "$ref": "#/definitions/sql.NullInt64"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/github_com_aasumitro_posbe_internal_model.Role"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

@@ -11,7 +11,7 @@ import (
 // AuthN expected tobe logged in
 func AuthN() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		tokenCookie, err := ctx.Request.Cookie("authn")
+		tokenCookie, err := ctx.Request.Cookie("access_token")
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return

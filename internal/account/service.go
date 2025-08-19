@@ -31,7 +31,7 @@ func (service accountService) Roles(
 		},
 	)
 
-	return utils.ValidateDataRows[model.Role]("roles", data, err)
+	return utils.HandleMultipleResults[model.Role]("roles", data, err)
 }
 
 func (service accountService) Users(
@@ -46,7 +46,7 @@ func (service accountService) Users(
 		},
 	)
 
-	return utils.ValidateDataRows[model.User]("users", data, err)
+	return utils.HandleMultipleResults[model.User]("users", data, err)
 }
 
 func (service accountService) UserByID(
@@ -54,7 +54,7 @@ func (service accountService) UserByID(
 ) (*model.User, *utils.ServiceError) {
 	data, err := service.repository.FindUserBy(ctx, model.FindWithID, id)
 
-	return utils.ValidateDataRow[model.User]("user", data, err)
+	return utils.HandleSingleResult[model.User]("user", data, err)
 }
 
 func (service accountService) CreateUser(
@@ -81,7 +81,7 @@ func (service accountService) CreateUser(
 		config.RdpPool.Del(ctx, model.UsersCacheKey)
 	}
 
-	return utils.ValidateDataRow[model.User]("user", user, err)
+	return utils.HandleSingleResult[model.User]("user", user, err)
 }
 
 func (service accountService) UpdateUser(
@@ -93,7 +93,7 @@ func (service accountService) UpdateUser(
 		config.RdpPool.Del(ctx, model.UsersCacheKey)
 	}
 
-	return utils.ValidateDataRow[model.User]("user", data, err)
+	return utils.HandleSingleResult[model.User]("user", data, err)
 }
 
 func (service accountService) UpdateUserPassword(
@@ -167,40 +167,96 @@ func (service accountService) RemoveUser(
 
 func (service accountService) AuthenticateUser(
 	ctx context.Context, form *LoginForm,
-) (user *model.User, token string, errData *utils.ServiceError) {
+) (user *model.User, errData *utils.ServiceError) {
 	// get user data from database
 	user, svcErr := service.getUserKV(ctx, model.FindWithUsername, form.Username)
 	if svcErr != nil {
-		return nil, "", svcErr
+		return nil, svcErr
 	}
 
 	// validate password from input
 	valid, err := utils.ComparePassword(runtime.NumCPU(), user.Password, form.Password)
 	if err != nil {
-		return nil, "", &utils.ServiceError{
+		return nil, &utils.ServiceError{
 			Code:    http.StatusBadRequest,
 			Message: err.Error(),
 		}
 	}
 	if !valid {
-		return nil, "", &utils.ServiceError{
+		return nil, &utils.ServiceError{
 			Code:    http.StatusBadRequest,
 			Message: "invalid password",
 		}
 	}
 
-	// generate tokens
+	// jwt items
 	secretKey := config.Instance.JWTSecretKey
+	accessTokenDurationSecond := int64(3600)   // 1hr
+	refreshTokenDurationSecond := int64(28800) // 8hrs
 	claim := jwt.MapClaims{"id": user.ID, "role_id": user.Role.ID, "role_name": user.Role.Name}
-	accessToken, err := utils.NewJWT(claim, secretKey, utils.AccessTokenDurationSecond)
+
+	// generate access token
+	accessToken, err := utils.NewJWT(claim, secretKey, accessTokenDurationSecond)
 	if err != nil {
-		return nil, "", &utils.ServiceError{
+		return nil, &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
+	user.AccessToken = accessToken
 
-	return user, accessToken, nil
+	// generate refresh token
+	refreshToken, err := utils.NewJWT(claim, secretKey, refreshTokenDurationSecond)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	user.RefreshToken = refreshToken
+
+	return user, nil
+}
+
+func (service accountService) RefreshToken(
+	ctx context.Context, token string,
+) (*model.User, *utils.ServiceError) {
+	secretKey := config.Instance.JWTSecretKey
+	accessTokenDurationSecond := int64(3600) // 1hr
+
+	claim, err := utils.ParseJWT(token, secretKey)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		}
+	}
+
+	userID, ok := claim["id"].(float64)
+	if !ok {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusUnauthorized,
+			Message: "invalid token",
+		}
+	}
+
+	user, svcErr := service.getUserKV(ctx, model.FindWithID, int(userID))
+	if svcErr != nil {
+		return nil, svcErr
+	}
+
+	// generate access token
+	claimMap := jwt.MapClaims{"id": user.ID, "role_id": user.Role.ID, "role_name": user.Role.Name}
+	accessToken, err := utils.NewJWT(claimMap, secretKey, accessTokenDurationSecond)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	user.AccessToken = accessToken
+
+	return user, nil
 }
 
 func (service accountService) getUserKV(

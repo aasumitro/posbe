@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const EmptyPath = ""
+
 type SuccessRespond struct {
 	Code   int         `json:"code"`
 	Status string      `json:"status"`

@@ -33,7 +33,7 @@ func RunServer(ctx context.Context) {
 	server := &http.Server{
 		Addr:              config.Instance.AppPort,
 		Handler:           routerEngine,
-		ReadHeaderTimeout: time.Second * utils.ServerReadTimeout,
+		ReadHeaderTimeout: time.Second * 10,
 	}
 	// Initializing the server in a goroutine so that
 	// it won't block the graceful shutdown handling below
@@ -95,8 +95,7 @@ func registerPublicRoutes(sgCtx context.Context, engine *gin.Engine) {
 	// swagger docs routes
 	router.GET("/api-specs/*any",
 		ginSwagger.WrapHandler(swaggerFiles.Handler,
-			ginSwagger.DefaultModelsExpandDepth(
-				utils.SwaggerDefaultModelsExpandDepth)))
+			ginSwagger.DefaultModelsExpandDepth(4)))
 }
 
 func registerAPIModuleV1(engine *gin.Engine) {
