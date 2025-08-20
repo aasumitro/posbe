@@ -25,8 +25,8 @@ type IAccountService interface {
 	Roles(ctx context.Context) ([]*model.Role, *utils.ServiceError)
 	Users(ctx context.Context) ([]*model.User, *utils.ServiceError)
 	UserByID(ctx context.Context, id int) (*model.User, *utils.ServiceError)
-	CreateUser(ctx context.Context, data *model.User) (*model.User, *utils.ServiceError)
-	UpdateUser(ctx context.Context, data *model.User) (*model.User, *utils.ServiceError)
+	CreateUser(ctx context.Context, data *NewUserForm) (*model.User, *utils.ServiceError)
+	UpdateUser(ctx context.Context, data *UpdateUserForm) (*model.User, *utils.ServiceError)
 	UpdateUserPassword(ctx context.Context, data *UpdatePasswordForm) *utils.ServiceError
 	RemoveUser(ctx context.Context, data *model.User) *utils.ServiceError
 	AuthenticateUser(ctx context.Context, form *LoginForm) (*model.User, *utils.ServiceError)

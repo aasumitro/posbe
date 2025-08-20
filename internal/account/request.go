@@ -28,34 +28,53 @@ func (f *LoginForm) Validate(ctx *gin.Context) interface{} {
 	}).Validate(ctx, f)
 }
 
-type UpdateProfileForm struct{}
-
-func (f *UpdateProfileForm) Validate(ctx *gin.Context) interface{} {
-	return nil
-}
-
 type UpdatePasswordForm struct {
 	ID          int    `json:"-" form:"-"`
-	OldPassword string `json:"old_pwd" form:"old_pwd"`
-	NewPassword string `json:"new_pwd" form:"new_pwd"`
+	Password    string `json:"password" form:"password"`
+	NewPassword string `json:"new_password" form:"new_password"`
 }
 
 func (f *UpdatePasswordForm) Validate(ctx *gin.Context) interface{} {
 	g := galidator.New()
 	return g.ComplexValidator(galidator.Rules{
-		"OldPassword": g.R("old_pwd").Required(),
-		"NewPassword": g.R("new_pwd").Required().Password(),
+		"Password":    g.R("password").Required(),
+		"NewPassword": g.R("new_password").Required().Password(),
 	}).Validate(ctx, f)
 }
 
-type NewUserForm struct{}
-
-func (f *NewUserForm) Validate(ctx *gin.Context) interface{} {
-	return nil
+type NewUserForm struct {
+	RoleID   int    `json:"role_id" form:"role_id"`
+	Name     string `json:"name" form:"name"`
+	Username string `json:"username" form:"username"`
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
 }
 
-type UpdateUserForm struct{}
+func (f *NewUserForm) Validate(ctx *gin.Context) interface{} {
+	g := galidator.New()
+	return g.ComplexValidator(galidator.Rules{
+		"RoleID":   g.R("role_id").Required(),
+		"Name":     g.R("name").Required(),
+		"Username": g.R("username").Required(),
+		"Email":    g.R("email").Required().Email(),
+		"Password": g.R("password").Required().Password(),
+	}).Validate(ctx, f)
+}
+
+type UpdateUserForm struct {
+	ID       int    `json:"-" form:"-"`
+	RoleID   int    `json:"role_id" form:"role_id"`
+	Name     string `json:"name" form:"name"`
+	Username string `json:"username" form:"username"`
+	Email    string `json:"email" form:"email"`
+}
 
 func (f *UpdateUserForm) Validate(ctx *gin.Context) interface{} {
-	return nil
+	g := galidator.New()
+	return g.ComplexValidator(galidator.Rules{
+		"RoleID":   g.R("role_id").Optional(),
+		"Name":     g.R("name").Optional(),
+		"Username": g.R("username").Optional(),
+		"Email":    g.R("email").Optional().Email(),
+	}).Validate(ctx, f)
 }

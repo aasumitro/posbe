@@ -61,13 +61,22 @@ func (handler userHandler) updateProfile(ctx *gin.Context) {
 		return
 	}
 
-	var form model.User
+	var form UpdateUserForm
+
+	// bind user input
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// validate user input in advance
+	if val := form.Validate(ctx); val != nil {
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
 		return
 	}
 
 	form.ID = int(uid.(float64))
+	form.RoleID = 0 // set to zero so the current user cannot update their own role
 	user, err := handler.svc.UpdateUser(ctx, &form)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
@@ -104,7 +113,7 @@ func (handler userHandler) updatePassword(ctx *gin.Context) {
 
 	// bind user input
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -123,7 +132,12 @@ func (handler userHandler) updatePassword(ctx *gin.Context) {
 
 	// remove cookie so user need to re-validate the state
 	http.SetCookie(ctx.Writer, &http.Cookie{
-		Name: "authn", Value: "", MaxAge: 0, Path: "/", // Secure: true,
+		Name: "access_token", Value: "", MaxAge: 0, Path: "/", // Secure: true,
+		Expires: time.Now().Add(-time.Hour),
+	})
+
+	http.SetCookie(ctx.Writer, &http.Cookie{
+		Name: "refresh_token", Value: "", MaxAge: 0, Path: "/", // Secure: true,
 		Expires: time.Now().Add(-time.Hour),
 	})
 
@@ -184,15 +198,17 @@ func (handler userHandler) show(ctx *gin.Context) {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /api/v1/users [POST]
 func (handler userHandler) store(ctx *gin.Context) {
-	var form model.User
+	var form NewUserForm
+
+	// bind user input
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if form.Password == "" {
-		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity,
-			"password is required")
+	// validate user input in advance
+	if val := form.Validate(ctx); val != nil {
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
 		return
 	}
 
@@ -233,9 +249,17 @@ func (handler userHandler) update(ctx *gin.Context) {
 		return
 	}
 
-	var form model.User
+	var form UpdateUserForm
+
+	// bind user input
 	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err.Error())
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// validate user input in advance
+	if val := form.Validate(ctx); val != nil {
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
 		return
 	}
 
