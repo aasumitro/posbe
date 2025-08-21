@@ -2,6 +2,8 @@ package model
 
 import (
 	"database/sql"
+	"errors"
+	"runtime"
 
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/golang-jwt/jwt/v5"
@@ -41,6 +43,19 @@ type (
 		Usage       int    `json:"usage,omitempty"`
 	}
 )
+
+var ErrInvalidCredential = errors.New("invalid username or password")
+
+func (user *User) ComparePassword(password string) error {
+	valid, err := utils.ComparePassword(runtime.NumCPU(), user.Password, password)
+	if err != nil {
+		return err
+	}
+	if !valid {
+		return ErrInvalidCredential
+	}
+	return nil
+}
 
 func (user *User) GenerateToken(secret string, includeRefresh bool) error {
 	claim := jwt.MapClaims{"id": user.ID, "role_id": user.Role.ID, "role_name": user.Role.Name}

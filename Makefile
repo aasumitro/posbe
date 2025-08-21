@@ -43,6 +43,10 @@ lint: $(GOLANGCI)
 	@ golangci-lint run -c .golangci.yaml ./...
 	@ echo "linting completed"
 
+.PHONY: mocks
+mocks: $(MOCKERY)
+	mockery --config .mockery.yml
+
 .PHONY: run
 run:
 	go mod tidy -compat=1.24

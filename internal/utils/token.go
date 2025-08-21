@@ -7,6 +7,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type ITokenUtil interface {
+	ParseJWT(token, verificationKey string) (jwt.MapClaims, error)
+	NewJWT(payload jwt.MapClaims, signingKey string, secondsDuration int64) (string, error)
+}
+
 // ParseJWT verifies and parses JWT and returns its claims.
 func ParseJWT(token, verificationKey string) (jwt.MapClaims, error) {
 	parser := jwt.NewParser(jwt.WithValidMethods([]string{"HS256"}))

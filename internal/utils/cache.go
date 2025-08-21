@@ -12,9 +12,9 @@ import (
 type (
 	FN[T any] func() (data T, err error)
 
-	// Cache Interface
+	// ICacheUtil Interface
 	// maybe not just for redis
-	Cache[T any] interface {
+	ICacheUtil[T any] interface {
 		CacheFirstData(ctx context.Context, rdp *redis.Client, i *CacheDataSupplied[T]) (data T, err error)
 	}
 

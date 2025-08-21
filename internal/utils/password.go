@@ -30,6 +30,11 @@ var (
 	ErrorPasswordUnableToVerify = fmt.Errorf("unable to verify password")
 )
 
+type IPasswordUtil interface {
+	MakePassword(par int, supplied string) (string, error)
+	ComparePassword(par int, stored, supplied string) (bool, error)
+}
+
 func MakePassword(par int, supplied string) (string, error) {
 	var scryptHash []byte
 	var err error

@@ -8,6 +8,12 @@ import (
 	"path/filepath"
 )
 
+type IAssetUtil interface {
+	UploadAsset(name, folder string, fileHeader *multipart.FileHeader) (string, error)
+	DeleteAsset(folder, name string) error
+	ProjectRootDir() (string, error)
+}
+
 // UploadAsset - upload assets (file: pdf, excel | image: png, img)
 //
 // example usage:

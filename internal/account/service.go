@@ -37,7 +37,7 @@ func (service accountService) Users(
 ) ([]*model.User, *utils.ServiceError) {
 	data, err := utils.CacheFirstData(ctx, config.RdpPool,
 		&utils.CacheDataSupplied[[]*model.User]{
-			Key: model.UsersCacheKey, TTL: time.Minute * 30,
+			Key: model.UsersCacheKey, TTL: time.Minute * 10,
 			CbF: func() ([]*model.User, error) {
 				return service.repository.GetAllUsers(ctx)
 			},
@@ -102,19 +102,15 @@ func (service accountService) UpdateUserPassword(
 	}
 
 	// validate password from input
-	valid, err := utils.ComparePassword(runtime.NumCPU(),
-		user.Password, form.Password)
-	if err != nil {
-		return &utils.ServiceError{
-			Code:    http.StatusBadRequest,
+	if err := user.ComparePassword(form.Password); err != nil {
+		svcErr = &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
-	}
-	if !valid {
-		return &utils.ServiceError{
-			Code:    http.StatusBadRequest,
-			Message: "invalid password",
+		if errors.Is(err, model.ErrInvalidCredential) {
+			svcErr.Code = http.StatusBadRequest
 		}
+		return svcErr
 	}
 
 	// generate new password
@@ -171,20 +167,17 @@ func (service accountService) AuthenticateUser(
 	}
 
 	// validate password from input
-	valid, err := utils.ComparePassword(runtime.NumCPU(), user.Password, form.Password)
-	if err != nil {
-		return nil, &utils.ServiceError{
-			Code:    http.StatusBadRequest,
+	if err := user.ComparePassword(form.Password); err != nil {
+		svcErr = &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
-	}
-	if !valid {
-		return nil, &utils.ServiceError{
-			Code:    http.StatusBadRequest,
-			Message: "invalid password",
+		if errors.Is(err, model.ErrInvalidCredential) {
+			svcErr.Code = http.StatusBadRequest
 		}
+		return nil, svcErr
 	}
-
+	
 	// generate tokens
 	secretKey := config.Instance.JWTSecretKey
 	if err := user.GenerateToken(secretKey, true); err != nil {

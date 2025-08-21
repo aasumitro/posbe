@@ -26,7 +26,7 @@ func RunServer(ctx context.Context) {
 	// router engine
 	routerEngine := config.GinEngine
 	// register public routes
-	registerPublicRoutes(ctx, routerEngine)
+	registerPublicRoutes(routerEngine)
 	// register providers
 	registerAPIModuleV1(routerEngine)
 	// server defines parameters for running an HTTP server.
@@ -69,7 +69,7 @@ func RunServer(ctx context.Context) {
 	log.Println("Server exiting")
 }
 
-func registerPublicRoutes(sgCtx context.Context, engine *gin.Engine) {
+func registerPublicRoutes(engine *gin.Engine) {
 	router := engine
 	// no route handler
 	router.NoMethod(func(ctx *gin.Context) {
