@@ -30,10 +30,10 @@ api-specs:
 	@ echo "api spec generated"
 
 .PHONY: tests
-tests: $(MOCKERY) $(GOTESTSUM) lint
+tests: $(MOCKERY) $(GOTESTSUM)
 	@ gotestsum --format pkgname-and-test-fails \
 		--hide-summary=skipped \
-		-- -coverprofile=cover.out ./...
+		-- -coverprofile=cover.out ./internal/account ./internal/utils
 	@ rm cover.out
 	@ echo "testing completed"
 

@@ -9,10 +9,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Loader} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useActionState } from "@/states/action-state";
+import {useAuthStore} from "@/states/auth-state";
+import {useLogout} from "@/hooks/use-auth";
+import {useNavigate} from "@tanstack/react-router";
+import {toast} from "sonner";
 
 export const LogoutModalState = "logout_modal_state"
 
@@ -20,6 +24,8 @@ export function LogoutAlertDialog() {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isSubmitted, setSubmitted] = useState(false);
   const { bool, setBoolState } = useActionState();
+  const { mutate: logout, isPending} = useLogout();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (bool[LogoutModalState]){
@@ -27,14 +33,36 @@ export function LogoutAlertDialog() {
     }
   }, [bool]);
 
-  const onSubmit = () => {
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
     setSubmitted(true);
+
+    logout(undefined, {
+      onSuccess: async () => {
+        await toSignIn();
+      },
+      onError: async (error) => {
+        if (error instanceof Error) {
+          const clientError = error as Error
+          if (clientError.message.includes("401")) {
+            toast.error("Logout successfully!");
+          }
+          await toSignIn();
+        }
+      }
+    })
   };
 
   const onClose = () => {
     setBoolState(LogoutModalState, false)
     setDialogOpen(false)
     setSubmitted(false);
+  }
+
+  const toSignIn = async () => {
+    onClose();
+    useAuthStore.getState().auth.reset();
+    await navigate({to: "/login", replace: true})
   }
 
   return (
@@ -52,10 +80,12 @@ export function LogoutAlertDialog() {
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={onClose}
+              disabled={isPending}
             >Cancel</AlertDialogCancel>
             <Button
               className="bg-red-500 hover:bg-red-600 text-white"
               type="submit"
+              disabled={isSubmitted || isPending}
             >
               <Loader className={
                 isSubmitted

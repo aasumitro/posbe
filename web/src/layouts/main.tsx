@@ -1,5 +1,6 @@
 import { MonitorXIcon } from "lucide-react";
 import { Outlet } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/sonner"
 
 function MainLayout() {
   return (
@@ -15,6 +16,8 @@ function MainLayout() {
       </div>
 
       <Outlet />
+
+      <Toaster />
     </>
   )
 }

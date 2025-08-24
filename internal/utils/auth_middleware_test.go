@@ -23,12 +23,12 @@ func TestAuthN(t *testing.T) {
 
 	// Create a valid JWT for testing
 	claims := map[string]any{
-		"id":        "user-123",
+		"id":        1,
 		"role_id":   "role-456",
 		"role_name": "admin",
 		"exp":       time.Now().Add(time.Hour).Unix(),
 	}
-	token, _ := utils.NewJWT(claims, config.Instance.JWTSecretKey, 30)
+	token, _ := utils.NewJWT(claims, config.Instance.JWTSecretKey, 300)
 
 	tests := []struct {
 		name           string
@@ -67,7 +67,7 @@ func TestAuthN(t *testing.T) {
 				if tc.expectUserID {
 					uid, exists := c.Get("user_id")
 					assert.True(t, exists)
-					assert.Equal(t, "user-123", uid)
+					assert.Equal(t, 1, int(uid.(float64)))
 				}
 				c.Status(http.StatusOK)
 			})
@@ -75,7 +75,7 @@ func TestAuthN(t *testing.T) {
 			req, _ := http.NewRequest(http.MethodGet, "/test", nil)
 			if tc.setCookie {
 				req.AddCookie(&http.Cookie{
-					Name:  "authn",
+					Name:  "access_token",
 					Value: tc.cookieValue,
 				})
 			}
