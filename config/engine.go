@@ -123,8 +123,10 @@ func logger() gin.HandlerFunc {
 				return
 			}
 
-			stmt := "INSERT INTO activity_logs (user_id, role, description, created_at) values ($1, $2, $3, EXTRACT(EPOCH FROM NOW())::BIGINT)"
-			if _, err := PgxPool.Exec(ctx, stmt, userID, roleName, logMsg); err != nil {
+			desc := fmt.Sprintf("%s | %s", logMsg, errorMsg)
+			stmt := "INSERT INTO activity_logs (user_id, role, description, status_code, created_at) " +
+				"values ($1, $2, $3, $4, EXTRACT(EPOCH FROM NOW())::BIGINT)"
+			if _, err := PgxPool.Exec(ctx, stmt, userID, roleName, desc, statusCode); err != nil {
 				log.Println("failed to store activity log", err.Error())
 				ctx.Next()
 				return

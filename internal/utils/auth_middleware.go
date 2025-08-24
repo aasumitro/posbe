@@ -23,11 +23,11 @@ func AuthN() gin.HandlerFunc {
 			return
 		}
 
-		if userIDClaim, ok := claim["id"].(string); ok {
+		if userIDClaim, ok := claim["id"].(float64); ok {
 			ctx.Set("user_id", userIDClaim)
 		}
 
-		if userRoleIDClaim, ok := claim["role_id"].(string); ok {
+		if userRoleIDClaim, ok := claim["role_id"].(float64); ok {
 			ctx.Set("role_id", userRoleIDClaim)
 		}
 
