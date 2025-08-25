@@ -15,5 +15,5 @@ export interface User {
   name: string,
   username: string,
   email: string,
-  Role?: Role
+  role?: Role
 }

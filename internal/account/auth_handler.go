@@ -2,6 +2,7 @@ package account
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/aasumitro/posbe/internal/utils"
@@ -81,17 +82,26 @@ func (handler authHandler) login(ctx *gin.Context) {
 // @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED"
 // @Router /api/v1/auth/refresh [POST]
 func (handler authHandler) refresh(ctx *gin.Context) {
-	tokenCookie, tokenErr := ctx.Request.Cookie("refresh_token")
-	if tokenErr != nil {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, tokenErr.Error())
-		return
-	}
-	if tokenCookie.Value == "" {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, "token cookie is empty")
+	token := func() string {
+		// Check cookie first
+		if tokenCookie, err := ctx.Request.Cookie("refresh_token"); err == nil {
+			return tokenCookie.Value
+		}
+		// Check Authorization header
+		authHeader := strings.TrimSpace(ctx.GetHeader("X-REFRESH-TOKEN"))
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+		}
+		return ""
+	}()
+
+	if token == "" {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized,
+			"invalid refresh token")
 	}
 
 	// verify user credentials
-	user, err := handler.svc.RefreshToken(ctx, tokenCookie.Value)
+	user, err := handler.svc.RefreshToken(ctx, token)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return

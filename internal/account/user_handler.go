@@ -141,10 +141,8 @@ func (handler userHandler) updatePassword(ctx *gin.Context) {
 		Expires: time.Now().Add(-time.Hour),
 	})
 
-	utils.NewHTTPRespond(ctx, http.StatusUnauthorized, map[string]any{
-		"message":        "Password updated successfully. Please log in again.",
-		"login_required": true,
-	})
+	utils.NewHTTPRespond(ctx, http.StatusUnauthorized,
+		"Password updated successfully. Please log in again.")
 }
 
 // users godoc

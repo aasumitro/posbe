@@ -13,7 +13,12 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {useAuthStore} from "@/states/auth-state";
+import {useUpdateProfile} from "@/hooks/use-user";
+import {Loader2Icon} from "lucide-react";
+import {toast} from "sonner";
+import {isHTTPResponse} from "@/lib/api";
+import {useQueryClient} from "@tanstack/react-query";
 
 export const ProfileSheetState = "profile_sheet_state"
 
@@ -27,6 +32,9 @@ const UserProfileFormSchema = z.object({
 export function UserProfileActionSheet() {
   const [openProfileSheet, setProfileSheetOpen] = useState(false);
   const { bool, setBoolState } = useActionState();
+  const {auth} = useAuthStore();
+  const { mutate: update, isPending} = useUpdateProfile();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (bool[ProfileSheetState]){
@@ -34,21 +42,50 @@ export function UserProfileActionSheet() {
     }
   }, [bool]);
 
-  const getResetValues = () => ({
-    username: "",
-    name: "",
-    email: "",
-    role: "",
+  const getResetValues = (data: typeof auth.user) => ({
+    username: data?.username ?? "",
+    name: data?.name ?? "",
+    email: data?.email ?? "",
+    role: data?.role?.name ?? "",
   });
 
   const form = useForm<z.infer<typeof UserProfileFormSchema>>({
     resolver: zodResolver(UserProfileFormSchema),
-    defaultValues: getResetValues(),
+    defaultValues: getResetValues(auth.user),
     mode: "onChange"
   });
 
+  useEffect(() => {
+    if (!auth?.user) return;
+    const id = setTimeout(() => {
+      form.reset(getResetValues(auth?.user));
+    }, 100);
+    return () => clearTimeout(id);
+  }, [auth?.user]);
+
   function onSubmit(data: z.infer<typeof UserProfileFormSchema>) {
-    console.log(data);
+    const filteredValues = Object.fromEntries(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      Object.entries(data).filter(([_, value]) =>
+        value !== undefined && value !== null && value !== "")
+    );
+
+    update(JSON.stringify(filteredValues), {
+      onSuccess: async (resp) => {
+        await queryClient.invalidateQueries({ queryKey: ['user', resp?.data?.id] })
+        toast.success("Update profile successfully");
+      },
+      onError: async (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          toast.error(error.data);
+          return;
+        }
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      }
+    })
   }
 
   function onOpenChange(newOpen: boolean) {
@@ -131,29 +168,13 @@ export function UserProfileActionSheet() {
               render={({field}) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a role"/>
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {[
-                        {id: 1, name: "admin"},
-                        {id: 2, name: "cashier"},
-                        {id: 3, name: "waiter"},
-                      ].map((role) => (
-                        <SelectItem
-                          key={role.id}
-                          value={`${role.id}`}
-                        >
-                          {role.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="-"
+                      disabled
+                    />
+                  </FormControl>
                   <FormMessage/>
                 </FormItem>
               )}
@@ -162,8 +183,11 @@ export function UserProfileActionSheet() {
             <Button
               type="submit"
               className="ml-auto mt-2"
-              disabled={!form.formState.isDirty || !form.formState.isValid}
-            >Save</Button>
+              disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
+            >
+              {isPending && <Loader2Icon className="w-4 animate-spin" />}
+              Save
+            </Button>
           </form>
         </Form>
       </SheetContent>

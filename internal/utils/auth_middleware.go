@@ -3,21 +3,39 @@ package utils
 import (
 	"net/http"
 	"slices"
+	"strings"
 
 	"github.com/aasumitro/posbe/config"
 	"github.com/gin-gonic/gin"
 )
 
+func extractToken(ctx *gin.Context) string {
+	// Check cookie first
+	if tokenCookie, err := ctx.Request.Cookie("access_token"); err == nil {
+		return tokenCookie.Value
+	}
+
+	// Check Authorization header
+	authHeader := strings.TrimSpace(ctx.GetHeader("Authorization"))
+	if strings.HasPrefix(authHeader, "Bearer ") {
+		return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+	}
+
+	return ""
+}
+
 // AuthN expected tobe logged in
 func AuthN() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		tokenCookie, err := ctx.Request.Cookie("access_token")
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+		token := extractToken(ctx)
+		if token == "" {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "missing or invalid access token",
+			})
 			return
 		}
 
-		claim, err := ParseJWT(tokenCookie.Value, config.Instance.JWTSecretKey)
+		claim, err := ParseJWT(token, config.Instance.JWTSecretKey)
 		if err != nil {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return

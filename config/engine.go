@@ -41,6 +41,8 @@ var (
 		"Cookie",
 		"X-Requested-With",
 		"X-Request-ID",
+		"X-REFRESH-TOKEN",
+		"X-FIREBASE-TOKEN",
 	}
 	corsAllowedMethods = []string{
 		http.MethodGet,

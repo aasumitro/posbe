@@ -46,13 +46,14 @@ api.interceptors.request.use(async  (config) => {
   const shouldRefresh = auth.accessToken && tokenExpired && auth.refreshToken && !isJWTExpired(auth.refreshToken);
 
   // Attach headers
+  if (auth.accessToken) config.headers.Authorization = `Bearer ${auth.accessToken}`;
   if (auth.firebaseToken) config.headers["X-FIREBASE-TOKEN"] = auth.firebaseToken;
 
   // Handle refresh
   if (shouldRefresh) {
     try {
       const refreshTokenURL = SERVER_URL+API_PATH.ACCOUNT.AUTH(AuthPath.REFRESH_TOKEN)
-      const response = await axios.post(refreshTokenURL, {}, {});
+      const response = await axios.post(refreshTokenURL, {}, {headers: {"X-REFRESH-TOKEN": auth.refreshToken}});
       if (response.status === HTTP_STATUS_CODE.CREATED) {
         const { access_token } = response.data.data;
         auth.setAccessToken(access_token);
