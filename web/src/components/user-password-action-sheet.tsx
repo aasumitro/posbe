@@ -66,7 +66,7 @@ export function UserPasswordActionSheet() {
   const hasUppercase = /[A-Z]/.test(form.watch("new_pwd") || "");
   const hasLowercase = /[a-z]/.test(form.watch("new_pwd") || "");
   const hasDigit = /\d/.test(form.watch("new_pwd") || "");
-  const hasAllowedChars = /[._@]/.test(form.watch("new_pwd"));
+  const hasAllowedChars = /[._@]/.test(form.watch("new_pwd") || "");
   const oldPwd = form.watch("old_pwd") || "";
   const isOldPwdValid = oldPwd.length >= 6 && oldPwd.length <= 12;
   const isFormValid = isOldPwdValid && hasUppercase && hasLowercase && hasDigit && hasAllowedChars;

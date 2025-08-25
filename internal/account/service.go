@@ -80,6 +80,8 @@ func (service accountService) CreateUser(
 func (service accountService) UpdateUser(
 	ctx context.Context, data *UpdateUserForm,
 ) (*model.User, *utils.ServiceError) {
+	// TODO: validate admin, if < 1 return error cannot change role
+
 	updateUser := model.User{ID: data.ID, RoleID: data.RoleID,
 		Name: data.Name, Username: data.Username, Email: data.Email}
 
@@ -177,7 +179,7 @@ func (service accountService) AuthenticateUser(
 		}
 		return nil, svcErr
 	}
-	
+
 	// generate tokens
 	secretKey := config.Instance.JWTSecretKey
 	if err := user.GenerateToken(secretKey, true); err != nil {

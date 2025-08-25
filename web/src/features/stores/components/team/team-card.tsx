@@ -2,15 +2,19 @@ import {Card, CardDescription, CardFooter, CardHeader, CardTitle} from "@/compon
 import {Separator} from "@/components/ui/separator";
 import {useActionState} from "@/states/action-state";
 import {TeamDetailActionSheetState} from "@/features/stores/components/team/team-detail-sheet";
+import type {User} from "@/types/user";
+import {useUserState} from "@/states/user-state";
 
-export function TeamCard() {
+export function TeamCard({user}: {user: User}) {
   const { setBoolState } = useActionState();
+  const { setSelectedUser } =  useUserState();
 
   return (
     <Card
       className="w-96 max-h-56 hover:bg-gray-50/50 select-none cursor-pointer"
       onClick={(e) => {
         e.preventDefault();
+        setSelectedUser(user);
         setBoolState(TeamDetailActionSheetState, true);
       }}
     >
@@ -24,10 +28,10 @@ export function TeamCard() {
         </div>
         <div className="w-fit space-y-2">
           <CardTitle className="mt-4">
-            Zeros Mardigue
+            {user?.name}
           </CardTitle>
           <CardDescription>
-            #admin
+            #{user?.role?.name}
           </CardDescription>
         </div>
       </CardHeader>

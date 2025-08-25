@@ -100,7 +100,7 @@ export function useNewUser() {
   return useMutation({ mutationFn: newUser })
 }
 
-export function useUpdateUser(id: number) {
+export function useUpdateUser(id?: number) {
   const editUser = async (
     body: string
   ): Promise<HTTPResponse<User>> => {
@@ -117,8 +117,10 @@ export function useUpdateUser(id: number) {
   return useMutation({ mutationFn: editUser })
 }
 
-export function useDeleteUser(id: number) {
-  const deleteUser = async (): Promise<HTTPResponse<null>> => {
+export function useDeleteUser() {
+  const deleteUser = async (
+    id?: number
+  ): Promise<HTTPResponse<null>> => {
     try {
       const url = `${API_PATH.ACCOUNT.USER}/${id}`
       const response =
