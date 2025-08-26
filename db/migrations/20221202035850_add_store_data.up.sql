@@ -11,7 +11,7 @@ VALUES
     ('name', 'Lorem Store'),
     ('phone', '+62872222'),
     ('email', 'lorem@store.id'),
-    ('pos_type', 'restaurant'), -- restaurant, bar, coffee, store, karaoke
+    ('type', 'restaurant'), -- restaurant, bar, coffee, store, karaoke
     ('address', 'Jalan Suka Maju'),
     ('currency', 'IDR'), -- IDR/USD
     ('service_rate', '5'), -- in percentage
@@ -19,4 +19,3 @@ VALUES
     ('tax_rate', '10'), -- in percentage
     ('tax_category', 'standard'),
     ('feature_floor', '1'),  -- true or false
-    ('feature_table', '1');  -- true or false

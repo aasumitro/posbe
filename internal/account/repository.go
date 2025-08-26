@@ -10,17 +10,10 @@ import (
 
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 )
 
-type IPgxPool interface {
-	Exec(context.Context, string, ...interface{}) (pgconn.CommandTag, error)
-	Query(context.Context, string, ...interface{}) (pgx.Rows, error)
-	QueryRow(context.Context, string, ...interface{}) pgx.Row
-}
-
 type accountRepository struct {
-	db IPgxPool
+	db model.IPgxPool
 }
 
 func (repository accountRepository) GetAllRoles(ctx context.Context) (roles []*model.Role, err error) {
@@ -229,6 +222,6 @@ func (repository accountRepository) DeleteUserByID(ctx context.Context, user mod
 	return err
 }
 
-func NewAccountRepository(db IPgxPool) IAccountRepository {
+func NewAccountRepository(db model.IPgxPool) IAccountRepository {
 	return &accountRepository{db: db}
 }

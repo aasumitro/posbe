@@ -54,29 +54,6 @@ export function FeatureSection() {
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="feature_table"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Table
-                      </FormLabel>
-                      <FormDescription>
-                        Enable table placement for floor and room layouts.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
             </CardContent>
 
             <CardFooter className="flex gap-2 justify-end border-t-2 pt-4">

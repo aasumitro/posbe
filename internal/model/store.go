@@ -7,6 +7,10 @@ import (
 	"github.com/aasumitro/posbe/internal/utils"
 )
 
+const (
+	StoreSettingCacheKey = "settings"
+)
+
 type (
 	Floor struct {
 		ID          int           `json:"id"`

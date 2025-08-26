@@ -32,7 +32,7 @@ export function StorePage() {
     {
       id: "feature-enabled",
       title: "Store Feature",
-      description: "Enable or disable key store features like floors, tables, and rooms.",
+      description: "Enable or disable key store features like floors, etc.",
       additionalHeading: (
         <Button
           variant="link"

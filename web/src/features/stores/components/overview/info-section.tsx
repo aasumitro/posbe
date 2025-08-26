@@ -116,11 +116,9 @@ export function InfoSection() {
                             <SelectValue placeholder="Store Type / Category" />
                           </SelectTrigger>
                           <SelectContent position="popper">
-                            <SelectItem value="restaurant">Restaurant</SelectItem>
                             <SelectItem value="bar">Bar</SelectItem>
                             <SelectItem value="coffee">Coffee</SelectItem>
-                            <SelectItem value="retail">Retail</SelectItem>
-                            <SelectItem value="karaoke">Karaoke</SelectItem>
+                            <SelectItem value="restaurant">Restaurant</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
