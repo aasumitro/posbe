@@ -5,20 +5,36 @@ import {Card, CardContent, CardFooter} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel} from "@/components/ui/form";
 import {Switch} from "@/components/ui/switch";
+import {useStoreState} from "@/states/store-state";
+import {useEffect} from "react";
 
 const formSchema = z.object({
   feature_floor: z.boolean().default(false).optional(),
-  feature_table: z.boolean().default(false).optional(),
 })
 
 export function FeatureSection() {
+  const {settings} =  useStoreState();
+
+  const getResetValues = (sett: typeof settings | null) => ({
+    feature_floor: sett?.feature_floor === "1",
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      feature_floor: false,
-      feature_table: false,
-    },
+    defaultValues: getResetValues(settings ?? null),
   })
+
+  // Reset form when organization changes
+  // noinspection DuplicatedCode
+  useEffect(() => {
+    if (!settings) return;
+    const id = setTimeout(() => {
+      form.reset(getResetValues(settings));
+    }, 100);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line
+  }, [settings]);
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.

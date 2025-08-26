@@ -6,6 +6,8 @@ import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {useStoreState} from "@/states/store-state";
+import {useEffect} from "react";
 
 const StoreInfoFormSchema = z.object({
   name: z.string().min(3).max(100),
@@ -21,24 +23,42 @@ const StoreInfoFormSchema = z.object({
 })
 
 export function InfoSection() {
-  const getResetValues = () => ({
-    name: "",
-    phone: "",
-    email: "",
-    type: "",
-    address_line1: "",
-    address_line2: "",
-    country: "",
-    state_province: "",
-    city_regency: "",
-    postal_code: "",
-  });
+  const {settings} =  useStoreState();
+
+  const getResetValues = (sett: typeof settings | null) => {
+    const location = sett?.address?.split("<>").map(s => s.trim()) ?? []
+    const [line1 = "", line2 = "", city_regency = "", state_province = "", country = "", postal_code = ""] = location
+
+    return {
+      name: sett?.name ?? "",
+      phone: sett?.phone ??  "",
+      email: sett?.email ?? "",
+      type: sett?.type ?? "",
+      address_line1: line1,
+      address_line2: line2,
+      country: country.toLocaleLowerCase(),
+      state_province: state_province.toLocaleLowerCase(),
+      city_regency: city_regency.toLocaleLowerCase(),
+      postal_code: postal_code,
+    }
+  };
 
   // Initialize form with live default values
   const form = useForm<z.infer<typeof StoreInfoFormSchema>>({
     resolver: zodResolver(StoreInfoFormSchema),
-    defaultValues: getResetValues(),
+    defaultValues: getResetValues(settings ?? null),
   });
+
+  // Reset form when organization changes
+  // noinspection DuplicatedCode
+  useEffect(() => {
+    if (!settings) return;
+    const id = setTimeout(() => {
+      form.reset(getResetValues(settings));
+    }, 100);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line
+  }, [settings]);
 
   function onSubmit(data: z.infer<typeof StoreInfoFormSchema>) {
     console.log(data);

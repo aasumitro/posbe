@@ -7,8 +7,24 @@ import {Separator} from "@/components/ui/separator";
 import {Button} from "@/components/ui/button";
 import {IconExternalLink} from "@tabler/icons-react";
 import {useNavigate} from "@tanstack/react-router";
+import {useRoleList, useUserList} from "@/hooks/use-user";
+import {useUserState} from "@/states/user-state";
+import {useEffect} from "react";
+import {useStoresSetting} from "@/hooks/use-store-setting";
+import {useStoreState} from "@/states/store-state";
 
 export function StorePage() {
+  const {data: settings, isPending: isLoadSetting} = useStoresSetting()
+  const {setSettings} =  useStoreState();
+
+  useEffect(() => {
+    if (settings?.data) {
+      setSettings(settings?.data ?? null)
+    }
+  }, [settings?.data]);
+
+  if (isLoadSetting) return <>Loading . . .</>
+
   const navigate = useNavigate();
 
   const sections = [

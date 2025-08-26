@@ -6,6 +6,8 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {useStoreState} from "@/states/store-state";
+import {useEffect} from "react";
 
 const ServiceTaxFormSchema = z.object({
   currency: z.string(),
@@ -16,19 +18,34 @@ const ServiceTaxFormSchema = z.object({
 })
 
 export function ServiceAndTaxRateSection() {
-  const getResetValues = () => ({
-    currency: "",
-    service_category: "",
-    service_rate: 0,
-    tax_category: "",
-    tax_rate: 0,
+  const {settings} =  useStoreState();
+
+  const getResetValues = (sett: typeof settings | null) => ({
+    currency: sett?.currency.toLocaleLowerCase() ?? "",
+    service_category: sett?.service_category ?? "",
+    service_rate: sett?.service_rate !== undefined && sett?.service_rate !== null && sett?.service_rate !== ""
+      ? Number(sett.service_rate) : 0,
+    tax_category: sett?.tax_category ?? "",
+    tax_rate: sett?.tax_rate !== undefined && sett?.tax_rate !== null && sett?.tax_rate !== ""
+      ? Number(sett.tax_rate) : 0,
   });
 
   // Initialize form with live default values
   const form = useForm<z.infer<typeof ServiceTaxFormSchema>>({
     resolver: zodResolver(ServiceTaxFormSchema),
-    defaultValues: getResetValues(),
+    defaultValues: getResetValues(settings ?? null),
   });
+
+  // Reset form when organization changes
+  // noinspection DuplicatedCode
+  useEffect(() => {
+    if (!settings) return;
+    const id = setTimeout(() => {
+      form.reset(getResetValues(settings));
+    }, 100);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line
+  }, [settings]);
 
   function onSubmit(data: z.infer<typeof ServiceTaxFormSchema>) {
     console.log(data);

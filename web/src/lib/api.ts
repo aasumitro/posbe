@@ -20,6 +20,9 @@ export const API_PATH = {
     USER: "/users",
     ROLE: "/roles"
   },
+  STORE: {
+    SETTINGS: "/store/settings",
+  }
 }
 
 export const HTTP_STATUS_CODE = {
