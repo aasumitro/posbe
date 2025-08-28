@@ -6,7 +6,12 @@ import {Button} from "@/components/ui/button";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel} from "@/components/ui/form";
 import {Switch} from "@/components/ui/switch";
 import {useStoreState} from "@/states/store-state";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
+import {useUpdateSetting} from "@/hooks/use-store-setting";
+import {useQueryClient} from "@tanstack/react-query";
+import {Loader2Icon} from "lucide-react";
+import {isHTTPResponse} from "@/lib/api";
+import {toast} from "sonner";
 
 const formSchema = z.object({
   feature_floor: z.boolean().default(false).optional(),
@@ -14,6 +19,8 @@ const formSchema = z.object({
 
 export function FeatureSection() {
   const {settings} =  useStoreState();
+  const {mutate: update, isPending} = useUpdateSetting()
+  const queryClient = useQueryClient();
 
   const getResetValues = (sett: typeof settings | null) => ({
     feature_floor: sett?.feature_floor === "1",
@@ -35,11 +42,41 @@ export function FeatureSection() {
     // eslint-disable-next-line
   }, [settings]);
 
+  // Watch all form values
+  const watchValues = form.watch();
+
+  // Compare form with initial data
+  const isDirtyComparedToSettingData = useMemo(() => {
+    const current = watchValues;
+    const initial = getResetValues(settings);
+    return Object.keys(initial).some((key) => {
+      return current[key as keyof typeof current] !== initial[key as keyof typeof initial];
+    });
+    // eslint-disable-next-line
+  }, [watchValues, settings]);
+
+  function restoreChanges() {
+    if (settings) form.reset(getResetValues(settings));
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+    const floorFlag = values.feature_floor ? "1" : "0"
+    update(JSON.stringify({feature_floor: floorFlag,}), {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['store.settings'] })
+        toast.success(`Floor feature ${floorFlag ? "enabled" : "disabled"}`);
+      },
+      onError: async (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          toast.error(error.data);
+          return;
+        }
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      }
+    })
   }
 
   return (
@@ -47,7 +84,7 @@ export function FeatureSection() {
       <Card>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="mb-6 space-y-3">
+            <CardContent className="space-y-3">
               <FormField
                 control={form.control}
                 name="feature_floor"
@@ -72,21 +109,24 @@ export function FeatureSection() {
               />
             </CardContent>
 
-            <CardFooter className="flex gap-2 justify-end border-t-2 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                className="text-xs cursor-pointer"
-              >Cancel</Button>
-              <Button
-                size="sm"
-                className="text-xs cursor-pointer"
-              >
-                {/*{isPending && <Loader2 className="w-4 animate-spin mr-1" />}*/}
-                Save
-              </Button>
-            </CardFooter>
+            {isDirtyComparedToSettingData && (
+              <CardFooter className="mt-6 flex gap-2 justify-end border-t-2 pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  className="text-xs cursor-pointer"
+                  onClick={restoreChanges}
+                >Cancel</Button>
+                <Button
+                  size="sm"
+                  className="text-xs cursor-pointer"
+                >
+                  {isPending && <Loader2Icon className="w-4 animate-spin mr-1" />}
+                  Save
+                </Button>
+              </CardFooter>
+            )}
           </form>
         </Form>
       </Card>

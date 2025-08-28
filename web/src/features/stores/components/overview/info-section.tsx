@@ -7,12 +7,21 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useStoreState} from "@/states/store-state";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
+import {useUpdateSetting} from "@/hooks/use-store-setting";
+import {useQueryClient} from "@tanstack/react-query";
+import {toast} from "sonner";
+import {isHTTPResponse} from "@/lib/api";
+import {Loader2Icon} from "lucide-react";
 
 const StoreInfoFormSchema = z.object({
   name: z.string().min(3).max(100),
-  phone: z.string(),
-  email: z.string(),
+  phone: z.string()
+    .min(6, "Phone number must be at least 6 digits")
+    .regex(/^\+[1-9]\d{6,14}$/,
+      "Invalid phone number format. Please use international format, e.g: +628123456789"
+    ),
+  email: z.string().email(),
   type: z.string(),
   address_line1: z.string(),
   address_line2: z.string(),
@@ -22,8 +31,17 @@ const StoreInfoFormSchema = z.object({
   postal_code: z.string(),
 })
 
+type InfoErrorResponse = {
+  name?: string[]
+  phone?: string[]
+  email?: string[]
+  type?: string[]
+}
+
 export function InfoSection() {
   const {settings} =  useStoreState();
+  const {mutate: update, isPending} = useUpdateSetting()
+  const queryClient = useQueryClient();
 
   const getResetValues = (sett: typeof settings | null) => {
     const location = sett?.address?.split("<>").map(s => s.trim()) ?? []
@@ -60,8 +78,100 @@ export function InfoSection() {
     // eslint-disable-next-line
   }, [settings]);
 
+  // Watch all form values
+  const watchValues = form.watch();
+
+  // Compare form with initial data
+  const isDirtyComparedToSettingData = useMemo(() => {
+    const current = watchValues;
+    const initial = getResetValues(settings);
+    return Object.keys(initial).some((key) => {
+      return current[key as keyof typeof current] !== initial[key as keyof typeof initial];
+    });
+    // eslint-disable-next-line
+  }, [watchValues, settings]);
+
+  function restoreChanges() {
+    if (settings) form.reset(getResetValues(settings));
+  }
+
+  function buildAddress(data: z.infer<typeof StoreInfoFormSchema>) {
+    return [
+      data.address_line1,
+      data.address_line2,
+      data.city_regency,
+      data.state_province,
+      data.country,
+      data.postal_code
+    ]
+      .filter(v => v !== "")
+      .join(" <> ");
+  }
+
+  function buildBody(data: z.infer<typeof StoreInfoFormSchema>, settings: typeof settings | null) {
+    const body: Record<string, unknown> = {};
+
+    // generic field comparison
+    const fields: (keyof typeof data)[] = ["name", "phone", "email", "type"];
+    for (const field of fields) {
+      if (data[field] !== "" && data[field] !== settings?.[field]) {
+        body[field] = data[field];
+      }
+    }
+
+    // address building
+    const address = buildAddress(data);
+    if (address && address !== settings?.address) {
+      body.address = address;
+    }
+
+    return body;
+  }
+
   function onSubmit(data: z.infer<typeof StoreInfoFormSchema>) {
-    console.log(data);
+    const body = buildBody(data, settings);
+    if (Object.keys(body).length === 0) {
+      return;
+    }
+
+    update(JSON.stringify(body), {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['store.settings'] })
+        toast.success("Store info data updated successfully.");
+      },
+      onError: async (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          if (typeof error.data === "string") {
+            toast.error(error.data);
+            return;
+          }
+
+          if (typeof error.data === "object" && error.data !== null) {
+            const data = error.data as InfoErrorResponse;
+
+            if (data.name && data.name.length > 0) {
+              form.setError("name", {type: "manual", message: data.name[0]})
+            }
+
+            if (data.phone && data.phone.length > 0) {
+              form.setError("phone", {type: "manual", message: data.phone[0]})
+            }
+
+            if (data.email && data.email.length > 0) {
+              form.setError("email", {type: "manual", message: data.email[0]})
+            }
+
+            if (data.type && data.type.length > 0) {
+              form.setError("type", {type: "manual", message: data.type[0]})
+            }
+          }
+        }
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      }
+    })
   }
 
   return (
@@ -69,7 +179,7 @@ export function InfoSection() {
       <Card>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="mb-6">
+            <CardContent>
               <div className="grid w-full items-center gap-4">
                 <FormField
                   control={form.control}
@@ -298,21 +408,24 @@ export function InfoSection() {
               </div>
             </CardContent>
 
-            <CardFooter className="flex gap-2 justify-end border-t-2 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                className="text-xs"
-              >Cancel</Button>
-              <Button
-                size="sm"
-                className="text-xs"
-              >
-                {/*{isPending && <Loader2 className="w-4 animate-spin mr-1" />}*/}
-                Save
-              </Button>
-            </CardFooter>
+            {isDirtyComparedToSettingData && (
+              <CardFooter className="mt-6 flex gap-2 justify-end border-t-2 pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  className="text-xs"
+                  onClick={restoreChanges}
+                >Cancel</Button>
+                <Button
+                  size="sm"
+                  className="text-xs"
+                >
+                  {isPending && <Loader2Icon className="w-4 animate-spin mr-1" />}
+                  Save
+                </Button>
+              </CardFooter>
+            )}
           </form>
         </Form>
       </Card>

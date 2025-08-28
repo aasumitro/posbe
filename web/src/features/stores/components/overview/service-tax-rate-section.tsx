@@ -7,18 +7,30 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useStoreState} from "@/states/store-state";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
+import {useUpdateSetting} from "@/hooks/use-store-setting";
+import {useQueryClient} from "@tanstack/react-query";
+import {Loader2Icon} from "lucide-react";
+import {toast} from "sonner";
+import {isHTTPResponse} from "@/lib/api";
 
 const ServiceTaxFormSchema = z.object({
   currency: z.string(),
   service_category: z.string(),
-  service_rate: z.number(),
+  service_rate: z.coerce.number(),
   tax_category: z.string(),
-  tax_rate: z.number(),
+  tax_rate: z.coerce.number(),
 })
+
+type ServiceAndTaxRateErrorResponse = {
+  service_rate?: string[]
+  tax_rate?: string[]
+}
 
 export function ServiceAndTaxRateSection() {
   const {settings} =  useStoreState();
+  const {mutate: update, isPending} = useUpdateSetting()
+  const queryClient = useQueryClient();
 
   const getResetValues = (sett: typeof settings | null) => ({
     currency: sett?.currency.toLocaleLowerCase() ?? "",
@@ -47,8 +59,67 @@ export function ServiceAndTaxRateSection() {
     // eslint-disable-next-line
   }, [settings]);
 
+  // Watch all form values
+  const watchValues = form.watch();
+
+  // Compare form with initial data
+  const isDirtyComparedToSettingData = useMemo(() => {
+    const current = watchValues;
+    const initial = getResetValues(settings);
+    return Object.keys(initial).some((key) => {
+      return current[key as keyof typeof current] !== initial[key as keyof typeof initial];
+    });
+    // eslint-disable-next-line
+  }, [watchValues, settings]);
+
+  function restoreChanges() {
+    if (settings) form.reset(getResetValues(settings));
+  }
+
   function onSubmit(data: z.infer<typeof ServiceTaxFormSchema>) {
-    console.log(data);
+    let filteredValues = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) =>
+        value !== undefined && value !== null && value !== ""
+      )
+    ) as Record<string, unknown>;
+
+    if (filteredValues.currency) {
+      filteredValues = {
+        ...filteredValues,
+        currency: data.currency.toUpperCase(),
+      }
+    }
+
+    update(JSON.stringify(filteredValues), {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['store.settings'] })
+        toast.success("Service and tax rate data updated successfully.");
+      },
+      onError: async (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          if (typeof error.data === "string") {
+            toast.error(error.data);
+            return;
+          }
+
+          if (typeof error.data === "object" && error.data !== null) {
+            const data = error.data as ServiceAndTaxRateErrorResponse;
+
+            if (data.service_rate && data.service_rate.length > 0) {
+              form.setError("service_rate", {type: "manual", message: data.service_rate[0]})
+            }
+
+            if (data.tax_rate && data.tax_rate.length > 0) {
+              form.setError("tax_rate", {type: "manual", message: data.tax_rate[0]})
+            }
+          }
+        }
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      }
+    })
   }
 
   return (
@@ -56,7 +127,7 @@ export function ServiceAndTaxRateSection() {
       <Card>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="mb-6">
+            <CardContent>
               <div className="grid w-full items-center gap-4">
                 <div className="mt-2 space-y-6">
                   <FormField
@@ -126,6 +197,7 @@ export function ServiceAndTaxRateSection() {
                                 type="number"
                                 placeholder="Service Rate"
                                 disabled={!form.watch("service_category")}
+                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                 {...field}
                               />
                               <div className="absolute inset-y-0 right-0 flex items-center px-3 text-sm bg-muted rounded-r-md uppercase">
@@ -183,6 +255,7 @@ export function ServiceAndTaxRateSection() {
                                 type="number"
                                 placeholder="Service Rate"
                                 disabled={!form.watch("tax_category")}
+                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
                                 {...field}
                               />
                               <div className="absolute inset-y-0 right-0 flex items-center px-3 text-sm bg-muted rounded-r-md uppercase">
@@ -199,21 +272,24 @@ export function ServiceAndTaxRateSection() {
               </div>
             </CardContent>
 
-            <CardFooter className="flex gap-2 justify-end border-t-2 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                className="text-xs"
-              >Cancel</Button>
-              <Button
-                size="sm"
-                className="text-xs"
-              >
-                {/*{isPending && <Loader2 className="w-4 animate-spin mr-1" />}*/}
-                Save
-              </Button>
-            </CardFooter>
+            {isDirtyComparedToSettingData && (
+              <CardFooter className="mt-6 flex gap-2 justify-end border-t-2 pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  className="text-xs"
+                  onClick={restoreChanges}
+                >Cancel</Button>
+                <Button
+                  size="sm"
+                  className="text-xs"
+                >
+                  {isPending && <Loader2Icon className="w-4 animate-spin mr-1" />}
+                  Save
+                </Button>
+              </CardFooter>
+            )}
           </form>
         </Form>
       </Card>

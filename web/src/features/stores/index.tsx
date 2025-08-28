@@ -7,8 +7,6 @@ import {Separator} from "@/components/ui/separator";
 import {Button} from "@/components/ui/button";
 import {IconExternalLink} from "@tabler/icons-react";
 import {useNavigate} from "@tanstack/react-router";
-import {useRoleList, useUserList} from "@/hooks/use-user";
-import {useUserState} from "@/states/user-state";
 import {useEffect} from "react";
 import {useStoresSetting} from "@/hooks/use-store-setting";
 import {useStoreState} from "@/states/store-state";
@@ -93,7 +91,7 @@ export function StorePage() {
         </div>
       </aside>
 
-      <aside className="@container/main flex flex-1 flex-col gap-2">
+      <aside className="@container/main flex flex-1 flex-col gap-2 mb-12">
         {sections.map(renderSection)}
       </aside>
     </div>

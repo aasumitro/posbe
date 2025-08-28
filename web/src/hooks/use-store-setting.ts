@@ -2,7 +2,6 @@ import type {HTTPResponse} from "@/types/http-response";
 import {api, API_PATH, catchHTTPError} from "@/lib/api";
 import {useMutation, useSuspenseQuery} from "@tanstack/react-query";
 import type {StoreSetting} from "@/types/store";
-import type {User} from "@/types/user";
 
 export function useStoresSetting() {
   const settings = async (): Promise<HTTPResponse<StoreSetting>> => {
@@ -26,12 +25,12 @@ export function useUpdateSetting() {
     try {
       const url = API_PATH.STORE.SETTINGS
       const response =
-        await api.put<HTTPResponse<null>>(url, body);
+        await api.patch<HTTPResponse<null>>(url, body);
       return response.data;
     } catch (error: unknown) {
       return catchHTTPError(error);
     }
   };
 
-  return useMutation({ mutationFn: profile })
+  return useMutation({ mutationFn: setting })
 }

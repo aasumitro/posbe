@@ -21,6 +21,12 @@ packages:
       dir: "./mocks"
       filename: "account_module_mocks.go"
       pkgname: mocks
+  github.com/aasumitro/posbe/internal/store:
+    config:
+      all: true
+      dir: "./mocks"
+      filename: "store_module_mocks.go"
+      pkgname: mocks    
   github.com/aasumitro/posbe/internal/utils:
     config:
       all: true

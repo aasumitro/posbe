@@ -15,6 +15,7 @@ import {cn} from "@/lib/utils";
 import type {Icon} from "@tabler/icons-react";
 import {Link, useRouterState} from "@tanstack/react-router";
 import * as React from "react";
+import {useStoreState} from "@/states/store-state";
 
 const data = {
   users: [
@@ -146,12 +147,17 @@ const Menuitem = ({
   icon: Icon
   enabled?: boolean
 }) => {
+  const {settings} =  useStoreState();
   const { location } = useRouterState();
   const pathname = location.pathname;
   let isActive = pathname === route;
 
   if (pathname.startsWith('/stores/products') && route === "/stores/catalogs") {
     isActive = true
+  }
+
+  if (route === '/stores/floors' && settings?.feature_floor === "0") {
+    return <></>
   }
 
   return (

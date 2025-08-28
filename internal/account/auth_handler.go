@@ -89,8 +89,11 @@ func (handler authHandler) refresh(ctx *gin.Context) {
 		}
 		// Check Authorization header
 		authHeader := strings.TrimSpace(ctx.GetHeader("X-REFRESH-TOKEN"))
-		if strings.HasPrefix(authHeader, "Bearer ") {
-			return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+		if authHeader != "" {
+			if strings.HasPrefix(authHeader, "Bearer ") {
+				return strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+			}
+			return authHeader
 		}
 		return ""
 	}()
@@ -112,6 +115,9 @@ func (handler authHandler) refresh(ctx *gin.Context) {
 		Name: "access_token", Value: user.AccessToken, MaxAge: 0,
 		Path: "/", HttpOnly: true, // Secure:   true,
 	})
+
+	ctx.Set("user_id", user.ID)
+	ctx.Set("role_id", user.Role.Name)
 
 	// return data to users
 	utils.NewHTTPRespond(ctx, http.StatusCreated, map[string]interface{}{
