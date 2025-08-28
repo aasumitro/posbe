@@ -8,7 +8,7 @@ import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useStoreState} from "@/states/store-state";
 import {useEffect, useMemo} from "react";
-import {useUpdateSetting} from "@/hooks/use-store-setting";
+import {useUpdateSetting} from "@/hooks/use-store";
 import {useQueryClient} from "@tanstack/react-query";
 import {Loader2Icon} from "lucide-react";
 import {toast} from "sonner";
@@ -189,26 +189,33 @@ export function ServiceAndTaxRateSection() {
                     <FormField
                       control={form.control}
                       name="service_rate"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                type="number"
-                                placeholder="Service Rate"
-                                disabled={!form.watch("service_category")}
-                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                                {...field}
-                              />
-                              <div className="absolute inset-y-0 right-0 flex items-center px-3 text-sm bg-muted rounded-r-md uppercase">
-                                {form.watch("service_category") === "standard" ? "% / TRX" : `${form.watch("currency")} / TRX`}
-                              </div>
-                            </div>
+                      render={({ field }) => {
+                        const {ref, name, value, onChange, ...rest} = field
 
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                        return (
+                          <FormItem className="w-full">
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  placeholder="Service Rate"
+                                  disabled={!form.watch("service_category")}
+                                  value={value ?? ""}
+                                  name={name}
+                                  ref={ref}
+                                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                  {...rest}
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center px-3 text-sm bg-muted rounded-r-md uppercase">
+                                  {form.watch("service_category") === "standard" ? "% / TRX" : `${form.watch("currency")} / TRX`}
+                                </div>
+                              </div>
+
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )
+                      }}
                     />
                   </div>
 
@@ -247,25 +254,32 @@ export function ServiceAndTaxRateSection() {
                     <FormField
                       control={form.control}
                       name="tax_rate"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                type="number"
-                                placeholder="Service Rate"
-                                disabled={!form.watch("tax_category")}
-                                onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                                {...field}
-                              />
-                              <div className="absolute inset-y-0 right-0 flex items-center px-3 text-sm bg-muted rounded-r-md uppercase">
-                                {form.watch("tax_category") === "standard" ? "% / TRX" : `${form.watch("currency")} / TRX`}
+                      render={({ field }) => {
+                        const {ref, name, value, onChange, ...rest} = field
+
+                        return (
+                          <FormItem className="w-full">
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  placeholder="Service Rate"
+                                  disabled={!form.watch("tax_category")}
+                                  value={value ?? ""}
+                                  name={name}
+                                  ref={ref}
+                                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                  {...rest}
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center px-3 text-sm bg-muted rounded-r-md uppercase">
+                                  {form.watch("tax_category") === "standard" ? "% / TRX" : `${form.watch("currency")} / TRX`}
+                                </div>
                               </div>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )
+                      }}
                     />
                   </div>
                 </div>

@@ -18,3 +18,8 @@ export interface ResponsePagination {
   total_pages: number;
   total_items: number;
 }
+
+export interface Time {
+  Int64: number
+  Valid: boolean
+}

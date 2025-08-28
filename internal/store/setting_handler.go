@@ -11,6 +11,17 @@ type settingHandler struct {
 	service IStoreSettingService
 }
 
+// store godoc
+// @Schemes
+// @Summary Store Settings
+// @Description Get Store Settings List.
+// @Tags Store Setting
+// @Accept json
+// @Produce json
+// @Success 200 {object} utils.SuccessRespond{data=[]model.StoreSetting} "OK RESPOND"
+// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
+// @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
+// @Router /api/v1/store/settings [GET]
 func (handler settingHandler) fetch(ctx *gin.Context) {
 	prefs, err := handler.service.AllSetting(ctx)
 	if err != nil {
@@ -20,6 +31,19 @@ func (handler settingHandler) fetch(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusOK, prefs)
 }
 
+// store godoc
+// @Schemes
+// @Summary Update Store Setting
+// @Description Update Store Setting by Key (one or all)
+// @Tags Store Setting
+// @Accept json
+// @Produce json
+// @Param 		form		body 	SettingForm false "form request for setting"
+// @Success 200 {object} utils.SuccessRespond{data=model.StoreSetting} "CREATED RESPOND"
+// @Failure 401 {object} utils.ErrorRespond "UNAUTHORIZED RESPOND"
+// @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
+// @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
+// @Router  /api/v1/store/settings [PATCH]
 func (handler settingHandler) edit(ctx *gin.Context) {
 	var form SettingForm
 

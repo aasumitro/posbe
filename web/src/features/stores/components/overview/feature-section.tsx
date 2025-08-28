@@ -7,7 +7,7 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel} from
 import {Switch} from "@/components/ui/switch";
 import {useStoreState} from "@/states/store-state";
 import {useEffect, useMemo} from "react";
-import {useUpdateSetting} from "@/hooks/use-store-setting";
+import {useUpdateSetting} from "@/hooks/use-store";
 import {useQueryClient} from "@tanstack/react-query";
 import {Loader2Icon} from "lucide-react";
 import {isHTTPResponse} from "@/lib/api";

@@ -8,20 +8,25 @@ import {Button} from "@/components/ui/button";
 import {IconExternalLink} from "@tabler/icons-react";
 import {useNavigate} from "@tanstack/react-router";
 import {useEffect} from "react";
-import {useStoresSetting} from "@/hooks/use-store-setting";
+import {useStoreShifts, useStoresSetting} from "@/hooks/use-store";
 import {useStoreState} from "@/states/store-state";
 
 export function StorePage() {
   const {data: settings, isPending: isLoadSetting} = useStoresSetting()
-  const {setSettings} =  useStoreState();
+  const {data: shifts, isPending: isLoadShifts} = useStoreShifts()
+  const {setSettings, setShifts} =  useStoreState();
 
   useEffect(() => {
     if (settings?.data) {
       setSettings(settings?.data ?? null)
     }
-  }, [settings?.data]);
 
-  if (isLoadSetting) return <>Loading . . .</>
+    if (shifts?.data) {
+      setShifts(shifts?.data ?? null)
+    }
+  }, [settings?.data, shifts?.data]);
+
+  if (isLoadSetting || isLoadShifts) return <>Loading . . .</>
 
   const navigate = useNavigate();
 

@@ -8,7 +8,7 @@ const SERVER_URL = `${window.location.protocol}//${host}/api/v1`
 
 export const AuthPath = {
   SIGN_IN: "login",
-  REFRESH_TOKEN: "refresh-token",
+  REFRESH_TOKEN: "refresh",
   SIGN_OUT: "logout"
 } as const;
 
@@ -22,6 +22,7 @@ export const API_PATH = {
   },
   STORE: {
     SETTINGS: "/store/settings",
+    SHIFTS: "/store/shifts",
   }
 }
 
@@ -58,10 +59,13 @@ api.interceptors.request.use(async  (config) => {
       const refreshTokenURL = SERVER_URL+API_PATH.ACCOUNT.AUTH(AuthPath.REFRESH_TOKEN)
       const response = await axios.post(refreshTokenURL, {}, {headers: {"X-REFRESH-TOKEN": auth.refreshToken}});
       if (response.status === HTTP_STATUS_CODE.CREATED) {
-        const { access_token } = response.data.data;
+        const { access_token } = response.data?.token;
         auth.setAccessToken(access_token);
+        config.headers.Authorization = `Bearer ${access_token}`;
+        console.log("new access token form refresh", access_token);
       }
-    } catch {
+    } catch (error) {
+      console.error(error, "failed to refresh token");
       auth.reset();
       window.location.href = "/login";
     }

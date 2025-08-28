@@ -8,7 +8,7 @@ import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {useStoreState} from "@/states/store-state";
 import {useEffect, useMemo} from "react";
-import {useUpdateSetting} from "@/hooks/use-store-setting";
+import {useUpdateSetting} from "@/hooks/use-store";
 import {useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {isHTTPResponse} from "@/lib/api";
@@ -108,20 +108,21 @@ export function InfoSection() {
       .join(" <> ");
   }
 
-  function buildBody(data: z.infer<typeof StoreInfoFormSchema>, settings: typeof settings | null) {
+  function buildBody(data: z.infer<typeof StoreInfoFormSchema>, sett: typeof settings | null) {
     const body: Record<string, unknown> = {};
 
     // generic field comparison
     const fields: (keyof typeof data)[] = ["name", "phone", "email", "type"];
     for (const field of fields) {
-      if (data[field] !== "" && data[field] !== settings?.[field]) {
+      // @ts-ignore
+      if (data[field] !== "" && data[field] !== sett?.[field]) {
         body[field] = data[field];
       }
     }
 
     // address building
     const address = buildAddress(data);
-    if (address && address !== settings?.address) {
+    if (address && address !== sett?.address) {
       body.address = address;
     }
 
