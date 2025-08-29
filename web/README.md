@@ -10,3 +10,8 @@
 
 ### Repo for full impl/integration with BE 
 - [POSBE - WIP](https://github.com/aasumitro/posbe)
+
+
+### UI ref:
+- https://ui.shadcn.com
+- https://shadcnstudio.com/

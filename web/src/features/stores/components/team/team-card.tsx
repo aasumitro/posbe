@@ -38,7 +38,7 @@ export function TeamCard({user}: {user: User}) {
       <CardFooter className="flex flex-row border-t px-4 [.border-t]:pt-4">
         <div className="flex w-full items-center gap-2">
           <div className="grid flex-1 auto-rows-min gap-0.5">
-            <div className="text-xs text-muted-foreground">This Year</div>
+            <div className="text-xs text-muted-foreground">This Month</div>
             <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
               <div className="w-10 h-8 bg-gray-200 rounded-md" />
               <span className="text-sm font-normal text-muted-foreground">

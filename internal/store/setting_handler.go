@@ -44,7 +44,7 @@ func (handler settingHandler) fetch(ctx *gin.Context) {
 // @Failure 422 {object} utils.ValidationErrorRespond "UNPROCESSABLE ENTITY RESPOND"
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router  /api/v1/store/settings [PATCH]
-func (handler settingHandler) edit(ctx *gin.Context) {
+func (handler settingHandler) update(ctx *gin.Context) {
 	var form SettingForm
 
 	// bind user input
@@ -70,5 +70,6 @@ func (handler settingHandler) edit(ctx *gin.Context) {
 func NewSettingHandler(service IStoreSettingService, router gin.IRoutes) {
 	handler := &settingHandler{service: service}
 	router.GET("/settings", handler.fetch)
-	router.PATCH("/settings", handler.edit)
+	authz := utils.AuthZ([]string{"admin"})
+	router.PATCH("/settings", authz, handler.update)
 }

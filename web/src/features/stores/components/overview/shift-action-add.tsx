@@ -1,28 +1,31 @@
 import {useState} from "react";
 import {
-  AlertDialog, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import {IconPlus} from "@tabler/icons-react";
 import {Button} from "@/components/ui/button";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Loader2Icon} from "lucide-react";
 import {useNewStoreShift} from "@/hooks/use-store";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {strTimeToInt, timeReference} from "@/lib/time";
+import {strTimeToInt} from "@/lib/time";
 import {toast} from "sonner";
 import {isHTTPResponse} from "@/lib/api";
 import {useQueryClient} from "@tanstack/react-query";
+import {TimePicker} from "@/components/ui/time-picker";
 
 const FormSchema = z.object({
-  name: z.string(),
+  name: z.string().min(3),
   start_time: z.string(),
   end_time: z.string()
 })
@@ -116,27 +119,33 @@ export function ShiftActionAdd() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <section className="grid gap-4 pt-2">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="w-full h-10"
-                        type="text"
-                        autoComplete="off"
-                        placeholder="shift 3"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </section>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="w-full h-10"
+                      type="text"
+                      autoComplete="off"
+                      placeholder="shift 3"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="mt-4 space-y-6">
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="flex-grow h-px bg-gray-200" />
+                <span className="whitespace-nowrap">Work Time</span>
+                <div className="flex-grow h-px bg-gray-200" />
+              </div>
+            </div>
 
             <section className="flex flex-col md:flex-row gap-2 mt-4 mb-8">
               <FormField
@@ -144,23 +153,23 @@ export function ShiftActionAdd() {
                 name="start_time"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Start Time</FormLabel>
                     <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select Start Time" />
-                        </SelectTrigger>
-                        <SelectContent position="popper">
-                          {timeReference.map((time, index) => (
-                            <SelectItem key={index} value={time}>{time}</SelectItem>
-                          ))}
-
-                        </SelectContent>
-                      </Select>
+                      <TimePicker
+                        aria-label="Start time"
+                        onChange={(val) => {
+                          if (val) {
+                            const hh = String(val.hour).padStart(2, "0");
+                            const mm = String(val.minute).padStart(2, "0");
+                            field.onChange(`${hh}:${mm}`);
+                          } else {
+                            field.onChange("");
+                          }
+                        }}
+                      />
                     </FormControl>
+                    {!form.formState.errors.start_time && (
+                      <FormDescription>This is the shift start time</FormDescription>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -171,23 +180,23 @@ export function ShiftActionAdd() {
                 name="end_time"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>End Time</FormLabel>
-
                     <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select End Time" />
-                        </SelectTrigger>
-                        <SelectContent position="popper">
-                          {timeReference.map((time, index) => (
-                            <SelectItem key={index} value={time}>{time}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <TimePicker
+                        aria-label="end time"
+                        onChange={(val) => {
+                          if (val) {
+                            const hh = String(val.hour).padStart(2, "0");
+                            const mm = String(val.minute).padStart(2, "0");
+                            field.onChange(`${hh}:${mm}`);
+                          } else {
+                            field.onChange("");
+                          }
+                        }}
+                      />
                     </FormControl>
+                    {!form.formState.errors.end_time && (
+                      <FormDescription>This is the shift end time</FormDescription>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -206,7 +215,6 @@ export function ShiftActionAdd() {
             </AlertDialogFooter>
           </form>
         </Form>
-
       </AlertDialogContent>
     </AlertDialog>
   )

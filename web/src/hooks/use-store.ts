@@ -3,7 +3,6 @@ import {api, API_PATH, catchHTTPError} from "@/lib/api";
 import {useMutation, useSuspenseQuery} from "@tanstack/react-query";
 import type {StoreSetting} from "@/types/store";
 import type {StoreShift} from "@/types/shift";
-import type {User} from "@/types/user";
 
 export function useStoresSetting() {
   const settings = async (): Promise<HTTPResponse<StoreSetting>> => {
@@ -55,11 +54,11 @@ export function useStoreShifts() {
 export function useNewStoreShift() {
   const newShift = async (
     body: string
-  ): Promise<HTTPResponse<User>> => {
+  ): Promise<HTTPResponse<StoreShift>> => {
     try {
       const url = API_PATH.STORE.SHIFTS
       const response =
-        await api.post<HTTPResponse<User>>(url, body);
+        await api.post<HTTPResponse<StoreShift>>(url, body);
       return response.data;
     } catch (error: unknown) {
       return catchHTTPError(error);
@@ -67,4 +66,38 @@ export function useNewStoreShift() {
   };
 
   return useMutation({ mutationFn: newShift })
+}
+
+export function useEditStoreShift() {
+  const editShift = async (
+    {id, body}: {id: number, body: string}
+  ): Promise<HTTPResponse<StoreShift>> => {
+    try {
+      const url = `${API_PATH.STORE.SHIFTS}/${id}`
+      const response =
+        await api.patch<HTTPResponse<StoreShift>>(url, body);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: editShift })
+}
+
+export function useDeleteShift() {
+  const deleteShift = async (
+    id?: number
+  ): Promise<HTTPResponse<null>> => {
+    try {
+      const url = `${API_PATH.STORE.SHIFTS}/${id}`
+      const response =
+        await api.delete<HTTPResponse<null>>(url);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: deleteShift })
 }

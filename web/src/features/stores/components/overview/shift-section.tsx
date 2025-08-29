@@ -4,9 +4,12 @@ import {Button} from "@/components/ui/button";
 import {ShiftActionAdd} from "@/features/stores/components/overview/shift-action-add";
 import {useStoreState} from "@/states/store-state";
 import {intToTime} from "@/lib/time";
+import {ShiftDetailActionSheet, ShiftDetailActionSheetState} from "@/features/stores/components/overview/shift-detail-sheet";
+import {useActionState} from "@/states/action-state";
 
 export function ShiftTableSection() {
-  const {shifts} = useStoreState();
+  const {shifts, setSelectedShifts} = useStoreState();
+  const { setBoolState } = useActionState();
 
   return (
     <div className="overflow-hidden border rounded-lg">
@@ -46,7 +49,15 @@ export function ShiftTableSection() {
               )}
 
               <TableCell className="space-x-2">
-                <Button variant="outline" className="p-1 h-8 w-8">
+                <Button
+                  variant="outline"
+                  className="p-1 h-8 w-8 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedShifts(shift);
+                    setBoolState(ShiftDetailActionSheetState, true);
+                  }}
+                >
                   <IconEye className="w-4 h-4 text-gray-500" />
                 </Button>
               </TableCell>
@@ -62,6 +73,8 @@ export function ShiftTableSection() {
           </TableRow>
         </TableFooter>
       </Table>
+
+      <ShiftDetailActionSheet />
     </div>
   )
 }

@@ -46,8 +46,8 @@ export const api = axios.create({
 // Automatically add header to requests also check for refresh token
 api.interceptors.request.use(async  (config) => {
   const auth = useAuthStore.getState().auth;
-  const tokenExpired = isJWTExpired(auth.accessToken);
-  const shouldRefresh = auth.accessToken && tokenExpired && auth.refreshToken && !isJWTExpired(auth.refreshToken);
+  const shouldRefresh = auth.accessToken && isJWTExpired(auth.accessToken)
+    && auth.refreshToken && !isJWTExpired(auth.refreshToken);
 
   // Attach headers
   if (auth.accessToken) config.headers.Authorization = `Bearer ${auth.accessToken}`;
@@ -57,15 +57,16 @@ api.interceptors.request.use(async  (config) => {
   if (shouldRefresh) {
     try {
       const refreshTokenURL = SERVER_URL+API_PATH.ACCOUNT.AUTH(AuthPath.REFRESH_TOKEN)
-      const response = await axios.post(refreshTokenURL, {}, {headers: {"X-REFRESH-TOKEN": auth.refreshToken}});
+      const response = await axios.post(refreshTokenURL, {},
+        {headers: {"X-REFRESH-TOKEN": auth.refreshToken}});
+
       if (response.status === HTTP_STATUS_CODE.CREATED) {
-        const { access_token } = response.data?.token;
+        const { access_token } = response.data?.data?.token;
         auth.setAccessToken(access_token);
+        api.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
         config.headers.Authorization = `Bearer ${access_token}`;
-        console.log("new access token form refresh", access_token);
       }
     } catch (error) {
-      console.error(error, "failed to refresh token");
       auth.reset();
       window.location.href = "/login";
     }
@@ -77,14 +78,18 @@ api.interceptors.request.use(async  (config) => {
 export const catchHTTPError = (error: unknown) => {
   if (error instanceof AxiosError && error.response) {
     const errorData = error.response.data;
+
     if (errorData && typeof errorData === "object") {
       throw errorData;
     }
+
     throw error
   }
+
   if (axios.isAxiosError(error) && !error.response) {
     throw new Error("Unable to connect to the server. Please check your internet and try again. If the issue persists, try again later.");
   }
+
   throw new Error("Unexpected error occurred");
 }
 

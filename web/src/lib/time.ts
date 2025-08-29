@@ -1,15 +1,6 @@
 import type {Time} from "@/types/http-response";
-
-export const timeReference: string[] = Array.from({ length: 24 * 60 / 5 }, (_, i) => {
-  const totalMinutes = i * 5;
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
-  const ampm = hours < 12 ? "AM" : "PM";
-  const hourStr = hour12.toString().padStart(2, "0");
-  const minuteStr = minutes.toString().padStart(2, "0");
-  return `${hourStr}:${minuteStr}${ampm}`;
-});
+import type {TimeValue} from "react-aria";
+import { Time as ITime } from "@internationalized/date";  // add this import
 
 export function formatTimestamp(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
@@ -58,4 +49,11 @@ export function sqlTimeToFormattedTime(time: Time) {
     return "-"
   }
   return formatTimestamp(time.Int64)
+}
+
+export function intToTimeValue(intVal?: number | null): TimeValue | null {
+  if (intVal === undefined || intVal === null) return null;
+  const hh = Math.floor(intVal / 100);
+  const mm = intVal % 100;
+  return new ITime(hh, mm); 
 }
