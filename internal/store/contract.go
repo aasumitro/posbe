@@ -25,14 +25,15 @@ type IStoreShiftRepository interface {
 	Create(ctx context.Context, form *ShiftForm) error
 	Update(ctx context.Context, form *ShiftForm) error
 	Delete(ctx context.Context, id int64) error
-
-	// OpenShift CloseShift for `active_shifts` table
-	// OpenShift()
-	// CloseShift()
+	Open(ctx context.Context, form *ActiveShiftForm) error
+	Close(ctx context.Context, form *ActiveShiftForm) error
 }
 
 type IStoreShiftService interface {
 	ShiftList(ctx context.Context) ([]*model.Shift, *utils.ServiceError)
 	ShiftDetail(ctx context.Context, id int64) (*model.Shift, *utils.ServiceError)
 	CreateShift(ctx context.Context, form *ShiftForm) *utils.ServiceError
+	UpdateShift(ctx context.Context, form *ShiftForm) *utils.ServiceError
+	DeleteShift(ctx context.Context, id int64) *utils.ServiceError
+	ActiveShiftAction(ctx context.Context, form *ActiveShiftForm) *utils.ServiceError
 }

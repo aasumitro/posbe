@@ -2,6 +2,10 @@ package model
 
 import "database/sql"
 
+const (
+	StoreShiftCacheKey = "store_shifts"
+)
+
 type (
 	// Shift is reference section data for store
 	Shift struct {
@@ -13,12 +17,18 @@ type (
 		UpdatedAt sql.NullInt64 `json:"updated_at,omitempty"`
 
 		// Relation
-		ActiveShift    *ActiveShift `json:"active_shift,omitempty" binding:"-"`
-		ShiftHistories *ActiveShift `json:"shift_histories,omitempty" binding:"-"`
+		Active    *ActiveShift   `json:"active,omitempty"`
+		Last      *ActiveShift   `json:"last,omitempty"` // so if active is empty (find last)
+		Histories []*ActiveShift `json:"histories,omitempty"`
+		Orders    []*Order       `json:"orders,omitempty"`
 
 		// Count data
-		TotalUsage       int64 `json:"total_usage" binding:"-"`
-		TotalTransaction int64 `json:"total_transaction" binding:"-"`
+		TotalUsage       int64 `json:"total_usage"`
+		TotalTransaction int64 `json:"total_transaction"`
+		TotalSurplus     int64 `json:"total_surplus"`
+		TotalDeficit     int64 `json:"total_deficit"`
+		Profit           int64 `json:"profit"`
+		Loss             int64 `json:"loss"`
 	}
 
 	ActiveShift struct {

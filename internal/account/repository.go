@@ -145,6 +145,10 @@ func (repository accountRepository) InsertUser(ctx context.Context, user model.U
 }
 
 func (repository accountRepository) UpdateUserByID(ctx context.Context, user model.User) (*model.User, error) {
+	if user.ID == 0 {
+		return nil, errors.New("missing user ID for update")
+	}
+
 	var setClauses []string
 	var args []any
 	argPos := 1
@@ -175,15 +179,13 @@ func (repository accountRepository) UpdateUserByID(ctx context.Context, user mod
 		args = append(args, user.Password)
 		argPos++
 	}
-
 	if len(setClauses) == 0 {
 		return nil, errors.New("no fields to update")
 	}
-
+	setClauses = append(setClauses, "updated_at = $"+strconv.Itoa(argPos))
+	args = append(args, time.Now().Unix())
+	argPos++
 	// Add WHERE clause
-	if user.ID == 0 {
-		return nil, errors.New("missing user ID for update")
-	}
 	args = append(args, user.ID)
 
 	q := fmt.Sprintf(`

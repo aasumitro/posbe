@@ -2,6 +2,8 @@ package store
 
 import (
 	"net/http"
+	"slices"
+	"strconv"
 
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -44,20 +46,20 @@ func (handler shiftHandler) fetch(ctx *gin.Context) {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /api/v1/shifts/{id} [GET]
 func (handler shiftHandler) show(ctx *gin.Context) {
-	//idParams := ctx.Param("id")
-	//id, errParse := strconv.Atoi(idParams)
-	//if errParse != nil {
-	//	utils.NewHTTPRespond(ctx,
-	//		http.StatusBadRequest,
-	//		errParse.Error())
-	//	return
-	//}
-	//data, err := handler.svc.ShiftDetail(ctx, id)
-	//if err != nil {
-	//	utils.NewHTTPRespond(ctx, err.Code, err.Message)
-	//	return
-	//}
-	//utils.NewHTTPRespond(ctx, http.StatusOK, data)
+	idParams := ctx.Param("id")
+	id, errParse := strconv.ParseInt(idParams, 10, 64)
+	if errParse != nil {
+		utils.NewHTTPRespond(ctx,
+			http.StatusBadRequest,
+			errParse.Error())
+		return
+	}
+	data, err := handler.service.ShiftDetail(ctx, id)
+	if err != nil {
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
+		return
+	}
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
 }
 
 func (handler shiftHandler) store(ctx *gin.Context) {
@@ -85,18 +87,106 @@ func (handler shiftHandler) store(ctx *gin.Context) {
 }
 
 func (handler shiftHandler) update(ctx *gin.Context) {
+	idParams := ctx.Param("id")
+	id, errParse := strconv.ParseInt(idParams, 10, 64)
+	if errParse != nil {
+		utils.NewHTTPRespond(ctx,
+			http.StatusBadRequest,
+			errParse.Error())
+		return
+	}
+
+	var form ShiftForm
+
+	// bind user input
+	if err := ctx.ShouldBind(&form); err != nil {
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// validate user input in advance
+	if val := form.Validate(ctx); val != nil {
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
+		return
+	}
+
+	form.ID = id
+	if err := handler.service.UpdateShift(ctx, &form); err != nil {
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
+		return
+	}
+
+	utils.NewHTTPRespond(ctx, http.StatusOK, nil)
 }
 
 func (handler shiftHandler) destroy(ctx *gin.Context) {
-	// items
+	idParams := ctx.Param("id")
+	id, errParse := strconv.ParseInt(idParams, 10, 64)
+	if errParse != nil {
+		utils.NewHTTPRespond(ctx,
+			http.StatusBadRequest,
+			errParse.Error())
+		return
+	}
+
+	if err := handler.service.DeleteShift(ctx, id); err != nil {
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
+		return
+	}
+
+	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
+}
+
+func (handler shiftHandler) active(ctx *gin.Context) {
+	idParams := ctx.Param("id")
+	id, errParse := strconv.ParseInt(idParams, 10, 64)
+	if errParse != nil {
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, errParse.Error())
+		return
+	}
+
+	actionParams := ctx.Param("action")
+	if !slices.Contains([]string{"open", "close"}, actionParams) {
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, "invalid action parameter")
+		return
+	}
+
+	uid, ok := ctx.Get("user_id")
+	if !ok {
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, "invalid user id")
+		return
+	}
+
+	var form ActiveShiftForm
+	if err := ctx.ShouldBind(&form); err != nil {
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if val := form.Validate(ctx); val != nil {
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
+		return
+	}
+
+	form.ShiftID = id
+	form.Action = actionParams
+	form.UserID = int64(uid.(float64))
+
+	if err := handler.service.ActiveShiftAction(ctx, &form); err != nil {
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
+		return
+	}
+
+	utils.NewHTTPRespond(ctx, http.StatusOK, nil)
 }
 
 func NewShiftHandler(service IStoreShiftService, router gin.IRoutes) {
 	handler := shiftHandler{service: service}
+	authz := utils.AuthZ([]string{"admin"})
 	router.GET("/shifts", handler.fetch)
 	router.GET("/shifts/:id", handler.show)
-	authz := utils.AuthZ([]string{"admin"})
 	router.POST("/shifts", authz, handler.store)
 	router.PATCH("/shifts/:id", authz, handler.update)
 	router.DELETE("/shifts/:id", authz, handler.destroy)
+	router.POST("/shifts/:id/:action", authz, handler.active)
 }

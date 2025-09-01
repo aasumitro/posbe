@@ -26,6 +26,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {TimePicker} from "@/components/ui/time-picker";
+import type {StoreShift} from "@/types/shift";
 
 export const ShiftDetailActionSheetState = "shift_detail_action_sheet_state"
 
@@ -67,8 +68,10 @@ export function ShiftDetailActionSheet() {
 
   const onSubmitDelete = (event: FormEvent) => {
     event.preventDefault();
-    setSubmitted(true);
+
     if (!selectedShift) return;
+
+    setSubmitted(true);
 
     deleteShift(selectedShift?.id, {
       onSuccess: async () => {
@@ -120,7 +123,6 @@ export function ShiftDetailActionSheet() {
   }
 
   function onSubmitUpdate(data: z.infer<typeof FormSchema>) {
-    setSubmitted(true);
     if (!selectedShift) return;
 
     const start = formatTime(data.start_time);
@@ -131,6 +133,8 @@ export function ShiftDetailActionSheet() {
       return;
     }
 
+    setSubmitted(true);
+
     editShift({
       id: selectedShift.id,
       body: JSON.stringify({
@@ -139,10 +143,9 @@ export function ShiftDetailActionSheet() {
         end_time: end,
       })
     }, {
-      onSuccess: async (resp) => {
+      onSuccess: async () => {
         toast.success("Shift update successfully");
         await queryClient.invalidateQueries({ queryKey: ['store.shifts'] })
-        setSelectedShifts(resp.data);
         setSubmitted(false);
       },
       onError: async (error) => {
@@ -175,6 +178,11 @@ export function ShiftDetailActionSheet() {
         }
       }
     })
+  }
+
+  function disabledDeleteButton(shift: StoreShift | null): boolean {
+    if (!shift) return true;
+    return shift.id === 1 || shift.id === 2;
   }
 
   return (
@@ -308,31 +316,16 @@ export function ShiftDetailActionSheet() {
               <AvatarFallback>ER</AvatarFallback>
             </Avatar>
           </div>
-
-          <h1 className="font-bold text-md px-4">Customers</h1>
-          <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale px-4">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarImage src="https://github.com/leerob.png" alt="@leerob" />
-              <AvatarFallback>LR</AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/evilrabbit.png"
-                alt="@evilrabbit"
-              />
-              <AvatarFallback>ER</AvatarFallback>
-            </Avatar>
-          </div>
         </div>
 
         <SheetFooter className="flex flex-row justify-between">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="link" className="text-red-500 cursor-pointer">
+              <Button
+                variant="link"
+                className="text-red-500 cursor-pointer"
+                disabled={disabledDeleteButton(selectedShift)}
+              >
                 DELETE
               </Button>
             </PopoverTrigger>

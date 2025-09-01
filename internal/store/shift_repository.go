@@ -2,6 +2,10 @@ package store
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aasumitro/posbe/internal/model"
@@ -11,6 +15,8 @@ import (
 type shiftRepository struct {
 	db model.IPgxPool
 }
+
+var ErrShiftHasOrders = errors.New("cannot delete shift, it has orders")
 
 func (repository shiftRepository) GetAll(ctx context.Context) ([]*model.Shift, error) {
 	q := `
@@ -46,7 +52,7 @@ func (repository shiftRepository) GetAll(ctx context.Context) ([]*model.Shift, e
 		s := shift
 		if activeShift.ID != 0 {
 			sa := activeShift
-			s.ActiveShift = &sa
+			s.Active = &sa
 		}
 		shifts = append(shifts, &s)
 		return nil
@@ -58,23 +64,70 @@ func (repository shiftRepository) GetAll(ctx context.Context) ([]*model.Shift, e
 }
 
 func (repository shiftRepository) FindByID(ctx context.Context, id int64) (*model.Shift, error) {
-	//q := "SELECT * FROM shifts WHERE "
-	////goland:noinspection ALL
-	//if key == model.FindWithID {
-	//	q += "id = $1 "
-	//}
-	//q += "LIMIT 1"
-	//row := repo.Db.QueryRowContext(ctx, q, val)
-	//shift = &model.Shift{}
-	//if err := row.Scan(
-	//	&shift.ID, &shift.Name, &shift.StartTime,
-	//	&shift.EndTime, &shift.CreatedAt, &shift.UpdatedAt,
-	//); err != nil {
-	//	return nil, err
-	//}
-	//return shift, nil
+	batch := &pgx.Batch{}
+	batch.Queue(`SELECT * FROM shifts WHERE id = $1`, id)
+	batch.Queue(`SELECT * FROM active_shifts WHERE shift_id = $1 ORDER BY created_at DESC`, id)
+	batch.Queue(`SELECT * FROM orders WHERE shift_id = $1`, id)
 
-	panic("implement me")
+	br := repository.db.SendBatch(ctx, batch)
+	defer func() { _ = br.Close() }()
+
+	// Fetch shift
+	var shift model.Shift
+	if err := br.QueryRow().Scan(
+		&shift.ID, &shift.Name,
+		&shift.StartTime, &shift.EndTime,
+		&shift.CreatedAt, &shift.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+
+	// Fetch active shifts
+	rows, err := br.Query()
+	if err != nil {
+		return nil, err
+	}
+	var histories []*model.ActiveShift
+	for rows.Next() {
+		var a model.ActiveShift
+		if err := rows.Scan(
+			&a.ID, &a.ShiftID,
+			&a.OpenAt, &a.OpenBy, &a.OpenCash,
+			&a.CloseAt, &a.CloseBy, &a.CloseCash,
+			&a.CreatedAt, &a.UpdatedAt,
+		); err != nil {
+			rows.Close()
+			return nil, err
+		}
+		histories = append(histories, &a)
+	}
+	rows.Close()
+	shift.Histories = histories
+
+	// --- 3. Fetch orders
+	orderRows, err := br.Query()
+	if err != nil {
+		return nil, err
+	}
+	var orders []*model.Order
+	for orderRows.Next() {
+		var o model.Order
+		if err := orderRows.Scan(
+			&o.ID, &o.CashierID, &o.ShiftID, &o.TableID,
+			&o.TimeOpen, &o.TimeClose, &o.Customer,
+			&o.Gross, &o.Discount, &o.Net, &o.Tax, &o.Total,
+			&o.Type, &o.Payment, &o.Change, &o.Notes,
+			&o.CancelReason, &o.Status, &o.CreatedAt, &o.UpdatedAt,
+		); err != nil {
+			orderRows.Close()
+			return nil, err
+		}
+		orders = append(orders, &o)
+	}
+	orderRows.Close()
+	shift.Orders = orders
+
+	return &shift, nil
 }
 
 func (repository shiftRepository) Create(ctx context.Context, form *ShiftForm) error {
@@ -96,62 +149,69 @@ func (repository shiftRepository) Create(ctx context.Context, form *ShiftForm) e
 	return nil
 }
 
-func (repository shiftRepository) Update(ctx context.Context, sh *ShiftForm) error {
-	//q := "UPDATE shifts SET "
-	//q += "name = $1, start_time = $2, "
-	//q += "end_time = $3, updated_at = $4 "
-	//q += " WHERE id = $5 RETURNING *"
-	//row := repo.Db.QueryRowContext(ctx, q,
-	//	params.Name, params.StartTime,
-	//	params.EndTime, time.Now().Unix(), params.ID)
-	//data = &model.Shift{}
-	//if err := row.Scan(&data.ID, &data.Name, &data.StartTime,
-	//	&data.EndTime, &data.CreatedAt, &data.UpdatedAt,
-	//); err != nil {
-	//	return nil, err
-	//}
-	//return data, nil
+func (repository shiftRepository) Update(ctx context.Context, form *ShiftForm) error {
+	if form.ID == 0 {
+		return errors.New("missing shift ID for update")
+	}
 
-	panic("implement me")
+	var setClauses []string
+	var args []any
+	argPos := 1
+
+	// Build SET clause dynamically only for fields that are non-zero/non-empty
+	if form.Name != "" {
+		setClauses = append(setClauses, "name = $"+strconv.Itoa(argPos))
+		args = append(args, form.Name)
+		argPos++
+	}
+	if form.StartTime > 0 {
+		setClauses = append(setClauses, "start_time = $"+strconv.Itoa(argPos))
+		args = append(args, form.StartTime)
+		argPos++
+	}
+	if form.EndTime > 0 {
+		setClauses = append(setClauses, "end_time = $"+strconv.Itoa(argPos))
+		args = append(args, form.EndTime)
+		argPos++
+	}
+	if len(setClauses) == 0 {
+		return errors.New("no fields to update")
+	}
+	setClauses = append(setClauses, "updated_at = $"+strconv.Itoa(argPos))
+	args = append(args, time.Now().Unix())
+	argPos++
+	args = append(args, form.ID) // Add WHERE clause
+
+	q := fmt.Sprintf(`UPDATE shifts SET %s WHERE id = $%d`,
+		strings.Join(setClauses, ", "), argPos)
+	_, err := repository.db.Exec(ctx, q, args...)
+	return err
 }
 
 func (repository shiftRepository) Delete(ctx context.Context, id int64) error {
-	// TODO: Check store_shift & transaction
-	// if shift being used by this 2 collection
-	// then reject the deletion command,
-	// instead user just can update this item
-	//qsst := "SELECT store_shifts.id as id, COUNT(orders) as order_count "
-	//qsst += "FROM store_shifts WHERE shift_id = $1 "
-	//qsst += "LEFT OUTER JOIN orders ON orders.shift_id = id"
-	//row := repo.Db.QueryRowContext(ctx, qsst, params.ID)
-	//shiftTR := &model.StoreShiftTransaction{}
-	//if err := row.Scan(
-	//	&shiftTR.ID,
-	//	&shiftTR.OrderCount,
-	//); err != nil {
-	//	return err
-	//}
-	//if shiftTR.OrderCount > 0 {
-	//	return fmt.Errorf(
-	//		"ERROR_RELATION: store shift used by %d transaction",
-	//		shiftTR.OrderCount)
-	//}
-	//tr, err := repo.Db.BeginTx(ctx, nil)
-	//if err != nil {
-	//	return err
-	//}
-	//qs := "DELETE FROM shifts WHERE id = $1"
-	//if _, err := tr.ExecContext(ctx, qs, params.ID); err != nil {
-	//	_ = tr.Rollback()
-	//	return err
-	//}
-	//qss := "DELETE FROM store_shifts WHERE shift_id = $1"
-	//if _, err := tr.ExecContext(ctx, qss, params.ID); err != nil {
-	//	_ = tr.Rollback()
-	//	return err
-	//}
-	//return tr.Commit()
+	var count int
+	qo := `SELECT COUNT(*) FROM orders WHERE shift_id = $1`
+	if err := repository.db.QueryRow(ctx, qo, id).Scan(&count); err != nil {
+		return err
+	}
+	if count > 0 {
+		return fmt.Errorf("%w: %d", ErrShiftHasOrders, count)
+	}
 
+	q := "DELETE FROM shifts WHERE id = $1"
+	_, err := repository.db.Exec(ctx, q, id)
+	return err
+}
+
+func (repository shiftRepository) Open(ctx context.Context, form *ActiveShiftForm) error {
+	//TODO implement me
+	// Check if theres active shift or not if yes throw error to close the prev first
+	panic("implement me")
+}
+
+func (repository shiftRepository) Close(ctx context.Context, form *ActiveShiftForm) error {
+	//TODO implement me
+	// check if theres active orders, if yes complete the order first before close
 	panic("implement me")
 }
 
