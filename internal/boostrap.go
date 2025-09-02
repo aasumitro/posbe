@@ -29,7 +29,7 @@ func RunServer(ctx context.Context) {
 	// register public routes
 	registerPublicRoutes(routerEngine)
 	// register providers
-	registerAPIModuleV1(routerEngine)
+	registerAPIModules(routerEngine)
 	// server defines parameters for running an HTTP server.
 	server := &http.Server{
 		Addr:              config.Instance.AppPort,
@@ -47,8 +47,6 @@ func RunServer(ctx context.Context) {
 	}()
 	// Listen for the interrupt signal.
 	<-ctx.Done()
-	// Restore default behavior on the interrupt signal and notify user of shutdown.
-	stop()
 	log.Println("shutting down gracefully, press Ctrl+C again to force")
 	// The context is used to inform the server it has 10 seconds to finish
 	// the request it is currently handling
@@ -74,7 +72,7 @@ func registerPublicRoutes(engine *gin.Engine) {
 	router := engine
 	// no route handler
 	router.NoMethod(func(ctx *gin.Context) {
-		ctx.String(http.StatusNotFound,
+		ctx.String(http.StatusBadRequest,
 			"HTTP_METHOD_NOT_FOUND")
 	})
 	// no route handler
@@ -99,7 +97,7 @@ func registerPublicRoutes(engine *gin.Engine) {
 			ginSwagger.DefaultModelsExpandDepth(4)))
 }
 
-func registerAPIModuleV1(engine *gin.Engine) {
+func registerAPIModules(engine *gin.Engine) {
 	routerGroup := engine.Group("api/v1")
 	account.NewAccountModuleProvider(routerGroup)
 	store.NewStoreModuleProvider(routerGroup)

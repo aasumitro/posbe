@@ -21,14 +21,16 @@ type (
 		Last      *ActiveShift   `json:"last,omitempty"` // so if active is empty (find last)
 		Histories []*ActiveShift `json:"histories,omitempty"`
 		Orders    []*Order       `json:"orders,omitempty"`
+		UsersID   []*int64       `json:"users_id,omitempty"`
 
 		// Count data
-		TotalUsage       int64 `json:"total_usage"`
-		TotalTransaction int64 `json:"total_transaction"`
-		TotalSurplus     int64 `json:"total_surplus"`
-		TotalDeficit     int64 `json:"total_deficit"`
-		Profit           int64 `json:"profit"`
-		Loss             int64 `json:"loss"`
+		TotalUsage       int64 `json:"total_usage,omitempty"`
+		TotalTransaction int64 `json:"total_transaction,omitempty"`
+		TotalSurplus     int64 `json:"total_surplus,omitempty"`
+		TotalDeficit     int64 `json:"total_deficit,omitempty"`
+		Profit           int64 `json:"profit,omitempty"`
+		Loss             int64 `json:"loss,omitempty"`
+		Net              int64 `json:"net,omitempty"`
 	}
 
 	ActiveShift struct {

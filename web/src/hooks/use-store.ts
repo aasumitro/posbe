@@ -1,6 +1,6 @@
 import type {HTTPResponse} from "@/types/http-response";
 import {api, API_PATH, catchHTTPError} from "@/lib/api";
-import {useMutation, useSuspenseQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useSuspenseQuery} from "@tanstack/react-query";
 import type {StoreSetting} from "@/types/store";
 import type {StoreShift} from "@/types/shift";
 
@@ -49,6 +49,21 @@ export function useStoreShifts() {
   };
 
   return useSuspenseQuery({ queryKey: ['store.shifts'], queryFn: shifts })
+}
+
+export function useStoreShiftDetail(id?: number) {
+  const shift = async (): Promise<HTTPResponse<StoreShift>> => {
+    try {
+      const url = `${API_PATH.STORE.SHIFTS}/${id}`
+      const response =
+        await api.get<HTTPResponse<StoreShift>>(url);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useQuery({ queryKey: ["store.shift", id], queryFn: shift,  enabled: !!id, })
 }
 
 export function useNewStoreShift() {

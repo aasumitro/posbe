@@ -5,7 +5,14 @@ export interface StoreShift {
   end_time: number;
   total_usage: number;
   total_transaction: number;
-  active_shift: ActiveShift | null;
+  total_surplus: number;
+  total_deficit: number;
+  profit: number;
+  loss: number;
+  net: number;
+  active: ActiveShift | null;
+  last: ActiveShift | null;
+  users_id: number[] | null;
 }
 
 export interface ActiveShift {

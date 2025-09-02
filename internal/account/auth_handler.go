@@ -155,9 +155,8 @@ func NewAuthHandler(accountService IAccountService, router *gin.RouterGroup) {
 	router = router.Group("auth")
 	router.POST("/login", handler.login)
 	router.POST("/refresh", handler.refresh)
-	// TODO: forgot & reset password handler
-	// router.POST("/password/forgot", handler.forgot)
-	// router.POST("/password/reset", handler.reset)
+	// TODO: router.POST("/password/forgot", handler.forgot)
+	// TODO: router.POST("/password/reset", handler.reset)
 	authn := router.Use(utils.AuthN())
 	authn.POST("/logout", handler.logout)
 }

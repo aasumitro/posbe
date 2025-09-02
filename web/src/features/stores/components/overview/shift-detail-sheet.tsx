@@ -15,7 +15,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Button} from "@/components/ui/button";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {PopoverClose} from "@radix-ui/react-popover";
-import {useDeleteShift, useEditStoreShift} from "@/hooks/use-store";
+import {useDeleteShift, useEditStoreShift, useStoreShiftDetail} from "@/hooks/use-store";
 import {toast} from "sonner";
 import {isHTTPResponse} from "@/lib/api";
 import {useQueryClient} from "@tanstack/react-query";
@@ -27,6 +27,7 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {Input} from "@/components/ui/input";
 import {TimePicker} from "@/components/ui/time-picker";
 import type {StoreShift} from "@/types/shift";
+import {Skeleton} from "@/components/ui/skeleton";
 
 export const ShiftDetailActionSheetState = "shift_detail_action_sheet_state"
 
@@ -49,6 +50,7 @@ export function ShiftDetailActionSheet() {
   const [isSubmitted, setSubmitted] = useState(false);
   const { mutate: deleteShift, isPending: isPendingDelete} = useDeleteShift();
   const { mutate: editShift, isPending: isPendingUpdate} = useEditStoreShift();
+  const {data: shift, isPending: isPendingShift} = useStoreShiftDetail(selectedShift?.id ?? undefined)
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -185,6 +187,18 @@ export function ShiftDetailActionSheet() {
     return shift.id === 1 || shift.id === 2;
   }
 
+  function Placeholder({avatars}: { avatars: boolean }) {
+    if (avatars) return (
+      <div className="flex -space-x-2 px-4">
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-8 w-8 rounded-full" />
+        <Skeleton className="h-8 w-8 rounded-full" />
+      </div>
+    );
+
+    return <Skeleton className="bg-black/25 h-6 w-[100px] mt-2" />
+  }
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col">
@@ -205,18 +219,22 @@ export function ShiftDetailActionSheet() {
                 "flex flex-col items-center justify-center w-full p-4"
               )}>
                 <p className="uppercase font-mono text-xs tracking-widest">open</p>
-                <h5 className="font-bold mt-2 tracking-wider">
-                  {selectedShift && intToTime(selectedShift.start_time)}
-                </h5>
+                {isPendingShift ? <Placeholder avatars={false} /> : (
+                  <h5 className="font-bold mt-2 tracking-wider">
+                    {shift?.data ? intToTime(shift.data.start_time) : "-"}
+                  </h5>
+                )}
               </div>
               <div className={cn(
                 "aspect-video rounded-xl bg-muted/50",
                 "flex flex-col items-center justify-center w-full p-4"
               )}>
                 <p className="uppercase font-mono text-xs tracking-widest">close</p>
-                <h5 className="font-bold mt-2 tracking-wider">
-                  {selectedShift && intToTime(selectedShift.end_time)}
-                </h5>
+                {isPendingShift ? <Placeholder avatars={false}/> : (
+                  <h5 className="font-bold mt-2 tracking-wider">
+                    {shift?.data ? intToTime(shift.data.end_time) : "-"}
+                  </h5>
+                )}
               </div>
             </section>
 
@@ -226,14 +244,22 @@ export function ShiftDetailActionSheet() {
                 "flex flex-col items-center justify-center w-full p-4"
               )}>
                 <p className="uppercase font-mono text-xs tracking-widest">USE</p>
-                <h5 className="font-bold mt-2 text-xl tracking-wider">3x</h5>
+                {isPendingShift ? <Placeholder avatars={false}/> : (
+                  <h5 className="font-bold mt-2 text-xl tracking-wider">
+                    {shift?.data && shift.data.total_usage > 0 ? `${shift.data.total_usage}x` : "-"}
+                  </h5>
+                )}
               </div>
               <div className={cn(
                 "aspect-video rounded-xl bg-muted/50",
                 "flex flex-col items-center justify-center w-full p-4"
               )}>
                 <p className="uppercase font-mono text-xs tracking-widest">TRX</p>
-                <h5 className="font-bold text-xl mt-2 tracking-wider">25x</h5>
+                {isPendingShift ? <Placeholder avatars={false}/> : (
+                  <h5 className="font-bold mt-2 text-xl tracking-wider">
+                    {shift?.data && shift.data.total_transaction > 0 ? `${shift.data.total_transaction}x` : "-"}
+                  </h5>
+                )}
               </div>
             </section>
 
@@ -257,14 +283,22 @@ export function ShiftDetailActionSheet() {
                 "flex flex-col items-center justify-center w-full p-4"
               )}>
                 <p className="uppercase font-mono text-xs tracking-widest">Surplus</p>
-                <h5 className="font-bold text-xl mt-2 tracking-wider">2x</h5>
+                {isPendingShift ? <Placeholder avatars={false}/> : (
+                  <h5 className="font-bold mt-2 text-xl tracking-wider">
+                    {shift?.data && shift.data.total_surplus > 0 ? `${shift.data.total_surplus}x` : "-"}
+                  </h5>
+                )}
               </div>
               <div className={cn(
                 "aspect-video rounded-xl bg-muted/50",
                 "flex flex-col items-center justify-center w-full p-4"
               )}>
                 <p className="uppercase font-mono text-xs tracking-widest">Deficit</p>
-                <h5 className="font-bold mt-2 text-xl tracking-wider">1x</h5>
+                {isPendingShift ? <Placeholder avatars={false}/> : (
+                  <h5 className="font-bold mt-2 text-xl tracking-wider">
+                    {shift?.data && shift.data.total_deficit > 0 ? `${shift.data.total_deficit}x` : "-"}
+                  </h5>
+                )}
               </div>
             </section>
 
@@ -274,14 +308,28 @@ export function ShiftDetailActionSheet() {
                 "flex flex-col items-center justify-center w-full p-4"
               )}>
                 <p className="uppercase font-mono text-xs tracking-widest">Profit</p>
-                <h5 className="font-bold mt-2 text-xl tracking-wider text-green-500"> {settings?.currency} 5M </h5>
+                {isPendingShift ? <Placeholder avatars={false}/> : (
+                  <h5 className={cn(
+                    "font-bold mt-2 text-xl tracking-wider",
+                    shift?.data && shift.data.profit && "text-green-500"
+                  )}>
+                    {shift?.data && shift.data.profit > 0 ? `${settings?.currency} 5M` : "-"}
+                  </h5>
+                )}
               </div>
               <div className={cn(
                 "aspect-video rounded-xl bg-muted/50",
                 "flex flex-col items-center justify-center w-full p-4"
               )}>
-                <p className="uppercase font-mono text-xs tracking-widest ">Loss</p>
-                <h5 className="font-bold text-xl mt-2 tracking-wider text-red-500"> {settings?.currency} 1M </h5>
+                <p className="uppercase font-mono text-xs tracking-widest">Loss</p>
+                {isPendingShift ? <Placeholder avatars={false}/> : (
+                  <h5 className={cn(
+                    "font-bold mt-2 text-xl tracking-wider",
+                    shift?.data && shift.data.loss && "text-red-500"
+                  )}>
+                    {shift?.data && shift.data.loss > 0 ? `${settings?.currency} 1M` : "-"}
+                  </h5>
+                )}
               </div>
             </section>
 
@@ -292,30 +340,37 @@ export function ShiftDetailActionSheet() {
               <p className="uppercase font-mono text-xs tracking-widest">
                 Net Profit
               </p>
-              <h5 className="font-bold mt-2 text-xl tracking-wider text-green-500">
-                {settings?.currency} 4M
-              </h5>
+              {isPendingShift ? <Placeholder avatars={false}/> : (
+                <h5 className={cn(
+                  "font-bold mt-2 text-xl tracking-wider",
+                  shift?.data && shift.data.net ? (shift.data.net > 0 ? "text-green-500" : "text-red-500") : ""
+                )}>
+                  {shift?.data && shift.data.net > 0 ? `${settings?.currency} 1M` : "-"}
+                </h5>
+              )}
             </div>
           </section>
 
           <h1 className="font-bold text-md px-4">Users</h1>
-          <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale px-4">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarImage src="https://github.com/leerob.png" alt="@leerob" />
-              <AvatarFallback>LR</AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/evilrabbit.png"
-                alt="@evilrabbit"
-              />
-              <AvatarFallback>ER</AvatarFallback>
-            </Avatar>
-          </div>
+          {isPendingShift ? <Placeholder avatars={true}/> : (
+            <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale px-4">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <Avatar>
+                <AvatarImage src="https://github.com/leerob.png" alt="@leerob" />
+                <AvatarFallback>LR</AvatarFallback>
+              </Avatar>
+              <Avatar>
+                <AvatarImage
+                  src="https://github.com/evilrabbit.png"
+                  alt="@evilrabbit"
+                />
+                <AvatarFallback>ER</AvatarFallback>
+              </Avatar>
+            </div>
+          )}
         </div>
 
         <SheetFooter className="flex flex-row justify-between">

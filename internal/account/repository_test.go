@@ -51,30 +51,30 @@ func (suite *accountRepositoryTestSuite) TestAccountRepository_RoleList_Expected
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
 }
-
-func (suite *accountRepositoryTestSuite) TestAccountRepository_RoleList_ExpectedReturnErrorFromQuery() {
+func (suite *accountRepositoryTestSuite) TestAccountRepository_RoleList_ExpectedReturnError() {
 	q := "SELECT roles.id, roles.name, roles.description, COUNT(users.role_id) as usage "
 	q += "FROM roles LEFT OUTER JOIN users ON users.role_id = roles.id "
 	q += "GROUP BY roles.id ORDER BY roles.id ASC"
 	expectedQuery := regexp.QuoteMeta(q)
-	suite.mock.ExpectQuery(expectedQuery).WillReturnError(errors.New(""))
-	res, err := suite.accountRepo.GetAllRoles(context.TODO())
-	require.NotNil(suite.T(), err)
-	require.Nil(suite.T(), res)
-}
-func (suite *accountRepositoryTestSuite) TestAccountRepository_RoleList_ExpectedReturnErrorFromScan() {
+
 	roles := suite.mock.
 		NewRows([]string{"id", "name", "description", "usage"}).
 		AddRow(1, "test", "test 1", 1).
 		AddRow("bad_id", nil, nil, nil)
-	q := "SELECT roles.id, roles.name, roles.description, COUNT(users.role_id) as usage "
-	q += "FROM roles LEFT OUTER JOIN users ON users.role_id = roles.id "
-	q += "GROUP BY roles.id ORDER BY roles.id ASC"
-	expectedQuery := regexp.QuoteMeta(q)
-	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(roles)
-	res, err := suite.accountRepo.GetAllRoles(context.TODO())
-	require.Nil(suite.T(), res)
-	require.NotNil(suite.T(), err)
+
+	suite.T().Run("error from query", func(t *testing.T) {
+		suite.mock.ExpectQuery(expectedQuery).WillReturnError(errors.New(""))
+		res, err := suite.accountRepo.GetAllRoles(context.TODO())
+		require.NotNil(suite.T(), err)
+		require.Nil(suite.T(), res)
+	})
+
+	suite.T().Run("error from scan", func(t *testing.T) {
+		suite.mock.ExpectQuery(expectedQuery).WillReturnRows(roles)
+		res, err := suite.accountRepo.GetAllRoles(context.TODO())
+		require.Nil(suite.T(), res)
+		require.NotNil(suite.T(), err)
+	})
 }
 
 func (suite *accountRepositoryTestSuite) TestAccountRepository_UserList_ExpectedReturnDataRows() {
@@ -92,52 +92,45 @@ func (suite *accountRepositoryTestSuite) TestAccountRepository_UserList_Expected
 	require.NoError(suite.T(), err)
 	require.NotNil(suite.T(), res)
 }
-func (suite *accountRepositoryTestSuite) TestAccountRepository_UserList_ExpectedReturnErrorFromQuery() {
+func (suite *accountRepositoryTestSuite) TestAccountRepository_UserList_ExpectedReturnError() {
 	q := "SELECT u.id, u.role_id, u.name, u.username, u.email, "
 	q += "r.id as role_id, r.name as role_name, r.description, u.created_at FROM users as u "
 	q += "JOIN roles as r ON r.id = u.role_id"
 	expectedQuery := regexp.QuoteMeta(q)
-	suite.mock.ExpectQuery(expectedQuery).WillReturnError(errors.New(""))
-	res, err := suite.accountRepo.GetAllUsers(context.TODO())
-	require.NotNil(suite.T(), err)
-	require.Nil(suite.T(), res)
-}
-func (suite *accountRepositoryTestSuite) TestAccountRepository_UserList_ExpectedReturnErrorFromScan() {
+
 	users := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "role_id", "role_name", "role_description", "created_at"}).
 		AddRow(1, 1, "lorem ipsum", "lorem", "lorem@ipsum.id", 1, "test", "test 12345", time.Now().Unix()).
 		AddRow("Bad_ID", nil, nil, nil, nil, nil, nil, nil, nil)
-	q := "SELECT u.id, u.role_id, u.name, u.username, u.email, r.id as role_id, "
-	q += "r.name as role_name, r.description, u.created_at FROM users as u "
-	q += "JOIN roles as r ON r.id = u.role_id"
-	expectedQuery := regexp.QuoteMeta(q)
-	suite.mock.ExpectQuery(expectedQuery).WillReturnRows(users)
-	res, err := suite.accountRepo.GetAllUsers(context.TODO())
-	require.Nil(suite.T(), res)
-	require.NotNil(suite.T(), err)
+
+	suite.T().Run("error from query", func(t *testing.T) {
+		suite.mock.ExpectQuery(expectedQuery).WillReturnError(errors.New(""))
+		res, err := suite.accountRepo.GetAllUsers(context.TODO())
+		require.NotNil(suite.T(), err)
+		require.Nil(suite.T(), res)
+	})
+
+	suite.T().Run("error from scan", func(t *testing.T) {
+		suite.mock.ExpectQuery(expectedQuery).WillReturnRows(users)
+		res, err := suite.accountRepo.GetAllUsers(context.TODO())
+		require.Nil(suite.T(), res)
+		require.NotNil(suite.T(), err)
+	})
 }
 
 func (suite *accountRepositoryTestSuite) TestAccountRepository_FindUser_ExpectedSuccess() {
-	user := suite.mock.
-		NewRows([]string{"id", "users.role_id", "name", "username", "email", "password", "role_id", "role_name", "role_description"}).
-		AddRow(1, 1, "lorem ipsum", "lorem", "lorem@ipsum.id", "qwe123", 1, "test", "test 12345")
-	q := "SELECT u.id, u.role_id, u.name, u.username, u.email, u.password, "
-	q += "r.id as role_id, r.name as role_name, r.description FROM users as u "
-	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
-	expectedQuery := regexp.QuoteMeta(q)
-	suite.mock.ExpectQuery(expectedQuery).WithArgs(1).WillReturnRows(user)
-	res, err := suite.accountRepo.FindUserBy(context.TODO(), model.FindWithID, 1)
-	require.Nil(suite.T(), err)
-	require.NoError(suite.T(), err)
-	require.NotNil(suite.T(), res)
-}
-func (suite *accountRepositoryTestSuite) TestAccountRepository_FindUser_WithParams_ExpectedSuccess() {
 	tests := []struct {
 		name  string
 		args  string
 		key   model.FindWith
-		value string
+		value any
 	}{
+		{
+			name:  "test find with username",
+			args:  "u.id = $1",
+			key:   model.FindWithID,
+			value: 1,
+		},
 		{
 			name:  "test find with username",
 			args:  "u.username = $1",
@@ -172,19 +165,24 @@ func (suite *accountRepositoryTestSuite) TestAccountRepository_FindUser_Expected
 	user := suite.mock.
 		NewRows([]string{"id", "users.role_id", "name", "username", "email", "password", "role_id", "role_name", "role_description"}).
 		AddRow("BAd_ID", nil, nil, nil, nil, nil, nil, nil, nil)
+
 	q := "SELECT u.id, u.role_id, u.name, u.username, u.email, u.password, "
 	q += "r.id as role_id, r.name as role_name, r.description FROM users as u "
 	q += "JOIN roles as r ON r.id = u.role_id WHERE u.id = $1"
 	expectedQuery := regexp.QuoteMeta(q)
-	suite.mock.ExpectQuery(expectedQuery).WithArgs(1).WillReturnRows(user)
-	res, err := suite.accountRepo.FindUserBy(context.TODO(), model.FindWithID, 1)
-	require.Nil(suite.T(), res)
-	require.NotNil(suite.T(), err)
-}
-func (suite *accountRepositoryTestSuite) TestAccountRepository_FindUser_ExpectedErrorKey() {
-	res, err := suite.accountRepo.FindUserBy(context.TODO(), model.FindWithSKU, 1)
-	require.Nil(suite.T(), res)
-	require.NotNil(suite.T(), err)
+
+	suite.T().Run("error from key", func(t *testing.T) {
+		res, err := suite.accountRepo.FindUserBy(context.TODO(), model.FindWithSKU, 1)
+		require.Nil(suite.T(), res)
+		require.NotNil(suite.T(), err)
+	})
+
+	suite.T().Run("error from query", func(t *testing.T) {
+		suite.mock.ExpectQuery(expectedQuery).WithArgs(1).WillReturnRows(user)
+		res, err := suite.accountRepo.FindUserBy(context.TODO(), model.FindWithID, 1)
+		require.Nil(suite.T(), res)
+		require.NotNil(suite.T(), err)
+	})
 }
 
 func (suite *accountRepositoryTestSuite) TestAccountRepository_CreateUser_ExpectedSuccess() {
@@ -243,8 +241,8 @@ func (suite *accountRepositoryTestSuite) TestAccountRepository_UpdateUser_Expect
 
 	q := `
 	WITH u AS (
-	    UPDATE users SET role_id = $1, name = $2, username = $3, email = $4, password = $5
-	    WHERE id = $6
+	    UPDATE users SET role_id = $1, name = $2, username = $3, email = $4, password = $5, updated_at = $6
+	    WHERE id = $7
 	    RETURNING *
 	)
 	SELECT u.id, u.role_id, u.name, u.username, u.email, u.password,
@@ -255,22 +253,22 @@ func (suite *accountRepositoryTestSuite) TestAccountRepository_UpdateUser_Expect
 
 	expectedQuery := regexp.QuoteMeta(q)
 	suite.mock.ExpectQuery(expectedQuery).
-		WithArgs(user.RoleID, user.Name, user.Username, user.Email, user.Password, user.ID).
+		WithArgs(user.RoleID, user.Name, user.Username, user.Email, user.Password, time.Now().Unix(), user.ID).
 		WillReturnRows(rows).WillReturnError(nil)
 	res, err := suite.accountRepo.UpdateUserByID(context.TODO(), user)
 	require.Nil(suite.T(), err)
 	require.NotNil(suite.T(), res)
 }
 func (suite *accountRepositoryTestSuite) TestAccountRepository_UpdateUser_ExpectedError() {
-	suite.T().Run("no clauses", func(t *testing.T) {
-		user := model.User{}
+	suite.T().Run("no user id", func(t *testing.T) {
+		user := model.User{RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Password: "12345"}
 		res, err := suite.accountRepo.UpdateUserByID(context.TODO(), user)
 		require.Nil(suite.T(), res)
 		require.NotNil(suite.T(), err)
 	})
 
-	suite.T().Run("no user id", func(t *testing.T) {
-		user := model.User{RoleID: 1, Name: "test 123", Username: "test", Email: "test@test.id", Password: "12345"}
+	suite.T().Run("no clauses", func(t *testing.T) {
+		user := model.User{ID: 1}
 		res, err := suite.accountRepo.UpdateUserByID(context.TODO(), user)
 		require.Nil(suite.T(), res)
 		require.NotNil(suite.T(), err)
@@ -283,8 +281,8 @@ func (suite *accountRepositoryTestSuite) TestAccountRepository_UpdateUser_Expect
 			AddRow("BadID", nil, nil, nil, nil, nil, nil, nil, nil)
 		q := `
 	WITH u AS (
-	    UPDATE users SET role_id = $1, name = $2, username = $3, email = $4, password = $5
-	    WHERE id = $6
+	    UPDATE users SET role_id = $1, name = $2, username = $3, email = $4, password = $5, updated_at = $6
+	    WHERE id = $7
 	    RETURNING *
 	)
 	SELECT u.id, u.role_id, u.name, u.username, u.email, u.password,
@@ -294,7 +292,7 @@ func (suite *accountRepositoryTestSuite) TestAccountRepository_UpdateUser_Expect
 	`
 		expectedQuery := regexp.QuoteMeta(q)
 		suite.mock.ExpectQuery(expectedQuery).
-			WithArgs(user.RoleID, user.Name, user.Username, user.Email, user.Password, user.ID).
+			WithArgs(user.RoleID, user.Name, user.Username, user.Email, user.Password, time.Now().Unix(), user.ID).
 			WillReturnRows(rows)
 		res, err := suite.accountRepo.UpdateUserByID(context.TODO(), user)
 		require.Nil(suite.T(), res)

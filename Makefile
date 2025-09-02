@@ -49,18 +49,18 @@ mocks: $(MOCKERY)
 
 .PHONY: run
 run:
-	go mod tidy -compat=1.24
+	go mod tidy -compat=1.25
 	go run ./cmd/api/main.go
 
 .PHONY: watch
 watch:
-	go mod tidy -compat=1.24
+	go mod tidy -compat=1.25
 	air
 
 .PHONY: binary
 binary: tests api-specs
 	@ mkdir -p ./build
 	@ cp ./misc/conf/.example.env ./build/.env
-	@ go mod tidy -compat=1.24
+	@ go mod tidy -compat=1.25
 	@ go build -o ./build/posbe ./cmd/api/main.go
 	@ echo "binary generated"
