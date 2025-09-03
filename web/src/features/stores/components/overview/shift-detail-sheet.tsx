@@ -10,8 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import {useStoreState} from "@/states/store-state";
 import {cn} from "@/lib/utils";
-import {intToTimeValue, intToTime} from "@/lib/time";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {intToTimeValue, intToTime, sqlTimeToFormattedTime} from "@/lib/time";
 import {Button} from "@/components/ui/button";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {PopoverClose} from "@radix-ui/react-popover";
@@ -28,6 +27,7 @@ import {Input} from "@/components/ui/input";
 import {TimePicker} from "@/components/ui/time-picker";
 import type {StoreShift} from "@/types/shift";
 import {Skeleton} from "@/components/ui/skeleton";
+import {UserHoverCard} from "@/components/user-hover-card";
 
 export const ShiftDetailActionSheetState = "shift_detail_action_sheet_state"
 
@@ -270,9 +270,18 @@ export function ShiftDetailActionSheet() {
               <p className="uppercase font-mono text-xs tracking-widest">
                 Last Activity
               </p>
-              <h5 className="font-bold mt-2 text-xl tracking-wider ">
-                Today (active)
-              </h5>
+              {isPendingShift ? <Placeholder avatars={false}/> : (
+                <h5 className="font-bold mt-2 text-xl tracking-wider">
+                  {shift?.data
+                    ? shift.data.active
+                      ? "Today (active)"
+                      : shift.data.last
+                        ? sqlTimeToFormattedTime(shift.data.last.open_at)
+                        : "-"
+                    : "-"}
+                </h5>
+              )}
+
             </div>
           </section>
 
@@ -352,23 +361,15 @@ export function ShiftDetailActionSheet() {
           </section>
 
           <h1 className="font-bold text-md px-4">Users</h1>
-          {isPendingShift ? <Placeholder avatars={true}/> : (
+          {isPendingShift ? (
+            <Placeholder avatars={true} />
+          ) : !shift?.data?.users_id || shift.data.users_id.length === 0 ? (
+            <div className="pl-6 mt-[-10px] font-bold">-</div>
+          ) : (
             <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale px-4">
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-              <Avatar>
-                <AvatarImage src="https://github.com/leerob.png" alt="@leerob" />
-                <AvatarFallback>LR</AvatarFallback>
-              </Avatar>
-              <Avatar>
-                <AvatarImage
-                  src="https://github.com/evilrabbit.png"
-                  alt="@evilrabbit"
-                />
-                <AvatarFallback>ER</AvatarFallback>
-              </Avatar>
+              {shift.data.users_id.map((id) => (
+                <UserHoverCard id={id} />
+              ))}
             </div>
           )}
         </div>

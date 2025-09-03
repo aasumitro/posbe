@@ -32,10 +32,9 @@ func (service shiftService) ShiftList(ctx context.Context) ([]*model.Shift, *uti
 func (service shiftService) ShiftDetail(ctx context.Context, id int64) (*model.Shift, *utils.ServiceError) {
 	data, err := service.repository.FindByID(ctx, id)
 
-	// TODO: proceed the data
-	//      data counting
-	//      last/current active shift
-	//      profit/loss
+	if data != nil {
+		data.ApplyCountingData()
+	}
 
 	return utils.HandleSingleResult[model.Shift]("shift", data, err)
 }

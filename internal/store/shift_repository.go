@@ -65,9 +65,10 @@ func (repository shiftRepository) GetAll(ctx context.Context) ([]*model.Shift, e
 
 func (repository shiftRepository) FindByID(ctx context.Context, id int64) (*model.Shift, error) {
 	batch := &pgx.Batch{}
-	batch.Queue(`SELECT * FROM shifts WHERE id = $1`, id)
+	batch.Queue(`SELECT s.id, s.name, s.start_time, s.end_time, s.created_at, s.updated_at, 
+		(SELECT COUNT(*) FROM orders o WHERE o.shift_id = s.id AND o.status <> 'cancel') AS total_transaction
+		FROM shifts s WHERE s.id = $1`, id)
 	batch.Queue(`SELECT * FROM active_shifts WHERE shift_id = $1 ORDER BY created_at DESC`, id)
-	batch.Queue(`SELECT * FROM orders WHERE shift_id = $1`, id)
 
 	br := repository.db.SendBatch(ctx, batch)
 	defer func() { _ = br.Close() }()
@@ -78,6 +79,7 @@ func (repository shiftRepository) FindByID(ctx context.Context, id int64) (*mode
 		&shift.ID, &shift.Name,
 		&shift.StartTime, &shift.EndTime,
 		&shift.CreatedAt, &shift.UpdatedAt,
+		&shift.TotalTransaction,
 	); err != nil {
 		return nil, err
 	}
@@ -103,29 +105,6 @@ func (repository shiftRepository) FindByID(ctx context.Context, id int64) (*mode
 	}
 	rows.Close()
 	shift.Histories = histories
-
-	// --- 3. Fetch orders
-	orderRows, err := br.Query()
-	if err != nil {
-		return nil, err
-	}
-	var orders []*model.Order
-	for orderRows.Next() {
-		var o model.Order
-		if err := orderRows.Scan(
-			&o.ID, &o.CashierID, &o.ShiftID, &o.TableID,
-			&o.TimeOpen, &o.TimeClose, &o.Customer,
-			&o.Gross, &o.Discount, &o.Net, &o.Tax, &o.Total,
-			&o.Type, &o.Payment, &o.Change, &o.Notes,
-			&o.CancelReason, &o.Status, &o.CreatedAt, &o.UpdatedAt,
-		); err != nil {
-			orderRows.Close()
-			return nil, err
-		}
-		orders = append(orders, &o)
-	}
-	orderRows.Close()
-	shift.Orders = orders
 
 	return &shift, nil
 }
@@ -206,46 +185,38 @@ func (repository shiftRepository) Delete(ctx context.Context, id int64) error {
 func (repository shiftRepository) Open(ctx context.Context, form *ActiveShiftForm) error {
 	//TODO implement me
 	// Check if theres active shift or not if yes throw error to close the prev first
+
+	//	// TODO: before open validate if theres open shift or not
+	//	// qss := "SELECT * FROM store_shifts WHERE close_at = null"
+	//
+	//	qssi := "INSERT INTO store_shifts "
+	//	qssi += "(shift_id, open_at, open_by, open_cash, created_at) "
+	//	qssi += " VALUES ($1, $2, $3, $4, $5) RETURNING id"
+	//	return repo.Db.QueryRowContext(ctx, qssi,
+	//		form.ShiftID, time.Now().Unix(), form.UserID,
+	//		form.Cash, time.Now().Unix()).Err()
+
 	panic("implement me")
 }
 
 func (repository shiftRepository) Close(ctx context.Context, form *ActiveShiftForm) error {
 	//TODO implement me
 	// check if theres active orders, if yes complete the order first before close
+
+	//	// TODO: before close validate theres open transaction or not
+	//	// qo := "SELECT count(*) FROM orders WHERE shift_id = $1 "
+	//	// qo += "AND status NOT IN ('paid', 'cancel') AND time_close = null"
+	//	q := "UPDATE store_shifts SET "
+	//	q += "close_at = $1, close_by = $2, "
+	//	q += "close_cash = $3, updated_at = $4 "
+	//	q += " WHERE id = $5 AND shift_id = $6 RETURNING id"
+	//	return repo.Db.QueryRowContext(ctx, q,
+	//		time.Now().Unix(), form.UserID,
+	//		form.Cash, time.Now().Unix(),
+	//		form.ID, form.ShiftID).Err()
+
 	panic("implement me")
 }
-
-// func (repo ShiftSQLRepository) OpenShift(
-//	ctx context.Context,
-//	form *model.StoreShiftForm,
-//) error {
-//	// TODO: before open validate if theres open shift or not
-//	// qss := "SELECT * FROM store_shifts WHERE close_at = null"
-//
-//	qssi := "INSERT INTO store_shifts "
-//	qssi += "(shift_id, open_at, open_by, open_cash, created_at) "
-//	qssi += " VALUES ($1, $2, $3, $4, $5) RETURNING id"
-//	return repo.Db.QueryRowContext(ctx, qssi,
-//		form.ShiftID, time.Now().Unix(), form.UserID,
-//		form.Cash, time.Now().Unix()).Err()
-//}
-//
-//func (repo ShiftSQLRepository) CloseShift(
-//	ctx context.Context,
-//	form *model.StoreShiftForm,
-//) error {
-//	// TODO: before close validate theres open transaction or not
-//	// qo := "SELECT count(*) FROM orders WHERE shift_id = $1 "
-//	// qo += "AND status NOT IN ('paid', 'cancel') AND time_close = null"
-//	q := "UPDATE store_shifts SET "
-//	q += "close_at = $1, close_by = $2, "
-//	q += "close_cash = $3, updated_at = $4 "
-//	q += " WHERE id = $5 AND shift_id = $6 RETURNING id"
-//	return repo.Db.QueryRowContext(ctx, q,
-//		time.Now().Unix(), form.UserID,
-//		form.Cash, time.Now().Unix(),
-//		form.ID, form.ShiftID).Err()
-//}
 
 func NewShiftRepository(db model.IPgxPool) IStoreShiftRepository {
 	return &shiftRepository{db: db}

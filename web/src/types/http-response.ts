@@ -19,7 +19,7 @@ export interface ResponsePagination {
   total_items: number;
 }
 
-export interface Time {
+export interface Int64R {
   Int64: number
   Valid: boolean
 }

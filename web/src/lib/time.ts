@@ -1,4 +1,4 @@
-import type {Time} from "@/types/http-response";
+import type {Int64R} from "@/types/http-response";
 import type {TimeValue} from "react-aria";
 import { Time as ITime } from "@internationalized/date";  // add this import
 
@@ -44,7 +44,7 @@ export const strTimeToInt = (timeStr: string): number => {
   return convertedHours * 100 + minutes;
 };
 
-export function sqlTimeToFormattedTime(time: Time) {
+export function sqlTimeToFormattedTime(time: Int64R) {
   if (!time.Valid) {
     return "-"
   }

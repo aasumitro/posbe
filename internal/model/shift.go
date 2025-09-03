@@ -49,3 +49,50 @@ type (
 		Shift *Shift `json:"shift,omitempty" binding:"-"`
 	}
 )
+
+func (s *Shift) ApplyCountingData() {
+	if s == nil || len(s.Histories) == 0 {
+		return
+	}
+
+	userSet := make(map[int64]struct{})
+
+	for _, h := range s.Histories {
+		if !h.CloseAt.Valid || !h.CloseCash.Valid {
+			if s.Active == nil {
+				s.Active = h
+			}
+		} else if s.Last == nil {
+			s.Last = h
+		}
+
+		s.TotalUsage++
+
+		if h.OpenCash.Valid && h.CloseCash.Valid {
+			diff := h.CloseCash.Int64 - h.OpenCash.Int64
+			if diff >= 0 {
+				s.TotalSurplus++
+				s.Profit += diff
+			} else {
+				s.TotalDeficit++
+				s.Loss += -diff
+			}
+		}
+
+		if h.OpenBy.Valid {
+			userSet[h.OpenBy.Int64] = struct{}{}
+		}
+		if h.CloseBy.Valid {
+			userSet[h.CloseBy.Int64] = struct{}{}
+		}
+	}
+
+	for uid := range userSet {
+		val := uid
+		s.UsersID = append(s.UsersID, &val)
+	}
+
+	s.Net = s.Profit + s.Loss
+	
+	s.Histories = nil
+}

@@ -20,7 +20,7 @@ export function ShiftTableSection() {
             <TableHead>Name</TableHead>
             <TableHead>Work time</TableHead>
             <TableHead>Total Used</TableHead>
-            <TableHead>Last Action (Open & Close)</TableHead>
+            <TableHead>Last Action</TableHead>
             <TableHead className="w-[100px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -37,9 +37,9 @@ export function ShiftTableSection() {
                 {shift.start_time && intToTime(shift.start_time)} -
                 {shift.end_time && intToTime(shift.end_time)}
               </TableCell>
-              <TableCell className="font-light text-xs text-center">{shift.total_usage}</TableCell>
+              <TableCell className="font-light text-xs text-center">{shift.total_usage ?? "no data"}</TableCell>
 
-              {!shift?.active_shift ? (
+              {!shift?.last ? (
                 <TableCell className="font-light text-xs text-center">no data</TableCell>
               ) : (
                 <TableCell className="font-light text-xs flex flex-col">
