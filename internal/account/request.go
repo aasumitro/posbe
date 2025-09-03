@@ -29,7 +29,7 @@ func (f *LoginForm) Validate(ctx *gin.Context) interface{} {
 }
 
 type UpdatePasswordForm struct {
-	ID          int    `json:"-" form:"-"`
+	ID          int64  `json:"-" form:"-"`
 	Password    string `json:"password" form:"password"`
 	NewPassword string `json:"new_password" form:"new_password"`
 }
@@ -62,7 +62,7 @@ func (f *NewUserForm) Validate(ctx *gin.Context) interface{} {
 }
 
 type UpdateUserForm struct {
-	ID       int    `json:"-" form:"-"`
+	ID       int64  `json:"-" form:"-"`
 	RoleID   int    `json:"role_id" form:"role_id"`
 	Name     string `json:"name" form:"name"`
 	Username string `json:"username" form:"username"`

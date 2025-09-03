@@ -48,7 +48,7 @@ func (service accountService) Users(
 }
 
 func (service accountService) UserByID(
-	ctx context.Context, id int,
+	ctx context.Context, id int64,
 ) (*model.User, *utils.ServiceError) {
 	data, err := service.repository.FindUserBy(ctx, model.FindWithID, id)
 

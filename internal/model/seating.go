@@ -21,11 +21,11 @@ type (
 		ID        int           `json:"id"`
 		FloorID   int           `json:"floor_id"`
 		Name      string        `json:"name"`
-		XPos      float32       `json:"x_pos"`
-		YPos      float32       `json:"y_pos"`
-		WSize     float32       `json:"w_size"`
-		HSize     float32       `json:"h_size"`
-		DSize     float32       `json:"d_size"`
+		XPos      float64       `json:"x_pos"`
+		YPos      float64       `json:"y_pos"`
+		WSize     float64       `json:"w_size"`
+		HSize     float64       `json:"h_size"`
+		DSize     float64       `json:"d_size"`
 		Capacity  int           `json:"capacity"`
 		Type      string        `json:"type"`
 		CreatedAt sql.NullInt64 `json:"created_at"`

@@ -3,7 +3,6 @@ package store
 import (
 	"net/http"
 	"slices"
-	"strconv"
 
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -46,14 +45,11 @@ func (handler shiftHandler) fetch(ctx *gin.Context) {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /api/v1/shifts/{id} [GET]
 func (handler shiftHandler) show(ctx *gin.Context) {
-	idParams := ctx.Param("id")
-	id, errParse := strconv.ParseInt(idParams, 10, 64)
-	if errParse != nil {
-		utils.NewHTTPRespond(ctx,
-			http.StatusBadRequest,
-			errParse.Error())
+	id, ok := utils.GetIDParam(ctx, "id")
+	if !ok {
 		return
 	}
+
 	data, err := handler.service.ShiftDetail(ctx, id)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
@@ -87,12 +83,8 @@ func (handler shiftHandler) store(ctx *gin.Context) {
 }
 
 func (handler shiftHandler) update(ctx *gin.Context) {
-	idParams := ctx.Param("id")
-	id, errParse := strconv.ParseInt(idParams, 10, 64)
-	if errParse != nil {
-		utils.NewHTTPRespond(ctx,
-			http.StatusBadRequest,
-			errParse.Error())
+	id, ok := utils.GetIDParam(ctx, "id")
+	if !ok {
 		return
 	}
 
@@ -120,12 +112,8 @@ func (handler shiftHandler) update(ctx *gin.Context) {
 }
 
 func (handler shiftHandler) destroy(ctx *gin.Context) {
-	idParams := ctx.Param("id")
-	id, errParse := strconv.ParseInt(idParams, 10, 64)
-	if errParse != nil {
-		utils.NewHTTPRespond(ctx,
-			http.StatusBadRequest,
-			errParse.Error())
+	id, ok := utils.GetIDParam(ctx, "id")
+	if !ok {
 		return
 	}
 
@@ -138,10 +126,8 @@ func (handler shiftHandler) destroy(ctx *gin.Context) {
 }
 
 func (handler shiftHandler) active(ctx *gin.Context) {
-	idParams := ctx.Param("id")
-	id, errParse := strconv.ParseInt(idParams, 10, 64)
-	if errParse != nil {
-		utils.NewHTTPRespond(ctx, http.StatusBadRequest, errParse.Error())
+	id, ok := utils.GetIDParam(ctx, "id")
+	if !ok {
 		return
 	}
 
@@ -182,11 +168,11 @@ func (handler shiftHandler) active(ctx *gin.Context) {
 
 func NewShiftHandler(service IStoreShiftService, router gin.IRoutes) {
 	handler := shiftHandler{service: service}
-	authz := utils.AuthZ([]string{"admin"})
 	router.GET("/shifts", handler.fetch)
 	router.GET("/shifts/:id", handler.show)
-	router.POST("/shifts", authz, handler.store)
-	router.PATCH("/shifts/:id", authz, handler.update)
-	router.DELETE("/shifts/:id", authz, handler.destroy)
-	router.POST("/shifts/:id/:action", authz, handler.active)
+	authz := router.Use(utils.AuthZ([]string{"admin"}))
+	authz.POST("/shifts", handler.store)
+	authz.PATCH("/shifts/:id", handler.update)
+	authz.DELETE("/shifts/:id", handler.destroy)
+	authz.POST("/shifts/:id/:action", handler.active)
 }

@@ -70,6 +70,6 @@ func (handler settingHandler) update(ctx *gin.Context) {
 func NewSettingHandler(service IStoreSettingService, router gin.IRoutes) {
 	handler := &settingHandler{service: service}
 	router.GET("/settings", handler.fetch)
-	authz := utils.AuthZ([]string{"admin"})
-	router.PATCH("/settings", authz, handler.update)
+	authz := router.Use(utils.AuthZ([]string{"admin"}))
+	authz.PATCH("/settings", handler.update)
 }

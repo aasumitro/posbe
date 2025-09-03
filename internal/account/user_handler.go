@@ -2,7 +2,6 @@ package account
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/aasumitro/posbe/internal/model"
@@ -75,7 +74,7 @@ func (handler userHandler) updateProfile(ctx *gin.Context) {
 		return
 	}
 
-	form.ID = int(uid.(float64))
+	form.ID = int64(uid.(float64))
 	form.RoleID = 0 // set to zero so the current user cannot update their own role
 	user, err := handler.svc.UpdateUser(ctx, &form)
 	if err != nil {
@@ -124,7 +123,7 @@ func (handler userHandler) updatePassword(ctx *gin.Context) {
 	}
 
 	// call action
-	form.ID = int(uid.(float64))
+	form.ID = int64(uid.(float64))
 	if err := handler.svc.UpdateUserPassword(ctx, &form); err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
@@ -159,12 +158,8 @@ func (handler userHandler) updatePassword(ctx *gin.Context) {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /api/v1/users/{id} [GET]
 func (handler userHandler) show(ctx *gin.Context) {
-	idParams := ctx.Param("id")
-	id, errParse := strconv.Atoi(idParams)
-	if errParse != nil {
-		utils.NewHTTPRespond(ctx,
-			http.StatusBadRequest,
-			errParse.Error())
+	id, ok := utils.GetIDParam(ctx, "id")
+	if !ok {
 		return
 	}
 
@@ -238,12 +233,8 @@ func (handler userHandler) store(ctx *gin.Context) {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /api/v1/users/{id} [PUT]
 func (handler userHandler) update(ctx *gin.Context) {
-	idParams := ctx.Param("id")
-	id, errParse := strconv.Atoi(idParams)
-	if errParse != nil {
-		utils.NewHTTPRespond(ctx,
-			http.StatusBadRequest,
-			errParse.Error())
+	id, ok := utils.GetIDParam(ctx, "id")
+	if !ok {
 		return
 	}
 
@@ -285,12 +276,8 @@ func (handler userHandler) update(ctx *gin.Context) {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /api/v1/users/{id} [DELETE]
 func (handler userHandler) destroy(ctx *gin.Context) {
-	idParams := ctx.Param("id")
-	id, errParse := strconv.Atoi(idParams)
-	if errParse != nil {
-		utils.NewHTTPRespond(ctx,
-			http.StatusBadRequest,
-			errParse.Error())
+	id, ok := utils.GetIDParam(ctx, "id")
+	if !ok {
 		return
 	}
 
