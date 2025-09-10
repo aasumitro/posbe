@@ -1,9 +1,9 @@
 INSERT INTO floors (name)
 VALUES ('1st');
 
-INSERT INTO tables (floor_id, name, x_pos, y_pos, w_size, h_size, d_size, capacity)
-VALUES (1, 'A1', 0, 0, 4 , 4, 0, 4),
-        (1, 'A2', 10, 10, 0 , 0, 6, 4);
+INSERT INTO tables (floor_id, name, x_pos, y_pos, w_size, h_size, d_size, capacity, type)
+VALUES (1, 'A1', 0, 0, 50 , 50, 0, 4, 'rectangle'),
+        (1, 'A2', 100, 0, 0 , 0, 50, 4, 'circle');
 
 -- pos_type : none, restaurant, coffee_shop, store, karaoke
 INSERT INTO store_prefs (key, value)

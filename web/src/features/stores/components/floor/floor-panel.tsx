@@ -1,20 +1,104 @@
 import {cn} from "@/lib/utils";
-import {ChevronDown} from "lucide-react";
+import {ChevronUp} from "lucide-react";
+import {useState} from "react";
+import {AnimatePresence, motion} from "framer-motion";
+import {useSeatingState} from "@/states/seating-state";
+import {FloorActionAdd} from "@/features/stores/components/floor/new-floor-action";
 
 export function FloorPanel() {
+  const [open, setOpen] = useState(false)
+  const {selectedFloor, floors, setSelectedFloor} =  useSeatingState();
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+
   return (
     <div
       className={cn(
-        "absolute top-16 right-5.5 select-none px-4 py-2 flex items-center justify-between w-28",
-        "rounded-lg text-muted-foreground bg-gray-100 font-mono text-[10px] cursor-not-allowed gap-2",
+        "absolute bottom-2 right-2 select-none",
+        "p-4 rounded-lg text-black bg-gray-100/50 w-56",
       )}
-      onClick={(e) => {
-        e.preventDefault();
-        alert("Floor feature currently not available");
-      }}
     >
-      1st Floor
-      <ChevronDown className="w-3.5 h-3.5" />
+      {/* Header with toggle */}
+      <div
+        onClick={() => setOpen(!open)}
+        className={cn(
+          "flex items-center justify-between cursor-pointer",
+          open && "border-b pb-2 mb-2"
+        )}
+        role="button"
+        aria-expanded={open}
+        tabIndex={0}
+      >
+        <h4 className="text-sm font-semibold">
+          {open ? "Floor List" : selectedFloor?.name}
+        </h4>
+        <motion.div
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.25 }}
+        >
+          <ChevronUp className="w-4 h-4" />
+        </motion.div>
+      </div>
+
+      {/* Collapsible content */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="table-status-content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-2 mt-2">
+              {floors?.map((floor) => (
+                <div
+                  className={cn(
+                    "relative flex flex-row gap-2 items-center text-xs ",
+                    "hover:bg-black/50 hover:text-white cursor-pointer rounded-md p-2",
+                    selectedFloor?.id === floor.id && "bg-black/50  text-white"
+                  )}
+                  key={floor.id}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedFloor(floor);
+                    setOpen(false);
+                  }}
+                >
+                  {floor.name} {floor?.total_tables ? `(${floor.total_tables})` : ''}
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenMenuId(openMenuId === floor.id ? null : floor.id);
+                    }}
+                    className="ml-auto p-1 rounded hover:bg-gray-200 hover:text-black cursor-pointer"
+                  >⋮</button>
+
+                  {openMenuId === floor.id && (
+                    <div className="absolute top-full left-0 mt-1 w-48 bg-white text-black rounded-md shadow-md z-10">
+                      <button
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setOpenMenuId(null);
+                          console.log("edit", floor.id)
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="text-sm font-semibold border-t my-3"/>
+
+            <FloorActionAdd />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

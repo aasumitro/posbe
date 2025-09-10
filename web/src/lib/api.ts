@@ -23,6 +23,8 @@ export const API_PATH = {
   STORE: {
     SETTINGS: "/store/settings",
     SHIFTS: "/store/shifts",
+    FLOORS: "/store/floors",
+    TABLES: "/store/tables",
   }
 }
 

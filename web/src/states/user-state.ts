@@ -9,9 +9,9 @@ interface States {
 }
 
 interface Actions {
-  setRoles: (roles: Role[]) => void
-  setUsers: (users: User[]) => void
-  setSelectedUser: (user: User) => void
+  setRoles: (roles: Role[] | null) => void
+  setUsers: (users: User[] | null) => void
+  setSelectedUser: (user: User | null) => void
 }
 
 export const useUserState = create<States & Actions>((set) => {

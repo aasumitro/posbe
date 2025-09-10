@@ -303,7 +303,7 @@ func (suite *accountRepositoryTestSuite) TestAccountRepository_UpdateUser_Expect
 func (suite *accountRepositoryTestSuite) TestAccountRepository_DeleteUser_ExpectedSuccess() {
 	expectedQuery := regexp.QuoteMeta("DELETE FROM users")
 	suite.mock.ExpectExec(expectedQuery).
-		WithArgs(1).
+		WithArgs(int64(1)).
 		WillReturnResult(pgxmock.NewResult("DELETE", 1))
 	user := model.User{ID: 1, RoleID: 1, Username: "test", Password: "12345"}
 	err := suite.accountRepo.DeleteUserByID(context.TODO(), user)
