@@ -15,3 +15,4 @@
 ### UI ref:
 - https://ui.shadcn.com
 - https://shadcnstudio.com/
+- https://tremor.so/
