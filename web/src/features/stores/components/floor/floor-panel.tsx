@@ -4,17 +4,17 @@ import {useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import {useSeatingState} from "@/states/seating-state";
 import {FloorActionAdd} from "@/features/stores/components/floor/new-floor-action";
+import {FloorSheet} from "@/features/stores/components/floor/floor-sheet";
 
 export function FloorPanel() {
   const [open, setOpen] = useState(false)
   const {selectedFloor, floors, setSelectedFloor} =  useSeatingState();
-  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   return (
     <div
       className={cn(
-        "absolute bottom-2 right-2 select-none",
-        "p-4 rounded-lg text-black bg-gray-100/50 w-56",
+        "absolute bottom-4 right-4 select-none",
+        "py-3 px-4 rounded-lg text-black bg-white border dark:bg-input/30 dark:border-input w-56",
       )}
     >
       {/* Header with toggle */}
@@ -66,36 +66,18 @@ export function FloorPanel() {
                   }}
                 >
                   {floor.name} {floor?.total_tables ? `(${floor.total_tables})` : ''}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenMenuId(openMenuId === floor.id ? null : floor.id);
-                    }}
-                    className="ml-auto p-1 rounded hover:bg-gray-200 hover:text-black cursor-pointer"
-                  >⋮</button>
-
-                  {openMenuId === floor.id && (
-                    <div className="absolute top-full left-0 mt-1 w-48 bg-white text-black rounded-md shadow-md z-10">
-                      <button
-                        className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setOpenMenuId(null);
-                          console.log("edit", floor.id)
-                        }}
-                      >
-                        Edit
-                      </button>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
 
-            <div className="text-sm font-semibold border-t my-3"/>
+            <h4 className="text-sm font-semibold border-t border-b py-2 my-4">
+              Floor Actions
+            </h4>
 
-            <FloorActionAdd />
+           <div className="space-y-2">
+             <FloorActionAdd />
+             <FloorSheet />
+           </div>
           </motion.div>
         )}
       </AnimatePresence>

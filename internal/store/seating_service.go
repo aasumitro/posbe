@@ -43,6 +43,18 @@ func (service seatingService) UpdateFloor(ctx context.Context, form *SeatingFloo
 }
 
 func (service seatingService) DeleteFloor(ctx context.Context, id int64) *utils.ServiceError {
+	floors, err := service.FloorList(ctx)
+	if err != nil {
+		return err
+	}
+
+	if len(floors) == 1 {
+		return &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "cannot delete this floor",
+		}
+	}
+
 	if err := service.repository.DeleteFloor(ctx, id); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
