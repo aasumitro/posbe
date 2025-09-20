@@ -98,3 +98,20 @@ export function useDeleteFloor() {
 
   return useMutation({ mutationFn: deleteFloor })
 }
+
+export function useNewTable() {
+  const newTable = async (
+    body: string
+  ): Promise<HTTPResponse<Table>> => {
+    try {
+      const url = API_PATH.STORE.TABLES
+      const response =
+        await api.post<HTTPResponse<Table>>(url, body);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: newTable })
+}

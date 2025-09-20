@@ -25,6 +25,12 @@ import { Label } from "@/components/ui/label"
 import {Slider} from "@/components/ui/slider";
 import {cn} from "@/lib/utils";
 import {IconPlus} from "@tabler/icons-react";
+import {useSeatingState} from "@/states/seating-state";
+import {useNewTable} from "@/hooks/use-seating";
+import {useQueryClient} from "@tanstack/react-query";
+import {toast} from "sonner";
+import {isHTTPResponse} from "@/lib/api";
+import {Loader2Icon} from "lucide-react";
 
 const formSchema = z.object({
   type: z.string(),
@@ -33,28 +39,93 @@ const formSchema = z.object({
     .min(1, { message: "Label must be at least 1 character" })
     .max(3, { message: "Label must be at most 3 characters" })
     .regex(/^[a-zA-Z0-9]+$/, { message: "Label must contain only letters or numbers" }),
-  name: z.string().min(1).max(50),
   chair: z.number().min(1).max(12)
 })
 
+type tableErrorResponse = {
+  floor_id?: string[]
+  name?: string[]
+  x_pos?: string[]
+  y_pos?: string[]
+  w_size?: string[]
+  h_size?: string[]
+  d_size?: string[]
+  capacity?: string[]
+  type?: string[]
+}
+
 export function NewTableAction() {
   const [open, setOpen] = useState<boolean>(false)
+  const {selectedFloor} =  useSeatingState();
+  const {mutate: addTable, isPending} = useNewTable();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       type: "",
       label: "",
-      name: "",
       chair: 1,
     },
     mode: "onChange"
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+    if (!selectedFloor) return;
+
+    let w_size = 0;
+    let h_size = 0;
+    let d_size = 0;
+
+    if (values.type === "rectangle") {
+      h_size = 50;
+      w_size =
+        values.chair <= 4 ? 50 :
+          values.chair <= 6 ? 100 :
+            values.chair <= 8 ? 150 :
+              values.chair <= 10 ? 200 : 250;
+    } else if (values.type === "circle") {
+      d_size = 50;
+    }
+
+    addTable(JSON.stringify({
+      floor_id: selectedFloor.id,
+      name: values.label,
+      capacity: values.chair,
+      type: values.type,
+      x_pos: 400,
+      y_pos: 400,
+      w_size,
+      h_size,
+      d_size,
+    }), {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['floors'] })
+        await queryClient.invalidateQueries({ queryKey: ["floor.tables", selectedFloor.id] })
+        toast.success("New table added successfully");
+        onOpenChange(false);
+      },
+      onError: async (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          if (typeof error.data === "string") {
+            toast.error(error.data);
+            return;
+          }
+
+          if (typeof error.data === "object" && error.data !== null) {
+            const data = error.data as tableErrorResponse;
+
+            if (data.name && data.name.length > 0) {
+              form.setError("label", {type: "manual", message: data.name[0]})
+            }
+          }
+        }
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      }
+    })
   }
 
   const onOpenChange = (newOpen: boolean) => {
@@ -70,19 +141,21 @@ export function NewTableAction() {
     const chair = form.watch("chair")
 
     if (type === "rectangle") {
+      const defaultHeight = 50
+      const defaultWidth =
+        chair <= 4 ? 50 :
+          chair <= 6 ? 100 :
+            chair <= 8 ? 150 :
+              chair <= 10 ? 200 : 250
+
       return (
         <Table
           name={label}
           status="available"
           config={{
             shape: "rectangle",
-            width:
-              chair <= 4 ? 50 :
-                chair <= 6 ? 100 :
-                  chair <= 8 ? 150 :
-                    chair <= 10 ? 200 :
-                      250,
-            height: 50,
+            width: defaultWidth,
+            height: defaultHeight,
             chairs: chair,
           } as RectangleTableConfig}
         />
@@ -171,33 +244,13 @@ export function NewTableAction() {
                     render={({ field }) => (
                       <FormItem>
                         <div className="grid grid-cols-3 items-center gap-4">
-                          <Label htmlFor="label">Label</Label>
+                          <Label htmlFor="label">Label/Name</Label>
                           <Input
                             id="label"
                             type="text"
                             maxLength={3}
                             className="col-span-2 h-8"
-                            placeholder="Label, e.g: TA1"
-                            {...field}
-                          />
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="grid grid-cols-3 items-center gap-4">
-                          <Label htmlFor="name">Name</Label>
-                          <Input
-                            id="name"
-                            type="text"
-                            className="col-span-2 h-8"
-                            placeholder="Name, e.g: First Table"
+                            placeholder="e.g: TA1"
                             {...field}
                           />
                         </div>
@@ -254,8 +307,11 @@ export function NewTableAction() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={form.watch("label") === "" || form.watch("chair") <= 0}
-                  >Submit</Button>
+                    disabled={form.watch("label") === "" || form.watch("chair") <= 0 || isPending}
+                  >
+                    {isPending && <Loader2Icon className="w-4 animate-spin" />}
+                    Submit
+                  </Button>
                 </>
               )}
             </form>

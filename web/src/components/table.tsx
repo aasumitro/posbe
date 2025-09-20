@@ -308,6 +308,45 @@ export function Table({
     )
   }
 
+  const renderMenu = (config: CircleTableConfig | RectangleTableConfig,  menu?: ReactNode): JSX.Element => {
+    if (config.shape === "circle") {
+      return (
+        <>
+          <defs>
+            <mask id="circleMenuMask">
+              <circle
+                cx="0"
+                cy="0"
+                r={config.diameter / 2 - 10}
+                fill="white"
+              />
+            </mask>
+          </defs>
+
+          <foreignObject
+            x={-(config.diameter / 2 - 10)}
+            y={-(config.diameter / 2 - 10)}
+            width={config.diameter - 20}
+            height={config.diameter - 20}
+            mask="url(#circleMenuMask)"
+          >
+            {menu}
+          </foreignObject>
+        </>
+      )
+    }
+    return  (
+      <foreignObject
+        x={-config.width / 4}
+        y={-config.height / 4}
+        width={config.width / 2}
+        height={config.height / 2}
+      >
+        {menu}
+      </foreignObject>
+    )
+  }
+
   /**
    * Renders a chair at the specified position
    */
@@ -332,8 +371,6 @@ export function Table({
 
   return (
     <div className="relative min-w-72">
-      {menu}
-
       <svg width="100%" height="100%" viewBox={viewBox} className="max-w-full max-h-full">
         {/* Table */}
         <defs>
@@ -349,9 +386,14 @@ export function Table({
           </pattern>
         </defs>
 
-        {config.shape === "rectangle"
-          ? renderRectangleTable(config)
-          : renderRoundTable(config)}
+        <g transform="translate(0,0)">
+          {config.shape === "rectangle"
+            ? renderRectangleTable(config)
+            : renderRoundTable(config)}
+
+          {/* Define a circular clipPath */}
+          {renderMenu(config, menu)}
+        </g>
 
         {/* Chairs */}
         {chairPositions.map((pos, index) =>

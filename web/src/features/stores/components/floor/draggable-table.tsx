@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react"
 import type {DraggableTableItem} from "@/components/table"
 import { Table } from "@/components/table";
 import {TableMenu} from "@/features/stores/components/floor/table-menu";
+import {cn} from "@/lib/utils";
 
 interface DraggableTableProps {
   item: DraggableTableItem
@@ -66,13 +67,45 @@ export function DraggableTable({
     onSelect(item.id)
   }
 
+  function getScale(shape: string, chairs: number): string {
+    const circleScales: Record<number, string> = {
+      1: "scale(0.8)",
+      2: "scale(1.1)",
+      3: "scale(0.85)",
+    };
+    const rectangleScales: Record<number, string> = {
+      1: "scale(0.5)",
+      2: "scale(0.5)",
+      3: "scale(0.8)",
+      4: "scale(1)",
+      5: "scale(0.9)",
+      6: "scale(1.2)",
+      7: "scale(1.1)",
+      8: "scale(1.4)",
+      9: "scale(1.3)",
+      12: "scale(1.8)",
+    };
+
+    if (shape === "circle") {
+      return circleScales[chairs] ?? "scale(1)";
+    } else {
+      return rectangleScales[chairs] ?? "scale(1.5)";
+    }
+  }
+
   return (
     <div
+      className={cn(
+        "flex items-center justify-center",
+        item.config.shape ===  "rectangle" && item.config.chairs <= 2 && "rotate-90"
+      )}
       style={{
         position: "absolute",
         left: item.xPos,
         top: item.yPos,
         zIndex: isDragging ? 1000 : isSelected ? 100 : 1,
+        transform: getScale(item.config.shape, item.config.chairs),
+        transformOrigin: "center",
       }}
       onMouseDown={handleMouseDown}
     >
@@ -81,9 +114,7 @@ export function DraggableTable({
         status={item.status}
         customers={item.customers}
         config={item.config}
-        menu={
-          <TableMenu shape={item.config.shape} />
-        }
+        menu={<TableMenu shape={item.config.shape}/>}
       />
     </div>
   )
