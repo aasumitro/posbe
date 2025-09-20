@@ -1,51 +1,34 @@
 "use client"
 
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useState, useEffect, type FormEvent } from "react";
-import { Loader} from "lucide-react";
+import {type FormEvent, useRef} from "react";
+import {Loader2Icon} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useActionState } from "@/states/action-state";
 import {toast} from "sonner";
 import {useUserState} from "@/states/user-state";
 import {useDeleteUser} from "@/hooks/use-user";
 import {isHTTPResponse} from "@/lib/api";
 import {useQueryClient} from "@tanstack/react-query";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {PopoverClose} from "@radix-ui/react-popover";
 
-export const ConfirmDeleteModalState = "team_confirm_delete_modal_state"
-
-export function TeamConfirmDeleteAlertDialog() {
-  const [isDialogOpen, setDialogOpen] = useState(false);
-  const [isSubmitted, setSubmitted] = useState(false);
-  const { bool, setBoolState } = useActionState();
+export function TeamConfirmDeleteAlertDialog({action}: {action: (state: boolean) => void}) {
   const { selectedUser } =  useUserState();
   const { mutate: deleteUser, isPending} = useDeleteUser();
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (bool[ConfirmDeleteModalState]){
-      setDialogOpen(bool[ConfirmDeleteModalState])
-    }
-  }, [bool]);
+  const cancelRef = useRef<HTMLButtonElement>(null);
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    setSubmitted(true);
 
     if (!selectedUser) return;
 
+    cancelRef.current?.click();
+    
     deleteUser(selectedUser?.id, {
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: ['users'] })
         toast.success("User delete successfully");
-        onClose();
+        action(false);
       },
       onError: async (error) => {
         if (error && isHTTPResponse<null>(error)) {
@@ -60,44 +43,48 @@ export function TeamConfirmDeleteAlertDialog() {
     })
   };
 
-  const onClose = () => {
-    setBoolState(ConfirmDeleteModalState, false)
-    setDialogOpen(false)
-    setSubmitted(false);
-  }
-
   return (
-    <AlertDialog open={isDialogOpen} onOpenChange={onClose}>
-      <AlertDialogContent className="w-96">
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            Confirm Delete
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete this user ({selectedUser?.name})?
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <form onSubmit={onSubmit}>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={onClose}
-              disabled={isPending}
-            >Cancel</AlertDialogCancel>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="link"
+          className="text-red-500 cursor-pointer"
+        >
+          DELETE
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4 mb-4">
+          <div className="space-y-2">
+            <h4 className="leading-none font-medium">Confirm Delete</h4>
+            <p className="text-muted-foreground text-sm">
+              Are you sure you want to delete this user ({selectedUser?.name})?
+            </p>
+          </div>
+        </div>
+        <form onSubmit={onSubmit} className="text-right space-x-2">
+          <PopoverClose asChild ref={cancelRef}>
             <Button
-              className="bg-red-500 hover:bg-red-600 text-white"
-              type="submit"
-              disabled={isSubmitted || isPending}
-            >
-              <Loader className={
-                isSubmitted
-                  ? "block animate-spin"
-                  : "hidden"
-              }/>
-              Confirm
-            </Button>
-          </AlertDialogFooter>
+              type="button"
+              variant="outline"
+              className="cursor-pointer"
+              disabled={isPending}
+            >Cancel</Button>
+          </PopoverClose>
+          <Button
+            className="bg-red-500 hover:bg-red-600 text-white"
+            type="submit"
+            disabled={isPending || isPending}
+          >
+            <Loader2Icon className={
+              isPending
+                ? "block animate-spin"
+                : "hidden"
+            }/>
+            Confirm
+          </Button>
         </form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </PopoverContent>
+    </Popover>
   );
 }

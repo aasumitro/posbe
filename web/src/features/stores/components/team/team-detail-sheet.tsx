@@ -15,14 +15,13 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {ConfirmDeleteModalState} from "@/features/stores/components/team/team-confirm-delete";
 import {useUpdateUser} from "@/hooks/use-user";
 import {Loader2Icon} from "lucide-react";
 import {toast} from "sonner";
 import {isHTTPResponse} from "@/lib/api";
 import {useQueryClient} from "@tanstack/react-query";
-
-// TODO: fix validation data
+import {TeamConfirmDeleteAlertDialog} from "@/features/stores/components/team/team-confirm-delete";
+import type {User} from "@/types/user";
 
 export const TeamDetailActionSheetState = "team_detail_action_sheet_state"
 
@@ -58,17 +57,21 @@ export function TeamDetailActionSheet() {
     }
 
     if (selectedUser) {
-      const id = setTimeout(() => {
-        form.reset({
-          username: selectedUser.username,
-          name: selectedUser.name,
-          email: selectedUser.email,
-          role: `${selectedUser.role?.id}`
-        });
-      }, 100);
-      return () => clearTimeout(id);
+      reset(selectedUser)
     }
   }, [bool, selectedUser]);
+
+  const reset = (selectedUser: User) => {
+    const id = setTimeout(() => {
+      form.reset({
+        username: selectedUser.username,
+        name: selectedUser.name,
+        email: selectedUser.email,
+        role: `${selectedUser.role?.id}`
+      });
+    }, 100);
+    return () => clearTimeout(id);
+  }
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     let filteredValues = Object.fromEntries(
@@ -94,10 +97,12 @@ export function TeamDetailActionSheet() {
       },
       onError: async (error) => {
         if (error && isHTTPResponse<null>(error)) {
+          reset(selectedUser as User)
           toast.error(error.data);
           return;
         }
         if (error instanceof Error) {
+          reset(selectedUser as User)
           const clientError = error as Error
           toast.error(clientError.message);
         }
@@ -212,36 +217,27 @@ export function TeamDetailActionSheet() {
               />
             </section>
 
-            <div className="flex justify-between items-center px-4 mt-2">
+            <div className="flex justify-end items-center px-4 mt-2 space-x-2">
               <Button
-                variant="link"
+                variant="outline"
                 type="button"
-                className="text-red-500"
-                onClick={() => {
-                  onOpenChange(false);
-                  setBoolState(ConfirmDeleteModalState, true);
-                }}
+                onClick={() => onOpenChange(false)}
+              >Cancel</Button>
+              <Button
+                type="submit"
+                disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
               >
-                DELETE
+                {isPending && <Loader2Icon className="w-4 animate-spin" />}
+                Save
               </Button>
-
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={() => onOpenChange(false)}
-                >Cancel</Button>
-                <Button
-                  type="submit"
-                  disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
-                >
-                  {isPending && <Loader2Icon className="w-4 animate-spin" />}
-                  Save
-                </Button>
-              </div>
             </div>
           </form>
         </Form>
+
+        {/*TODO: fix the style*/}
+        <div className="absolute top-[39%]">
+          <TeamConfirmDeleteAlertDialog action={onOpenChange} />
+        </div>
       </SheetContent>
     </Sheet>
   )

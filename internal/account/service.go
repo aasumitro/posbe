@@ -80,12 +80,17 @@ func (service accountService) CreateUser(
 func (service accountService) UpdateUser(
 	ctx context.Context, data *UpdateUserForm,
 ) (*model.User, *utils.ServiceError) {
-	// TODO: validate admin, if < 1 return error cannot change role
+	user, err := service.ValidateAdmin(ctx, data.ID, data.RoleID)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
+	}
 
 	updateUser := model.User{ID: data.ID, RoleID: data.RoleID,
 		Name: data.Name, Username: data.Username, Email: data.Email}
-
-	user, err := service.repository.UpdateUserByID(ctx, updateUser)
+	user, err = service.repository.UpdateUserByID(ctx, updateUser)
 
 	if err == nil {
 		config.RdpPool.Del(ctx, model.UsersCacheKey)
@@ -139,10 +144,12 @@ func (service accountService) UpdateUserPassword(
 func (service accountService) RemoveUser(
 	ctx context.Context, data *model.User,
 ) *utils.ServiceError {
-	// get user data from database
-	user, svcErr := service.getUserKV(ctx, model.FindWithID, data.ID)
-	if svcErr != nil {
-		return svcErr
+	user, err := service.ValidateAdmin(ctx, data.ID, 0)
+	if err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
 	}
 
 	// call repo for delete action
@@ -252,6 +259,44 @@ func (service accountService) getUserKV(
 			Code:    http.StatusNotFound,
 			Message: "user not found",
 		}
+	}
+
+	return user, nil
+}
+
+func (service accountService) ValidateAdmin(
+	ctx context.Context, id int64, roleID int,
+) (*model.User, error) {
+	// get user data from database
+	user, svcErr := service.getUserKV(ctx, model.FindWithID, id)
+	if svcErr != nil {
+		return nil, errors.New("failed to get user by given id")
+	}
+
+	users, err := service.Users(ctx)
+	if err != nil {
+		return nil, errors.New("failed to get user list")
+	}
+
+	adminCount := 0
+	for _, u := range users {
+		if u.Role.Name == "admin" {
+			adminCount++
+		}
+	}
+	isAdmin := user.Role.Name == "admin"
+
+	// Delete action
+	if roleID == 0 {
+		if isAdmin && adminCount <= 1 {
+			return nil, errors.New("cannot delete this admin user")
+		}
+		return user, nil
+	}
+
+	// Update action
+	if isAdmin && adminCount == 1 && roleID != user.RoleID {
+		return nil, errors.New("cannot change this admin user role")
 	}
 
 	return user, nil

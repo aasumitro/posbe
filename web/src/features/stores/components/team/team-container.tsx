@@ -2,7 +2,6 @@ import {TeamActionAdd} from "@/features/stores/components/team/team-action-add";
 import {TeamCard} from "@/features/stores/components/team/team-card";
 import {TeamDetailActionSheet} from "@/features/stores/components/team/team-detail-sheet";
 import {useUserState} from "@/states/user-state";
-import {TeamConfirmDeleteAlertDialog} from "@/features/stores/components/team/team-confirm-delete";
 
 export function TeamContainer() {
   const {users} = useUserState()
@@ -16,7 +15,6 @@ export function TeamContainer() {
       ))}
 
       <TeamDetailActionSheet />
-      <TeamConfirmDeleteAlertDialog />
     </aside>
   )
 }
