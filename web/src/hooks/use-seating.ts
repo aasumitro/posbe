@@ -116,6 +116,23 @@ export function useNewTable() {
   return useMutation({ mutationFn: newTable })
 }
 
+export function useUpdateTable() {
+  const editTable = async (
+    {id, body}: {id?: number, body: string}
+  ): Promise<HTTPResponse<Table>> => {
+    try {
+      const url = `${API_PATH.STORE.TABLES}/${id}`
+      const response =
+        await api.patch<HTTPResponse<Table>>(url, body);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: editTable })
+}
+
 export function useDeleteTable() {
   const deleteTable = async (
     id?: number

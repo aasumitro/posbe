@@ -95,6 +95,7 @@ func (service seatingService) UpdateTable(ctx context.Context, form *SeatingTabl
 }
 
 func (service seatingService) DeleteTable(ctx context.Context, tableID int64) *utils.ServiceError {
+	// TODO: validate in use or not (has active order)!
 	if err := service.repository.DeleteTable(ctx, tableID); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,

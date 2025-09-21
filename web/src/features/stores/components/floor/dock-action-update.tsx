@@ -3,13 +3,13 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import {Separator} from "@/components/ui/separator";
 import {Save, SaveOff} from "lucide-react";
 
-export function UpdateActionDock() {
+export function UpdateActionDock({revert, save}: ({revert: () => void, save: () => void})) {
   return (
     <TooltipProvider>
       <Dock direction="middle" className="absolute bottom-2 left-0 right-0">
         <Tooltip>
           <TooltipTrigger asChild>
-            <DockIcon>
+            <DockIcon onTap={revert}>
               <SaveOff className="size-4" />
             </DockIcon>
           </TooltipTrigger>
@@ -26,7 +26,7 @@ export function UpdateActionDock() {
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <DockIcon>
+            <DockIcon onTap={save}>
               <Save className="size-4" />
             </DockIcon>
           </TooltipTrigger>
