@@ -8,10 +8,17 @@ import {
 import {Button} from "@/components/ui/button";
 import {IconDotsVertical} from "@tabler/icons-react";
 import type {Unit} from "@/types/unit";
+import {useActionState} from "@/states/action-state";
+import {UnitActionDeleteModalState} from "@/features/stores/components/attribute/unit-action-delete";
+import {useAttributeState} from "@/states/attribute-state";
+import {UnitActionEditModalState} from "@/features/stores/components/attribute/unit-action-edit";
 
 export function UnitCard({
-  magnitude, symbol, name
+  id, magnitude, symbol, name
 }: Unit) {
+  const { setBoolState } = useActionState();
+  const { setSelectedUnit } =  useAttributeState();
+
   return (
     <div className="bg-muted/50 aspect-video rounded-xl relative flex items-center justify-center">
       <div className="flex items-center justify-center select-none">
@@ -39,8 +46,23 @@ export function UnitCard({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator/>
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              setSelectedUnit({id, name, magnitude, symbol});
+              setBoolState(UnitActionEditModalState, true);
+            }}
+          >Edit</DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            variant="destructive"
+            onClick={(e) => {
+              e.preventDefault();
+              setSelectedUnit({id, name, magnitude, symbol});
+              setBoolState(UnitActionDeleteModalState, true);
+            }}
+          >Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

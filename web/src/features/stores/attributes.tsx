@@ -1,10 +1,23 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {UnitContainer} from "@/features/stores/components/attribute/unit-container";
 import {CategoryContainer} from "@/features/stores/components/attribute/category-container";
+import {useAttributeState} from "@/states/attribute-state";
+import {useUnitList} from "@/hooks/use-attribute";
 
 export function MasterDataPage() {
   const [activeTab, setActiveTab] = useState("units")
+  const {data: units, isPending: isLoadUnit} = useUnitList()
+  const {setUnits} =  useAttributeState();
+
+  useEffect(() => {
+    if (units?.data) {
+      setUnits(units.data)
+    }
+  }, [units?.data]);
+
+
+  if (isLoadUnit) return <>Loading . . .</>
 
   return (
     <div className="w-full pt-4 xl:pt-6 space-y-6 select-none">

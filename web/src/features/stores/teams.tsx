@@ -17,7 +17,6 @@ export function TeamMemberPage() {
     }
   }, [roles?.data, users?.data]);
 
-
   if (isLoadRoles || isLoadUsers) return <>Loading . . .</>
 
   return (

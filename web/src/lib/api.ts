@@ -25,6 +25,11 @@ export const API_PATH = {
     SHIFTS: "/store/shifts",
     FLOORS: "/store/floors",
     TABLES: "/store/tables",
+  },
+  CATALOG: {
+    ATTRIBUTES: {
+      UNITS: "/units",
+    },
   }
 }
 

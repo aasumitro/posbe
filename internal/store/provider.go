@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewStoreModuleProvider(router *gin.RouterGroup) {
+func New(router *gin.RouterGroup) {
 	authn := router.Group("store").Use(utils.AuthN())
 	// store setting
 	settingRepo := NewSettingRepository(config.PgxPool)

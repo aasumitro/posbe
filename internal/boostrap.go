@@ -12,6 +12,7 @@ import (
 
 	"github.com/aasumitro/posbe/config"
 	"github.com/aasumitro/posbe/internal/account"
+	"github.com/aasumitro/posbe/internal/catalog"
 	"github.com/aasumitro/posbe/internal/store"
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -99,8 +100,8 @@ func registerPublicRoutes(engine *gin.Engine) {
 
 func registerAPIModules(engine *gin.Engine) {
 	routerGroup := engine.Group("api/v1")
-	account.NewAccountModuleProvider(routerGroup)
-	store.NewStoreModuleProvider(routerGroup)
-	// catalog.NewCatalogModuleProvider(routerGroup)
-	// transaction.NewTransactionModuleProvider(routerGroup)
+	account.New(routerGroup)
+	store.New(routerGroup)
+	catalog.New(routerGroup)
+	// transaction.New(routerGroup)
 }

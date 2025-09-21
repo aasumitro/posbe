@@ -12,7 +12,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func NewAccountModuleProvider(router *gin.RouterGroup) {
+func New(router *gin.RouterGroup) {
 	repository := NewAccountRepository(config.PgxPool)
 	as := NewAccountService(repository)
 	shouldCacheData(context.Background(), repository)

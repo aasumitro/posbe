@@ -31,6 +31,11 @@ import {
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useState} from "react";
+import {useQueryClient} from "@tanstack/react-query";
+import {useNewUnit} from "@/hooks/use-attribute";
+import {toast} from "sonner";
+import {isHTTPResponse} from "@/lib/api";
+import {Loader2Icon} from "lucide-react";
 
 const FormSchema = z.object({
   magnitude: z.string({
@@ -44,15 +49,66 @@ const FormSchema = z.object({
   }).min(1, "Name must be at least 1 character.").max(20, "Name must be at most 20 characters."),
 })
 
+type UnitErrorResponse = {
+  magnitude?: string[]
+  name?: string[]
+  symbol?: string[]
+}
+
 export function UnitActionAdd() {
   const [open, setOpen] = useState(false)
+  const {mutate: addUnit, isPending} = useNewUnit();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      magnitude: "",
+      name: "",
+      symbol: ""
+    }
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    alert(data)
+    addUnit(JSON.stringify({
+      name: data.name,
+      symbol: data.symbol,
+      magnitude: data.magnitude,
+    }), {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['units'] })
+        toast.success("New unit added successfully");
+        onOpenChange(false);
+      },
+      onError: async (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          if (typeof error.data === "string") {
+            toast.error(error.data);
+            return;
+          }
+
+          if (typeof error.data === "object" && error.data !== null) {
+            const data = error.data as UnitErrorResponse;
+
+            if (data.name && data.name.length > 0) {
+              form.setError("name", {type: "manual", message: data.name[0]})
+            }
+
+            if (data.magnitude && data.magnitude.length > 0) {
+              form.setError("magnitude", {type: "manual", message: data.magnitude[0]})
+            }
+
+            if (data.symbol && data.symbol.length > 0) {
+              form.setError("symbol", {type: "manual", message: data.symbol[0]})
+            }
+          }
+        }
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      }
+    })
   }
 
   function onOpenChange(state: boolean) {
@@ -148,12 +204,14 @@ export function UnitActionAdd() {
             </section>
 
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <Button type="submit">Save</Button>
+              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Loader2Icon className="w-4 animate-spin" />}
+                Save
+              </Button>
             </AlertDialogFooter>
           </form>
         </Form>
-
       </AlertDialogContent>
     </AlertDialog>
   )
