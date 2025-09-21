@@ -115,3 +115,20 @@ export function useNewTable() {
 
   return useMutation({ mutationFn: newTable })
 }
+
+export function useDeleteTable() {
+  const deleteTable = async (
+    id?: number
+  ): Promise<HTTPResponse<null>> => {
+    try {
+      const url = `${API_PATH.STORE.TABLES}/${id}`
+      const response =
+        await api.delete<HTTPResponse<null>>(url);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: deleteTable })
+}

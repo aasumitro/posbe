@@ -12,7 +12,7 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {PopoverClose} from "@radix-ui/react-popover";
 
 export function TeamConfirmDeleteAlertDialog({action}: {action: (state: boolean) => void}) {
-  const { selectedUser } =  useUserState();
+  const { selectedUser, setSelectedUser } =  useUserState();
   const { mutate: deleteUser, isPending} = useDeleteUser();
   const queryClient = useQueryClient();
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -28,6 +28,7 @@ export function TeamConfirmDeleteAlertDialog({action}: {action: (state: boolean)
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: ['users'] })
         toast.success("User delete successfully");
+        setSelectedUser(null);
         action(false);
       },
       onError: async (error) => {

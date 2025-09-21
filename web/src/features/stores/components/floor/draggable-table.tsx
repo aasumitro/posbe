@@ -9,8 +9,8 @@ import {cn} from "@/lib/utils";
 
 interface DraggableTableProps {
   item: DraggableTableItem
-  onMove: (id: string, x: number, y: number) => void
-  onSelect: (id: string) => void
+  onMove: (id: number, x: number, y: number) => void
+  onSelect: (id: number) => void
   isSelected: boolean
   scale: number
   setDragging: (dragging: boolean) => void
@@ -110,11 +110,12 @@ export function DraggableTable({
       onMouseDown={handleMouseDown}
     >
       <Table
-        name={item.id}
+        id={item.id}
+        name={item.name}
         status={item.status}
         customers={item.customers}
         config={item.config}
-        menu={<TableMenu shape={item.config.shape}/>}
+        menu={<TableMenu id={item.id} shape={item.config.shape}/>}
       />
     </div>
   )

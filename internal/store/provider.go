@@ -8,15 +8,15 @@ import (
 
 func NewStoreModuleProvider(router *gin.RouterGroup) {
 	authn := router.Group("store").Use(utils.AuthN())
-
+	// store setting
 	settingRepo := NewSettingRepository(config.PgxPool)
 	settingSvc := NewSettingService(settingRepo)
 	NewSettingHandler(settingSvc, authn)
-
+	// store shift
 	shiftRepo := NewShiftRepository(config.PgxPool)
 	shiftSvc := NewShiftService(shiftRepo)
 	NewShiftHandler(shiftSvc, authn)
-
+	// seating (floor and table)
 	seatingRepo := NewSeatingRepository(config.PgxPool)
 	seatingSvc := NewSeatingService(seatingRepo)
 	NewSeatingHandler(seatingSvc, authn)

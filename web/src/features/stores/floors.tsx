@@ -32,7 +32,8 @@ export function FloorPlanPage() {
 
   const setDefaultLayout = (tables: Table[] | null) => {
     const defaultTables: DraggableTableItem[] = tables?.map((table) => ({
-      id: table.id.toString(),
+      id: table.id,
+      name: table.name,
       xPos: table.x_pos,
       yPos: table.y_pos,
       config: table.type === "circle"

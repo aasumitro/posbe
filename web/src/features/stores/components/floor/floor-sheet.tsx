@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sheet"
 import {IconEdit, IconFocusAuto, IconTrash} from "@tabler/icons-react";
 import {Button} from "@/components/ui/button";
-import {FloorActionAdd} from "@/features/stores/components/floor/new-floor-action";
+import {FloorActionAdd} from "@/features/stores/components/floor/floor-action-new";
 import {useSeatingState} from "@/states/seating-state";
 import {
   Choicebox,

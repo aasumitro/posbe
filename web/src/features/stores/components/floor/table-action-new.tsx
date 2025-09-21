@@ -54,7 +54,7 @@ type tableErrorResponse = {
   type?: string[]
 }
 
-export function NewTableAction() {
+export function TableActionNew() {
   const [open, setOpen] = useState<boolean>(false)
   const {selectedFloor} =  useSeatingState();
   const {mutate: addTable, isPending} = useNewTable();
@@ -150,6 +150,7 @@ export function NewTableAction() {
 
       return (
         <Table
+          id={0}
           name={label}
           status="available"
           config={{
@@ -164,6 +165,7 @@ export function NewTableAction() {
 
     return (
       <Table
+        id={0}
         name={label}
         status="available"
         config={{

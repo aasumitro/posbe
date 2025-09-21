@@ -7,12 +7,25 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import {IconAdjustmentsCog} from "@tabler/icons-react";
+import {useActionState} from "@/states/action-state";
+import {useSeatingState} from "@/states/seating-state";
+import {TableActionDeleteModalState} from "@/features/stores/components/floor/table-action-delete";
 
 export function TableMenu({
+  id,
   shape
 }: {
+  id: number
   shape: string
 }) {
+  const { setBoolState } = useActionState();
+  const {setSelectedTableId} =  useSeatingState();
+
+  const confirmDelete = (id: number) => {
+    setSelectedTableId(id);
+    setBoolState(TableActionDeleteModalState, true);
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,7 +52,13 @@ export function TableMenu({
           <DropdownMenuItem>
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem variant="destructive">
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={(e) => {
+              e.preventDefault();
+              confirmDelete(id);
+            }}
+          >
             Delete
           </DropdownMenuItem>
         </DropdownMenuGroup>

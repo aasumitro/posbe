@@ -46,7 +46,8 @@ export function StorePage() {
     {
       id: "shift-table",
       title: "Store Shift",
-      description: "Manage your store's shift schedule, working hours, and staff assignments.",      content: <ShiftTableSection />
+      description: "Manage your store's shift schedule, working hours, and staff assignments.",
+      content: <ShiftTableSection />
     },
     {
       id: "feature-enabled",

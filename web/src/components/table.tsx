@@ -20,7 +20,8 @@ export interface CircleTableConfig extends BaseTableConfig {
 }
 
 export interface DraggableTableItem {
-  id: string
+  id: number
+  name: string
   xPos: number
   yPos: number
   config: RectangleTableConfig | CircleTableConfig
@@ -38,6 +39,7 @@ export interface ChairPosition {
  * Component for displaying a visual preview of the table
  */
 export interface TableProps {
+  id: number
   name: string
   status: TableStatus
   customers?: number

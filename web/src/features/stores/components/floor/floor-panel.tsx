@@ -3,7 +3,7 @@ import {ChevronUp} from "lucide-react";
 import {useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import {useSeatingState} from "@/states/seating-state";
-import {FloorActionAdd} from "@/features/stores/components/floor/new-floor-action";
+import {FloorActionAdd} from "@/features/stores/components/floor/floor-action-new";
 import {FloorSheet} from "@/features/stores/components/floor/floor-sheet";
 
 export function FloorPanel() {
