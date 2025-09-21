@@ -21,6 +21,7 @@ export interface CircleTableConfig extends BaseTableConfig {
 
 export interface DraggableTableItem {
   id: number
+  floor_id: number
   name: string
   xPos: number
   yPos: number

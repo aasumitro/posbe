@@ -45,11 +45,6 @@ const formSchema = z.object({
 type tableErrorResponse = {
   floor_id?: string[]
   name?: string[]
-  x_pos?: string[]
-  y_pos?: string[]
-  w_size?: string[]
-  h_size?: string[]
-  d_size?: string[]
   capacity?: string[]
   type?: string[]
 }
@@ -117,6 +112,14 @@ export function TableActionNew() {
 
             if (data.name && data.name.length > 0) {
               form.setError("label", {type: "manual", message: data.name[0]})
+            }
+
+            if (data.capacity && data.capacity.length > 0) {
+              form.setError("chair", {type: "manual", message: data.capacity[0]})
+            }
+
+            if (data.type && data.type.length > 0) {
+              form.setError("type", {type: "manual", message: data.type[0]})
             }
           }
         }

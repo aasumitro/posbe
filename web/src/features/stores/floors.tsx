@@ -33,6 +33,7 @@ export function FloorPlanPage() {
   const setDefaultLayout = (tables: Table[] | null) => {
     const defaultTables: DraggableTableItem[] = tables?.map((table) => ({
       id: table.id,
+      floor_id: table.floor_id,
       name: table.name,
       xPos: table.x_pos,
       yPos: table.y_pos,

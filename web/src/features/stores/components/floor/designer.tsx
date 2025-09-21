@@ -15,21 +15,15 @@ import {toast} from "sonner";
 import {isHTTPResponse} from "@/lib/api";
 import {useSeatingState} from "@/states/seating-state";
 import {useQueryClient} from "@tanstack/react-query";
+import {TableActionUpdate} from "@/features/stores/components/floor/table-action-update";
 
 interface FloorDesignerProps {
   initialTables?: DraggableTableItem[]
 }
 
 type tableErrorResponse = {
-  floor_id?: string[]
-  name?: string[]
   x_pos?: string[]
   y_pos?: string[]
-  w_size?: string[]
-  h_size?: string[]
-  d_size?: string[]
-  capacity?: string[]
-  type?: string[]
 }
 
 export function FloorDesigner({
@@ -41,7 +35,6 @@ export function FloorDesigner({
   const [isDraggingTable, setIsDraggingTable] = useState(false)
   const { mutate: updateTable} = useUpdateTable();
   const [isPendingUpdate, setIsPendingUpdate] = useState(false)
-
   const { selectedFloor } =  useSeatingState();
   const queryClient = useQueryClient();
 
@@ -96,8 +89,12 @@ export function FloorDesigner({
 
         if (typeof error.data === "object" && error.data !== null) {
           const data = error.data as tableErrorResponse;
-          if (data.name && data.name.length > 0) {
-            toast.error(data.name[0]);
+          if (data.x_pos && data.x_pos.length > 0) {
+            toast.error(data.x_pos[0]);
+          }
+
+          if (data.y_pos && data.y_pos.length > 0) {
+            toast.error(data.y_pos[0]);
           }
         }
       }
@@ -147,6 +144,7 @@ export function FloorDesigner({
         />
       )}
 
+      <TableActionUpdate />
       <TableActionDelete />
     </div>
   )

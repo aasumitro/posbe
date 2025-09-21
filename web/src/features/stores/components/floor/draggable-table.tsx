@@ -115,7 +115,11 @@ export function DraggableTable({
         status={item.status}
         customers={item.customers}
         config={item.config}
-        menu={<TableMenu id={item.id} shape={item.config.shape}/>}
+        menu={<TableMenu
+          id={item.id}
+          fid={item.floor_id}
+          shape={item.config.shape}
+        />}
       />
     </div>
   )
