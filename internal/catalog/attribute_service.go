@@ -49,6 +49,33 @@ func (service attributeService) DeleteUnit(ctx context.Context, id int64) *utils
 	return nil
 }
 
+func (service attributeService) CategoryList(ctx context.Context) ([]*model.Category, *utils.ServiceError) {
+	data, err := service.repository.GetAllCategory(ctx)
+	return utils.HandleMultipleResults[model.Category]("categories", data, err)
+}
+
+func (service attributeService) CreateCategory(ctx context.Context, form *NewCategoryForm) *utils.ServiceError {
+	if err := service.repository.CreateCategory(ctx, form); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
+func (service attributeService) DeleteCategory(ctx context.Context, id int64) *utils.ServiceError {
+	// TODO: validate in use or not (has used by product)!
+
+	if err := service.repository.DeleteCategory(ctx, id); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
 func NewAttributeService(repository IAttributeRepository) IAttributeService {
 	return &attributeService{repository: repository}
 }

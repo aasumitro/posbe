@@ -29,6 +29,8 @@ export const API_PATH = {
   CATALOG: {
     ATTRIBUTES: {
       UNITS: "/units",
+      CATEGORIES: "/categories",
+      SUBCATEGORIES: "/subcategories",
     },
   }
 }

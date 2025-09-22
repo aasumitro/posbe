@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -90,6 +91,142 @@ func (repository attributeRepository) DeleteUnit(ctx context.Context, id int64) 
 	q := "DELETE FROM units WHERE id = $1"
 	_, err := repository.db.Exec(ctx, q, id)
 	return err
+}
+
+func (repository attributeRepository) GetAllCategory(ctx context.Context) ([]*model.Category, error) {
+	q := `
+		SELECT 
+		  c.id, 
+		  c.name,
+		  (SELECT COUNT(*) FROM products AS p WHERE p.category_id = c.id) AS usage,
+		  COALESCE(
+		    json_agg(
+		      json_build_object(
+		        'id', sc.id,
+		        'category_id', sc.category_id,
+		        'name', sc.name,
+		        'usage', COALESCE(
+				  (SELECT COUNT(*) FROM products AS p WHERE p.subcategory_id = sc.id),
+				  0
+				)
+		      )
+		    ) FILTER (WHERE sc.id IS NOT NULL), 
+		    '[]'
+		  ) AS subcategories
+		FROM categories c
+		LEFT JOIN subcategories sc ON c.id = sc.category_id
+		GROUP BY c.id, c.name
+		ORDER BY c.id;
+	`
+	rows, err := repository.db.Query(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	type categoryRow struct {
+		ID            int64           `json:"id"`
+		Name          string          `json:"name"`
+		Usage         int64           `json:"usage"`
+		Subcategories json.RawMessage `json:"subcategories"`
+	}
+	var categories []*model.Category
+
+	for rows.Next() {
+		var r categoryRow
+		if err := rows.Scan(&r.ID, &r.Name, &r.Usage, &r.Subcategories); err != nil {
+			return nil, err
+		}
+		var subs []*model.Subcategory
+		if err := json.Unmarshal(r.Subcategories, &subs); err != nil {
+			return nil, err
+		}
+		categories = append(categories, &model.Category{
+			ID: r.ID, Name: r.Name, Usage: r.Usage, Subcategories: subs,
+		})
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return categories, nil
+}
+
+func (repository attributeRepository) CreateCategory(ctx context.Context, form *NewCategoryForm) error {
+	tx, err := repository.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if tx != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	// Insert category
+	var categoryID int64
+	if err = tx.QueryRow(ctx,
+		`INSERT INTO categories (name) VALUES ($1) RETURNING id`,
+		form.Name,
+	).Scan(&categoryID); err != nil {
+		return err
+	}
+
+	// Insert subcategories if provided
+	if len(form.Subcategories) > 0 {
+		rows := make([]string, 0, len(form.Subcategories))
+		args := make([]interface{}, 0, len(form.Subcategories)*2)
+		for i, sub := range form.Subcategories {
+			rows = append(rows, fmt.Sprintf("($1, $%d)", i+2))
+			args = append(args, sub)
+		}
+		args = append([]interface{}{categoryID}, args...)
+		query := fmt.Sprintf("INSERT INTO subcategories (category_id, name) VALUES %s", strings.Join(rows, ","))
+		if _, err = tx.Exec(ctx, query, args...); err != nil {
+			return err
+		}
+	}
+
+	// Commit transaction
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+
+	// set tx = nil so rollback is skipped
+	tx = nil
+	return nil
+}
+
+func (repository attributeRepository) DeleteCategory(ctx context.Context, id int64) error {
+	tx, err := repository.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if tx != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	// First delete tables under this floor
+	if _, err := tx.Exec(ctx, "DELETE FROM subcategories WHERE category_id = $1", id); err != nil {
+		return err
+	}
+
+	// Then delete the floor itself
+	if _, err := tx.Exec(ctx, "DELETE FROM categories WHERE id = $1", id); err != nil {
+		return err
+	}
+
+	// Commit transaction
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+
+	// set tx = nil so rollback is skipped
+	tx = nil
+	return nil
 }
 
 func NewAttributeRepository(db model.IPgxPool) IAttributeRepository {

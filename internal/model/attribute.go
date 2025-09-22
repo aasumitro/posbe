@@ -10,10 +10,10 @@ type (
 	}
 
 	Category struct {
-		ID          int64          `json:"id"`
-		Name        string         `json:"name"`
-		Subcategory []*Subcategory `json:"subcategories,omitempty"`
-		Usage       int64          `json:"usage,omitempty"`
+		ID            int64          `json:"id"`
+		Name          string         `json:"name"`
+		Subcategories []*Subcategory `json:"subcategories,omitempty"`
+		Usage         int64          `json:"usage,omitempty"`
 	}
 
 	Subcategory struct {

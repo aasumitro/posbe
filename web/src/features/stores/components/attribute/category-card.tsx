@@ -10,12 +10,19 @@ import {Button} from "@/components/ui/button";
 import {IconDotsVertical} from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {cn} from "@/lib/utils";
+import {useActionState} from "@/states/action-state";
+import {useAttributeState} from "@/states/attribute-state";
+import {CategoryActionDeleteModalState} from "@/features/stores/components/attribute/category-action-delete";
 
 export function CategoryCard({
- name, subcategories
-}: Category) {
+ id, name, usage, subcategories, className
+}: Category & {className?: string}) {
+  const { setBoolState } = useActionState();
+  const { setSelectedCategory } =  useAttributeState();
+
   return (
-    <div className="bg-muted/50 aspect-video rounded-xl relative px-6 py-4 select-none">
+    <div className={cn("bg-muted/50 aspect-video rounded-xl relative px-6 py-4 select-none", className)}>
       <div className="flex items-center justify-between">
        <div className="flex items-center gap-2">
          <h5 className="text-lg font-mono uppercase">{name}</h5>
@@ -25,11 +32,11 @@ export function CategoryCard({
                className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
                variant="outline"
              >
-               20+
+               {usage ?? "0"}
              </Badge>
            </TooltipTrigger>
            <TooltipContent>
-             <p>90 products are linked.</p>
+             <p>{usage ?? "no"} products are linked.</p>
            </TooltipContent>
          </Tooltip>
        </div>
@@ -49,14 +56,23 @@ export function CategoryCard({
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator/>
             <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              variant="destructive"
+              onClick={(e) => {
+                e.preventDefault();
+                setSelectedCategory({id, name, usage});
+                setBoolState(CategoryActionDeleteModalState, true);
+              }}
+            >Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      <section className="p-4 border-1 border-dashed mt-2 rounded-lg space-y-4">
+      <section className="p-4 border-1 border-dashed mt-2 rounded-lg space-y-4 h-full">
         <p className="text-xs">Subcategories</p>
-        {subcategories?.map((subcategory) => (
+
+        {subcategories?.slice(0, 2).map((subcategory) => (
           <div className="flex items-center gap-2" key={subcategory.id}>
             <p className="text-sm text-muted-foreground">– {subcategory.name}</p>
             <Tooltip>
@@ -65,15 +81,27 @@ export function CategoryCard({
                   className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums"
                   variant="outline"
                 >
-                  20+
+                  {subcategory.usage ?? "0"}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
-                <p>90 products are linked.</p>
+                <p>{subcategory.usage ?? "no"} products are linked.</p>
               </TooltipContent>
             </Tooltip>
           </div>
         ))}
+
+        {subcategories && subcategories.length > 2 && (
+          <p className="text-xs text-muted-foreground">
+            +{subcategories.length - 2} more
+          </p>
+        )}
+
+        {(!subcategories || subcategories.length === 0) && (
+          <p className="text-xs text-muted-foreground">
+            No subcategory
+          </p>
+        )}
       </section>
     </div>
   )

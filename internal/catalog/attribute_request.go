@@ -31,3 +31,41 @@ func (f *UnitForm) Validate(ctx *gin.Context) interface{} {
 	}
 	return g.ComplexValidator(r).Validate(ctx, f)
 }
+
+type NewCategoryForm struct {
+	Name          string   `form:"name" json:"name"`
+	Subcategories []string `form:"subcategories" json:"subcategories"`
+}
+
+func (f *NewCategoryForm) Validate(ctx *gin.Context) interface{} {
+	g := galidator.New()
+
+	if err := g.ComplexValidator(galidator.Rules{
+		"Name": g.R("name").Required().Min(3).Max(20),
+	}).Validate(ctx, f); err != nil {
+		return err
+	}
+
+	if f.Subcategories != nil {
+		errs := map[string][]string{}
+		for _, sub := range f.Subcategories {
+			if len(sub) < 3 {
+				errs[sub] = append(errs[sub], "subcategory must be at least 3 characters long")
+			}
+		}
+		if len(errs) > 0 {
+			return map[string]interface{}{"subcategories": errs}
+		}
+	}
+
+	return nil
+}
+
+type NewSubcategoryForm struct {
+	CategoryID int64    `form:"-" json:"-"`
+	Names      []string `form:"names" json:"names"`
+}
+
+func (f *NewSubcategoryForm) Validate(ctx *gin.Context) interface{} {
+	return nil
+}
