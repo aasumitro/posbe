@@ -23,7 +23,7 @@ import {toast} from "sonner";
 const FormSchema = z.object({
   name: z.string({
     required_error: "Please set a name to display.",
-  }).min(1, "Name must be at least 1 character.").max(20, "Name must be at most 20 characters."),
+  }).min(3, "Name must be at least 1 character.").max(20, "Name must be at most 20 characters."),
 })
 
 type CategoryErrorResponse = {

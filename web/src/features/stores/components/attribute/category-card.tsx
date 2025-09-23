@@ -14,6 +14,7 @@ import {cn} from "@/lib/utils";
 import {useActionState} from "@/states/action-state";
 import {useAttributeState} from "@/states/attribute-state";
 import {CategoryActionDeleteModalState} from "@/features/stores/components/attribute/category-action-delete";
+import {CategoryActionEditModalState} from "@/features/stores/components/attribute/category-action-edit";
 
 export function CategoryCard({
  id, name, usage, subcategories, className
@@ -55,7 +56,14 @@ export function CategoryCard({
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator/>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                setSelectedCategory({id, name, usage, subcategories});
+                setBoolState(CategoryActionEditModalState, true);
+              }}
+            >Edit</DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer"
               variant="destructive"

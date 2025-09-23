@@ -24,7 +24,21 @@ export const useAttributeState = create<States & Actions>((set) => {
     selectedCategory: null,
     setUnits: (units: Unit[]) => set({units}),
     setSelectedUnit: (selectedUnit: Unit | null) => set({selectedUnit}),
-    setCategories: (categories: Category[])  => set({categories}),
+    setCategories: (categories: Category[])  => set((state) => {
+      let selectedCategory = state.selectedCategory;
+
+      if (selectedCategory) {
+        const found = categories.find((c) =>
+          c.id === selectedCategory?.id);
+        if (found) {
+          selectedCategory = found;
+        } else {
+          selectedCategory = null;
+        }
+      }
+
+      return {categories, selectedCategory}
+    }),
     setSelectedCategory: (selectedCategory: Category | null) => set({selectedCategory}),
   }
 })

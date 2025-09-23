@@ -2,6 +2,7 @@ import {CategoryCard} from "@/features/stores/components/attribute/category-card
 import {CategoryActionAdd} from "@/features/stores/components/attribute/category-action-add";
 import {useAttributeState} from "@/states/attribute-state";
 import {CategoryActionDelete} from "@/features/stores/components/attribute/category-action-delete";
+import {CategoryActionEdit} from "@/features/stores/components/attribute/category-action-edit";
 
 export function CategoryContainer() {
   const {categories} =  useAttributeState();
@@ -14,6 +15,7 @@ export function CategoryContainer() {
         <CategoryCard key={item.id} {...item} />
       ))}
 
+      <CategoryActionEdit />
       <CategoryActionDelete />
     </div>
   )

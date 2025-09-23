@@ -61,11 +61,52 @@ func (f *NewCategoryForm) Validate(ctx *gin.Context) interface{} {
 	return nil
 }
 
-type NewSubcategoryForm struct {
-	CategoryID int64    `form:"-" json:"-"`
-	Names      []string `form:"names" json:"names"`
+type EditCategoryForm struct {
+	ID                int64                  `form:"-" json:"-"`
+	Name              string                 `form:"name" json:"name"`
+	EditSubcategories []*EditSubcategoryForm `form:"subcategories" json:"subcategories"`
+	NewSubcategories  []string               `form:"new_subcategories" json:"new_subcategories"`
 }
 
-func (f *NewSubcategoryForm) Validate(ctx *gin.Context) interface{} {
+type EditSubcategoryForm struct {
+	ID   int64  `form:"id" json:"id"`
+	Name string `form:"name" json:"name"`
+}
+
+func (f *EditCategoryForm) Validate(ctx *gin.Context) interface{} {
+	g := galidator.New()
+
+	if err := g.ComplexValidator(galidator.Rules{
+		"Name": g.R("name").Optional().Min(3).Max(20),
+	}).Validate(ctx, f); err != nil {
+		return err
+	}
+
+	if f.EditSubcategories != nil {
+		rules := galidator.Rules{
+			"ID":   g.R("id").Required(),
+			"Name": g.R("name").Required().Min(3).Max(20),
+		}
+		validator := g.ComplexValidator(rules)
+
+		for _, sub := range f.EditSubcategories {
+			if err := validator.Validate(ctx, sub); err != nil {
+				return err
+			}
+		}
+	}
+
+	if f.NewSubcategories != nil {
+		errs := map[string][]string{}
+		for _, sub := range f.NewSubcategories {
+			if len(sub) < 3 {
+				errs[sub] = append(errs[sub], "subcategory must be at least 3 characters long")
+			}
+		}
+		if len(errs) > 0 {
+			return map[string]interface{}{"subcategories": errs}
+		}
+	}
+
 	return nil
 }

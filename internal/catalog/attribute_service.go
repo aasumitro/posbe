@@ -64,10 +64,32 @@ func (service attributeService) CreateCategory(ctx context.Context, form *NewCat
 	return nil
 }
 
+func (service attributeService) UpdateCategory(ctx context.Context, form *EditCategoryForm) *utils.ServiceError {
+	if err := service.repository.UpdateCategory(ctx, form); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
 func (service attributeService) DeleteCategory(ctx context.Context, id int64) *utils.ServiceError {
 	// TODO: validate in use or not (has used by product)!
 
 	if err := service.repository.DeleteCategory(ctx, id); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
+func (service attributeService) DeleteSubcategory(ctx context.Context, cid, sid int64) *utils.ServiceError {
+	// TODO: validate in use or not (has used by product)!
+
+	if err := service.repository.DeleteSubcategory(ctx, cid, sid); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),

@@ -15,7 +15,9 @@ type IAttributeRepository interface {
 
 	GetAllCategory(ctx context.Context) ([]*model.Category, error)
 	CreateCategory(ctx context.Context, form *NewCategoryForm) error
+	UpdateCategory(ctx context.Context, form *EditCategoryForm) error
 	DeleteCategory(ctx context.Context, id int64) error
+	DeleteSubcategory(ctx context.Context, cid, sid int64) error
 }
 
 type IAttributeService interface {
@@ -26,5 +28,7 @@ type IAttributeService interface {
 
 	CategoryList(ctx context.Context) ([]*model.Category, *utils.ServiceError)
 	CreateCategory(ctx context.Context, form *NewCategoryForm) *utils.ServiceError
+	UpdateCategory(ctx context.Context, form *EditCategoryForm) *utils.ServiceError
 	DeleteCategory(ctx context.Context, id int64) *utils.ServiceError
+	DeleteSubcategory(ctx context.Context, cid, sid int64) *utils.ServiceError
 }

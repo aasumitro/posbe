@@ -102,12 +102,46 @@ export function useNewCategory() {
   return useMutation({ mutationFn: newCategory })
 }
 
+export function useUpdateCategory() {
+  const editCategory = async (
+    {id, body}: {id?: number, body: string}
+  ): Promise<HTTPResponse<Unit>> => {
+    try {
+      const url = `${API_PATH.CATALOG.ATTRIBUTES.CATEGORIES}/${id}`
+      const response =
+        await api.patch<HTTPResponse<Unit>>(url, body);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: editCategory })
+}
+
 export function useDeleteCategory() {
   const deleteCategory = async (
     id?: number
   ): Promise<HTTPResponse<null>> => {
     try {
       const url = `${ API_PATH.CATALOG.ATTRIBUTES.CATEGORIES}/${id}`
+      const response =
+        await api.delete<HTTPResponse<null>>(url);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: deleteCategory })
+}
+
+export function useDeleteSubcategory() {
+  const deleteCategory = async (
+    {cid,sid}: {cid?: number, sid: number}
+  ): Promise<HTTPResponse<null>> => {
+    try {
+      const url = `${ API_PATH.CATALOG.ATTRIBUTES.CATEGORIES}/${cid}/subcategories/${sid}`
       const response =
         await api.delete<HTTPResponse<null>>(url);
       return response.data;

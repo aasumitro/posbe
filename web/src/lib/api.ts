@@ -30,7 +30,6 @@ export const API_PATH = {
     ATTRIBUTES: {
       UNITS: "/units",
       CATEGORIES: "/categories",
-      SUBCATEGORIES: "/subcategories",
     },
   }
 }

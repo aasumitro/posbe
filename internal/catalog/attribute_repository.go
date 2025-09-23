@@ -198,6 +198,75 @@ func (repository attributeRepository) CreateCategory(ctx context.Context, form *
 	return nil
 }
 
+func (repository attributeRepository) UpdateCategory(ctx context.Context, form *EditCategoryForm) error {
+	tx, err := repository.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if tx != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	if form.Name != "" {
+		q := "UPDATE categories SET name = $1 WHERE id = $2"
+		if _, err := tx.Exec(ctx, q, form.Name, form.ID); err != nil {
+			return err
+		}
+	}
+
+	if len(form.EditSubcategories) > 0 {
+		values := make([]string, 0, len(form.EditSubcategories))
+		args := []interface{}{form.ID}
+
+		for i, sub := range form.EditSubcategories {
+			if sub.Name == "" {
+				continue
+			}
+			values = append(values, fmt.Sprintf("($%d::BIGINT, $%d::TEXT)", i*2+2, i*2+3))
+			args = append(args, sub.ID, sub.Name)
+		}
+
+		if len(values) > 0 {
+			query := fmt.Sprintf(`
+		        UPDATE subcategories AS sc
+		        SET name = v.name
+		        FROM (VALUES %s) AS v(id, name)
+		        WHERE sc.id = v.id
+		          AND sc.category_id = $1
+		    `, strings.Join(values, ","))
+			if _, err := tx.Exec(ctx, query, args...); err != nil {
+				return err
+			}
+		}
+	}
+
+	// Insert new subcategories if provided
+	if len(form.NewSubcategories) > 0 {
+		rows := make([]string, 0, len(form.NewSubcategories))
+		args := make([]interface{}, 0, len(form.NewSubcategories)*2)
+		for i, sub := range form.NewSubcategories {
+			rows = append(rows, fmt.Sprintf("($1, $%d)", i+2))
+			args = append(args, sub)
+		}
+		args = append([]interface{}{form.ID}, args...)
+		query := fmt.Sprintf("INSERT INTO subcategories (category_id, name) VALUES %s", strings.Join(rows, ","))
+		if _, err = tx.Exec(ctx, query, args...); err != nil {
+			return err
+		}
+	}
+
+	// Commit transaction
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+
+	// set tx = nil so rollback is skipped
+	tx = nil
+	return nil
+}
+
 func (repository attributeRepository) DeleteCategory(ctx context.Context, id int64) error {
 	tx, err := repository.db.Begin(ctx)
 	if err != nil {
@@ -227,6 +296,12 @@ func (repository attributeRepository) DeleteCategory(ctx context.Context, id int
 	// set tx = nil so rollback is skipped
 	tx = nil
 	return nil
+}
+
+func (repository attributeRepository) DeleteSubcategory(ctx context.Context, cid, sid int64) error {
+	q := "DELETE FROM subcategories WHERE category_id = $1 AND id = $2"
+	_, err := repository.db.Exec(ctx, q, cid, sid)
+	return err
 }
 
 func NewAttributeRepository(db model.IPgxPool) IAttributeRepository {
