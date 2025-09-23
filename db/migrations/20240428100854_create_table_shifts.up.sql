@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS shifts(
     updated_at BIGINT
 );
 
-CREATE TABLE IF NOT EXISTS store_shifts(
+CREATE TABLE IF NOT EXISTS active_shifts(
     id BIGSERIAL PRIMARY KEY NOT NULL,
     shift_id BIGINT NOT NULL,
     open_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
@@ -20,5 +20,5 @@ CREATE TABLE IF NOT EXISTS store_shifts(
     updated_at BIGINT
 );
 
-ALTER TABLE store_shifts ADD CONSTRAINT fk_shift_store_shifts
+ALTER TABLE active_shifts ADD CONSTRAINT fk_shift_active_shifts
     FOREIGN KEY (shift_id) REFERENCES shifts(id);

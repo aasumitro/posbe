@@ -1,50 +1,89 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { RouterProvider, createRouter } from '@tanstack/react-router'
+import {QueryCache, QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {AppLoading} from "@/components/app-loading";
+import {AxiosError} from "axios";
+import {HTTP_STATUS_CODE} from "@/lib/api";
+import {useAuthStore} from "@/states/auth-state";
+
+// Import the styles
 import './index.css'
-import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
-import {Home} from "@/pages/home.tsx";
-import {BackofficeLayout} from "@/layouts/backoffice.tsx";
-import {LoginPage} from "@/pages/login.tsx";
-import {QueryClient, QueryClientProvider} from "react-query";
-import {Sonner} from "@/components/ui/sonner.tsx";
-import {StorePage} from "@/pages/store";
-import {TransactionPage} from "@/pages/transaction";
-import {OldLayoutPage} from "@/pages/layout/old.tsx";
-import {CatalogPage} from "@/pages/catalog";
-import {TooltipProvider} from "@/components/ui/tooltip.tsx";
-import {LayoutBlueprintPage} from "@/pages/layout/ref";
-import {StoreLayoutPage} from "@/pages/layout";
+
+// Import the generated route tree
+import { routeTree } from './routeTree.gen'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      cacheTime: 1000 * 60 * 2
+      retry: (failureCount, error) => {
+        if (import.meta.env.DEV) console.log({ failureCount, error })
+        if (failureCount >= 0 && import.meta.env.DEV) return false
+        if (failureCount > 3 && import.meta.env.PROD) return false
+        // noinspection SuspiciousTypeOfGuard
+        return !(
+          error instanceof AxiosError &&
+          [
+            HTTP_STATUS_CODE.INTERNAL_SERVER_ERROR,
+            HTTP_STATUS_CODE.FORBIDDEN
+          ].includes(error.response?.status ?? 0)
+        )
+      },
+      refetchOnWindowFocus: import.meta.env.PROD,
+      staleTime: 10 * 1000, // 10s
+    },
+    mutations: {
+      onError: (error) => {
+        // noinspection SuspiciousTypeOfGuard
+        if (error instanceof AxiosError) {
+          if (error.response?.status === HTTP_STATUS_CODE.UNAUTHORIZED) {
+            useAuthStore.getState().auth.reset()
+            const redirect = `${router.history.location.href}`
+            router.navigate({ to: '/login', search: { redirect } })
+          }
+        }
+      },
     },
   },
-});
+  queryCache: new QueryCache({
+    onError: (error) => {
+      // noinspection SuspiciousTypeOfGuard
+      if (error instanceof AxiosError) {
+        if (error.response?.status === HTTP_STATUS_CODE.UNAUTHORIZED) {
+          useAuthStore.getState().auth.reset()
+          const redirect = `${router.history.location.href}`
+          router.navigate({ to: '/login', search: { redirect } })
+        }
+      }
+    },
+  }),
+})
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage/>}/>
-            <Route element={<BackofficeLayout />}>
-              <Route path="/" element={<Navigate to="home"/>}/>
-              <Route path="/home" element={<Home/>}/>
-              <Route path="/layouts" element={<StoreLayoutPage/>}/>
-              <Route path="/layouts/ref" element={<LayoutBlueprintPage/>}/>
-              <Route path="/layouts/old" element={<OldLayoutPage/>}/>
-              <Route path="/transactions" element={<TransactionPage/>}/>
-              <Route path="/catalogs" element={<CatalogPage />}/>
-              <Route path="/store/*" element={<StorePage/>}/>
-            </Route>
-          </Routes>
-        </BrowserRouter>
-        <Sonner/>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </React.StrictMode>,
-)
+// Create a new router instance
+const router = createRouter({
+  context: { queryClient },
+  routeTree,
+  defaultPreload: 'intent',
+  defaultPendingMinMs: 0,
+  defaultPendingComponent: AppLoading,
+})
+
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
+
+// Render the app
+const rootElement = document.getElementById('root')!
+if (!rootElement.innerHTML) {
+  const root = createRoot(rootElement)
+  root.render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </StrictMode>,
+  )
+}

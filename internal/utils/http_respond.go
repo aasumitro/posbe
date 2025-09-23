@@ -2,9 +2,12 @@ package utils
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
+const EmptyPath = ""
 
 type SuccessRespond struct {
 	Code   int         `json:"code"`
@@ -61,4 +64,14 @@ func NewHTTPRespond(context *gin.Context, code int, data interface{}) {
 		Status: http.StatusText(code),
 		Data:   msg,
 	})
+}
+
+func GetIDParam(ctx *gin.Context, param string) (int64, bool) {
+	idParam := ctx.Param(param)
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
+		return 0, false
+	}
+	return id, true
 }

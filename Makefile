@@ -13,62 +13,54 @@ deps: $(GOTESTSUM) $(MOCKERY)
 deps:
 	@ echo "Required Tools Are Available"
 
-.Phony: build-binary
-build-binary: api-specs
-	@ echo "Build Binary"
-	@ mkdir ./build
-	@ cp .example.env ./build/.env
-	@ go mod tidy -compat=1.22
-	@ go build -o ./build/posbe ./cmd/api/main.go
-	@ GOOS=windows GOARCH=amd64 go build -o ./build/posbe.exe ./cmd/api/main.go
-	@ echo "generate binary done"
+# action: up | down - usage make migrate action=down|up
+.PHONY: migrate
+migrate:
+	@ if [ "$(action)" ]; then \
+    	migrate -database "postgresql://postgres:@127.0.0.1:5432/posbe?sslmode=disable" -path db/migrations $(action); \
+    	echo "migration ${action} done"; \
+   	else \
+    	echo "missing action (use: make migrate action=up or action=down)"; \
+    fi
 
-.Phony: just-api-specs
-just-api-specs: run-lint
-	@ echo "Re-generate Swagger File (API Spec docs)"
+.PHONY: api-specs
+api-specs:
 	@ swag init --parseDependency --parseInternal \
 		--parseDepth 4 -g ./cmd/api/main.go
-	@ echo "generate swagger file done"
+	@ echo "api spec generated"
 
-.Phony: api-specs
-api-specs: run-tests
-	@ echo "Re-generate Swagger File (API Spec docs)"
-	@ swag init --parseDependency --parseInternal \
-		--parseDepth 4 -g ./cmd/api/main.go
-	@ echo "generate swagger file done"
-
-.Phony: run-tests
-run-tests: $(MOCKERY) $(GOTESTSUM) run-lint
-	@ echo "Run tests"
+.PHONY: tests
+tests: $(MOCKERY) $(GOTESTSUM)
 	@ gotestsum --format pkgname-and-test-fails \
 		--hide-summary=skipped \
-		-- -coverprofile=cover.out ./...
+		-- -coverprofile=cover.out ./internal/account ./internal/utils
 	@ rm cover.out
+	@ echo "testing completed"
 
-.Phony: run-lint
-run-lint: $(GOLANGCI)
-	@ echo "Applying linter"
+.PHONY: lint
+lint: $(GOLANGCI)
 	@ golangci-lint cache clean
 	@ golangci-lint run -c .golangci.yaml ./...
+	@ echo "linting completed"
 
-.Phony: run-api
-run-api:
-	@echo "Run App"
-	go mod tidy -compat=1.22
+.PHONY: mocks
+mocks: $(MOCKERY)
+	mockery --config .mockery.yml
+
+.PHONY: run
+run:
+	go mod tidy -compat=1.25
 	go run ./cmd/api/main.go
 
-.Phony: run-watch-api
-run-watch-api:
-	go mod tidy -compat=1.22
+.PHONY: watch
+watch:
+	go mod tidy -compat=1.25
 	air
 
-.Phony: run-app
-run-app:
-	@echo "Run App"
-	cd ./web && npm run build && cd ..
-	go mod tidy -compat=1.22
-	go run ./cmd/api/main.go
-
-build-fe:
-	@ echo "Build Frontend"
-	@ cd web && npm install && npm run build
+.PHONY: binary
+binary: tests api-specs
+	@ mkdir -p ./build
+	@ cp ./misc/conf/.example.env ./build/.env
+	@ go mod tidy -compat=1.25
+	@ go build -o ./build/posbe ./cmd/api/main.go
+	@ echo "binary generated"

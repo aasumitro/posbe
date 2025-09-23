@@ -23,8 +23,8 @@ import (
 // @in                          header
 // @name                        Authorization
 //
-// @license.name  MIT
-// @license.url   https://github.com/aasumitro/posbe/blob/main/LICENSE
+// @license.name                MIT
+// @license.url                 https://github.com/aasumitro/posbe/blob/main/LICENSE
 
 func main() {
 	viper.SetConfigFile(".env")

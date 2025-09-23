@@ -1,4 +1,6 @@
-import {Time} from "@/lib/types/common.ts";
+import type {Int64R} from "@/types/http-response";
+import type {TimeValue} from "react-aria";
+import { Time as ITime } from "@internationalized/date";  // add this import
 
 export function formatTimestamp(unixTimestamp: number) {
   const date = new Date(unixTimestamp * 1000);
@@ -29,9 +31,29 @@ export const intToTime = (timeInt: number): string => {
   return `${formattedHourString}:${formattedMinuteString}${period}`;
 };
 
-export function sqlTimeToFormattedTime(time: Time) {
+export const strTimeToInt = (timeStr: string): number => {
+  const cleanTimeString = timeStr.replace(/(am|pm)/i, "").trim();
+  const [hours, minutes] = cleanTimeString.split(":").map(Number);
+  let convertedHours = hours;
+  if (timeStr.toLowerCase().includes("pm") && hours !== 12) {
+    convertedHours = hours + 12;
+  }
+  if (timeStr.toLowerCase().includes("am") && hours === 12) {
+    convertedHours = 0; // Midnight case
+  }
+  return convertedHours * 100 + minutes;
+};
+
+export function sqlTimeToFormattedTime(time: Int64R) {
   if (!time.Valid) {
     return "-"
   }
   return formatTimestamp(time.Int64)
+}
+
+export function intToTimeValue(intVal?: number | null): TimeValue | null {
+  if (intVal === undefined || intVal === null) return null;
+  const hh = Math.floor(intVal / 100);
+  const mm = intVal % 100;
+  return new ITime(hh, mm); 
 }

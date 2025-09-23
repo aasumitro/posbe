@@ -2,59 +2,123 @@ package utils_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/aasumitro/posbe/internal/utils"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestJSONWebToken_ClaimJWTToken(t *testing.T) {
-	type fields struct {
-		Issuer    string
-		SecretKey []byte
-		Payload   interface{}
-		IssuedAt  time.Time
-		ExpiredAt time.Time
-	}
-
-	issuedAt, _ := time.Parse("",
-		"2022-12-05 17:57:44.321843 +0800 WITA m=+25.737606459")
-	expiredAt, _ := time.Parse("",
-		"2022-12-06 17:57:44.321851 +0800 WITA m=+86425.737614876")
-
-	tests := []struct {
-		name    string
-		fields  fields
-		want    string
-		wantErr assert.ErrorAssertionFunc
+func TestParseJWT(t *testing.T) {
+	scenarios := []struct {
+		token        string
+		secret       string
+		expectError  bool
+		expectClaims jwt.MapClaims
 	}{
+		// invalid formatted JWT
 		{
-			name: "NEW JWT TEST SHOULD SUCCESS",
-			fields: fields{
-				Issuer: "POSBE_TEST",
-				Payload: map[string]string{
-					"data": "hello world",
-				},
-				IssuedAt:  issuedAt,
-				ExpiredAt: expiredAt,
-			},
-			want:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJQT1NCRV9URVNUIiwiZXhwIjotNjIxMzU1OTY4MDAsImlhdCI6LTYyMTM1NTk2ODAwLCJwYXlsb2FkIjp7ImRhdGEiOiJoZWxsbyB3b3JsZCJ9fQ.-_tfeKKhqSRP2H_pVg4f_spkX_Z1Lo1nuiu09OFFvO0",
-			wantErr: assert.NoError,
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCJ9",
+			"test",
+			true,
+			nil,
+		},
+		// properly formatted JWT with INVALID claims and INVALID secret
+		// {"name": "test", "exp": 1516239022}
+		{
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCIsImV4cCI6MTUxNjIzOTAyMn0.xYHirwESfSEW3Cq2BL47CEASvD_p_ps3QCA54XtNktU",
+			"invalid",
+			true,
+			nil,
+		},
+		// properly formatted JWT with INVALID claims and VALID secret
+		// {"name": "test", "exp": 1516239022}
+		{
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCIsImV4cCI6MTUxNjIzOTAyMn0.xYHirwESfSEW3Cq2BL47CEASvD_p_ps3QCA54XtNktU",
+			"test",
+			true,
+			nil,
+		},
+		// properly formatted JWT with VALID claims and INVALID secret
+		// {"name": "test", "exp": 1898636137}
+		{
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCIsImV4cCI6MTg5ODYzNjEzN30.gqRkHjpK5s1PxxBn9qPaWEWxTbpc1PPSD-an83TsXRY",
+			"invalid",
+			true,
+			nil,
+		},
+		// properly formatted EXPIRED JWT with VALID secret
+		// {"name": "test", "exp": 1652097610}
+		{
+			"eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoidGVzdCIsImV4cCI6OTU3ODczMzc0fQ.0oUUKUnsQHs4nZO1pnxQHahKtcHspHu4_AplN2sGC4A",
+			"test",
+			true,
+			nil,
+		},
+		// properly formatted JWT with VALID claims and VALID secret
+		// {"name": "test", "exp": 1898636137}
+		{
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCIsImV4cCI6MTg5ODYzNjEzN30.gqRkHjpK5s1PxxBn9qPaWEWxTbpc1PPSD-an83TsXRY",
+			"test",
+			false,
+			jwt.MapClaims{"name": "test", "exp": 1898636137.0},
+		},
+		// properly formatted JWT with VALID claims (without exp) and VALID secret
+		// {"name": "test"}
+		{
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGVzdCJ9.ml0QsTms3K9wMygTu41ZhKlTyjmW9zHQtoS8FUsCCjU",
+			"test",
+			false,
+			jwt.MapClaims{"name": "test"},
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			j := &utils.JSONWebToken{
-				Issuer:    tt.fields.Issuer,
-				SecretKey: tt.fields.SecretKey,
-				IssuedAt:  tt.fields.IssuedAt,
-				ExpiredAt: tt.fields.ExpiredAt,
-			}
-			got, err := j.ClaimJWTToken(tt.fields.Payload)
-			if !tt.wantErr(t, err, "ClaimJWTToken()") {
-				return
-			}
-			assert.Equalf(t, tt.want, got, "ClaimJWTToken()")
-		})
+
+	for _, scenario := range scenarios {
+		result, err := utils.ParseJWT(scenario.token, scenario.secret)
+		if scenario.expectError && err == nil {
+			assert.NoError(t, err)
+		}
+		if !scenario.expectError && err != nil {
+			assert.Error(t, err)
+		}
+		assert.Equal(t, len(result), len(scenario.expectClaims))
+		for k, v := range scenario.expectClaims {
+			v2, ok := result[k]
+			assert.True(t, ok)
+			assert.Equal(t, v, v2)
+		}
+	}
+}
+
+func TestNewJWT(t *testing.T) {
+	scenarios := []struct {
+		claims      jwt.MapClaims
+		key         string
+		duration    int64
+		expectError bool
+	}{
+		// empty, zero duration
+		{jwt.MapClaims{}, "", 0, true},
+		// empty, 10 seconds duration
+		{jwt.MapClaims{}, "", 10, false},
+		// non-empty, 10 seconds duration
+		{jwt.MapClaims{"name": "test"}, "test", 10, false},
+	}
+
+	for _, scenario := range scenarios {
+		token, tokenErr := utils.NewJWT(scenario.claims, scenario.key, scenario.duration)
+		assert.NoError(t, tokenErr)
+		claims, parseErr := utils.ParseJWT(token, scenario.key)
+		hasParseErr := parseErr != nil
+		assert.Equal(t, hasParseErr, scenario.expectError)
+		if scenario.expectError {
+			continue
+		}
+		_, ok := claims["exp"]
+		assert.True(t, ok)
+		delete(claims, "exp")
+		assert.Equal(t, len(claims), len(scenario.claims))
+		for j := range claims {
+			assert.Equal(t, claims[j], scenario.claims[j])
+		}
 	}
 }

@@ -5,13 +5,12 @@ CREATE TABLE IF NOT EXISTS orders (
     cashier_id BIGINT,
     shift_id BIGINT,
     table_id BIGINT,
-    room_id BIGINT,
     time_open BIGINT,
     time_close BIGINT,
     customer VARCHAR(255),
-    brutto NUMERIC,
+    gross NUMERIC,
     discount NUMERIC,
-    netto NUMERIC,
+    net NUMERIC,
     tax NUMERIC,
     total NUMERIC,
     type VARCHAR(255),
@@ -27,11 +26,9 @@ CREATE TABLE IF NOT EXISTS orders (
 ALTER TABLE orders ADD CONSTRAINT fk_order_cashier
     FOREIGN KEY (cashier_id) REFERENCES users(id);
 ALTER TABLE orders ADD CONSTRAINT fk_order_shift
-    FOREIGN KEY (shift_id) REFERENCES store_shifts(id);
+    FOREIGN KEY (shift_id) REFERENCES active_shifts(id);
 ALTER TABLE orders ADD CONSTRAINT fk_order_table
     FOREIGN KEY (table_id) REFERENCES tables(id);
-ALTER TABLE orders ADD CONSTRAINT fk_order_room
-    FOREIGN KEY (room_id) REFERENCES rooms(id);
 
 CREATE TABLE IF NOT EXISTS order_products (
     id BIGSERIAL PRIMARY KEY NOT NULL,

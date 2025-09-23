@@ -1,2 +1,2 @@
-DROP TABLE IF EXISTS store_shifts;
+DROP TABLE IF EXISTS active_shifts;
 DROP TABLE IF EXISTS shifts;
