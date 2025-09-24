@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {ProductContainer} from "@/features/stores/components/catalog/product-container";
 import {AddonContainer} from "@/features/stores/components/catalog/addon-container";
@@ -17,11 +17,21 @@ import {AddonActionAdd, AddonActionAddModalState} from "@/features/stores/compon
 import {ProductActionDeleteModal} from "@/features/stores/components/catalog/product-action-delete";
 import {AddonActionEdit} from "@/features/stores/components/catalog/addon-action-edit";
 import {AddonActionDelete} from "@/features/stores/components/catalog/addon-action-delete";
+import {useProductAddonList} from "@/hooks/use-product";
+import {useProductState} from "@/states/product-state";
 
 export function ProductCatalogPage() {
   const { setBoolState } = useActionState();
   const [activeTab, setActiveTab] = useState("products");
   const navigate = useNavigate();
+  const {data: addons} = useProductAddonList();
+  const {setAddons} = useProductState();
+
+  useEffect(() => {
+    if (addons?.data) {
+      setAddons(addons.data);
+    }
+  }, [addons?.data]);
 
   async function onAddNewItem() {
     if (activeTab === "products") {
@@ -59,9 +69,9 @@ export function ProductCatalogPage() {
                 size="sm"
                 variant="outline"
                 className="h-7 gap-1 text-sm"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
-                  onAddNewItem();
+                  await onAddNewItem();
                 }}
               >
                 <Plus className="h-3.5 w-3.5"/>

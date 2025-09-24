@@ -12,4 +12,7 @@ func New(router *gin.RouterGroup) {
 	attSvc := NewAttributeService(attRepo)
 	NewAttributeUnitHandler(attSvc, authn)
 	NewAttributeCategoryHandler(attSvc, authn)
+	prdRepo := NewProductRepository(config.PgxPool)
+	prdSvc := NewProductService(prdRepo)
+	NewProductAddonHandler(prdSvc, authn)
 }

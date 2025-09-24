@@ -9,10 +9,11 @@ import (
 
 type (
 	Addon struct {
-		ID          int     `json:"id"`
-		Name        string  `json:"name" form:"name" binding:"required"`
-		Description string  `json:"description" form:"description"  binding:"required"`
-		Price       float32 `json:"price" form:"price" binding:"required"`
+		ID          int64   `json:"id"`
+		Price       float64 `json:"price"`
+		Name        string  `json:"name"`
+		Description string  `json:"description"`
+		Usage       int64   `json:"usage"`
 	}
 
 	Product struct {

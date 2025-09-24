@@ -31,6 +31,9 @@ export const API_PATH = {
       UNITS: "/units",
       CATEGORIES: "/categories",
     },
+    PRODUCTS: {
+      ADDONS: "/product-addons",
+    }
   }
 }
 

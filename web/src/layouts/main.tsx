@@ -17,7 +17,7 @@ function MainLayout() {
 
       <Outlet />
 
-      <Toaster />
+      <Toaster position="bottom-center" />
     </>
   )
 }

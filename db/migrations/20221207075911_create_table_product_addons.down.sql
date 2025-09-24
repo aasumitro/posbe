@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS addons;
+DROP TABLE IF EXISTS product_addons;
