@@ -31,3 +31,19 @@ func (f *AddonForm) Validate(ctx *gin.Context) interface{} {
 	}
 	return g.ComplexValidator(r).Validate(ctx, f)
 }
+
+type ProductForm struct {
+}
+
+func (f *ProductForm) Validate(ctx *gin.Context) interface{} {
+	g := galidator.New()
+	return g.ComplexValidator(galidator.Rules{}).Validate(ctx, f)
+}
+
+type ProductUpdateForm struct {
+}
+
+func (f *ProductUpdateForm) Validate(ctx *gin.Context) interface{} {
+	g := galidator.New()
+	return g.ComplexValidator(galidator.Rules{}).Validate(ctx, f)
+}

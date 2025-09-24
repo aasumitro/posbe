@@ -38,6 +38,13 @@ type IProductRepository interface {
 	CreateAddon(ctx context.Context, form *AddonForm) error
 	UpdateAddon(ctx context.Context, form *AddonForm) error
 	DeleteAddon(ctx context.Context, id int64) error
+
+	//GetAllProduct(ctx context.Context) ([]*model.Product, error)
+	//GetProductDetail(ctx context.Context, id int64) ([]*model.Product, error)
+	//CreateProduct(ctx context.Context, form *NewCategoryForm) error
+	//UpdateProduct(ctx context.Context, form *EditCategoryForm) error
+	//DeleteProduct(ctx context.Context, id int64) error
+	//DeleteProductVariant(ctx context.Context, pid, vid int64) error
 }
 
 type IProductService interface {

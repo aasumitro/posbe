@@ -65,7 +65,10 @@ export function CategoryActionEdit() {
         name: selectedCategory.name,
       })
 
-      if (!selectedCategory.subcategories) return;
+      if (!selectedCategory.subcategories) {
+        setSubcategories([{id: -1, category_id: selectedCategory.id, name: ""}]);
+        return;
+      }
 
       setSubcategories([...selectedCategory.subcategories])
     }

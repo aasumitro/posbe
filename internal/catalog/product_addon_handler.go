@@ -87,11 +87,14 @@ func (handler productAddonHandler) destroy(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewProductAddonHandler(service IProductService, router gin.IRoutes) {
+func NewProductAddonHandler(service IProductService, router *gin.RouterGroup) {
 	handler := productAddonHandler{service: service}
 	router.GET("/product-addons", handler.fetch)
-	authz := router.Use(utils.AuthZ([]string{"admin"}))
-	authz.POST("/product-addons", handler.add)
-	authz.PATCH("/product-addons/:id", handler.edit)
-	authz.DELETE("/product-addons/:id", handler.destroy)
+	authz := router.Group("/product-addons")
+	authz.Use(utils.AuthZ([]string{"admin"}))
+	{
+		authz.POST(utils.EmptyPath, handler.add)
+		authz.PATCH("/:id", handler.edit)
+		authz.DELETE("/:id", handler.destroy)
+	}
 }

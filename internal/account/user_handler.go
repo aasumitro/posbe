@@ -291,15 +291,18 @@ func (handler userHandler) destroy(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewUserHandler(accountService IAccountService, router gin.IRoutes) {
+func NewUserHandler(accountService IAccountService, router *gin.RouterGroup) {
 	handler := userHandler{svc: accountService}
 	router.GET("/users", handler.fetch)
 	router.PUT("/users", handler.updateProfile)
 	router.PATCH("/users", handler.updatePassword)
 	router.GET("/users/:id", handler.show)
 	// only admin can access this route
-	authz := utils.AuthZ([]string{"admin"})
-	router.POST("/users", authz, handler.store)
-	router.PUT("/users/:id", authz, handler.update)
-	router.DELETE("/users/:id", authz, handler.destroy)
+	authz := router.Group("/users")
+	authz.Use(utils.AuthZ([]string{"admin"}))
+	{
+		authz.POST(utils.EmptyPath, handler.store)
+		authz.PUT("/:id", handler.update)
+		authz.DELETE("/:id", handler.destroy)
+	}
 }

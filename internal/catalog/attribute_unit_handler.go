@@ -87,11 +87,14 @@ func (handler attributeUnitHandler) destroy(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewAttributeUnitHandler(service IAttributeService, router gin.IRoutes) {
+func NewAttributeUnitHandler(service IAttributeService, router *gin.RouterGroup) {
 	handler := attributeUnitHandler{service: service}
 	router.GET("/units", handler.fetch)
-	authz := router.Use(utils.AuthZ([]string{"admin"}))
-	authz.POST("/units", handler.add)
-	authz.PATCH("/units/:id", handler.edit)
-	authz.DELETE("/units/:id", handler.destroy)
+	authz := router.Group("/units")
+	authz.Use(utils.AuthZ([]string{"admin"}))
+	{
+		authz.POST(utils.EmptyPath, handler.add)
+		authz.PATCH("/:id", handler.edit)
+		authz.DELETE("/:id", handler.destroy)
+	}
 }

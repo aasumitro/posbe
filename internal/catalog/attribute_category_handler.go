@@ -106,12 +106,15 @@ func (handler attributeCategoryHandler) destroySub(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewAttributeCategoryHandler(service IAttributeService, router gin.IRoutes) {
+func NewAttributeCategoryHandler(service IAttributeService, router *gin.RouterGroup) {
 	handler := attributeCategoryHandler{service: service}
 	router.GET("/categories", handler.fetch)
-	authz := router.Use(utils.AuthZ([]string{"admin"}))
-	authz.POST("/categories", handler.add)
-	authz.PATCH("/categories/:id", handler.edit)
-	authz.DELETE("/categories/:id", handler.destroy)
-	authz.DELETE("/categories/:id/subcategories/:sid", handler.destroySub)
+	authz := router.Group("/categories")
+	authz.Use(utils.AuthZ([]string{"admin"}))
+	{
+		authz.POST(utils.EmptyPath, handler.add)
+		authz.PATCH("/:id", handler.edit)
+		authz.DELETE("/:id", handler.destroy)
+		authz.DELETE("/:id/subcategories/:sid", handler.destroySub)
+	}
 }
