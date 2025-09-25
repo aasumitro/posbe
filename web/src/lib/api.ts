@@ -32,6 +32,7 @@ export const API_PATH = {
       CATEGORIES: "/categories",
     },
     PRODUCTS: {
+      BASE: "/products",
       ADDONS: "/product-addons",
     }
   }

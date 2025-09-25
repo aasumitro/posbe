@@ -47,6 +47,60 @@ func (service productService) DeleteAddon(ctx context.Context, id int64) *utils.
 	return nil
 }
 
+func (service productService) ProductList(ctx context.Context) ([]*model.Product, *utils.ServiceError) {
+	data, err := service.repository.GetAllProduct(ctx)
+	return utils.HandleMultipleResults[model.Product]("products", data, err)
+}
+
+func (service productService) ProductDetail(ctx context.Context, id int64) (*model.Product, *utils.ServiceError) {
+	data, err := service.repository.GetProductDetail(ctx, id)
+	return utils.HandleSingleResult[model.Product]("product", data, err)
+}
+
+func (service productService) CreateProduct(ctx context.Context, form *NewProductForm) *utils.ServiceError {
+	if err := service.repository.CreateProduct(ctx, form); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
+func (service productService) UpdateProduct(ctx context.Context, form *ProductUpdateForm) *utils.ServiceError {
+	if err := service.repository.UpdateProduct(ctx, form); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
+func (service productService) DeleteProduct(ctx context.Context, id int64) *utils.ServiceError {
+	// TODO: validate in use or not (has used by product)!
+
+	if err := service.repository.DeleteProduct(ctx, id); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
+func (service productService) DeleteProductVariant(ctx context.Context, pid, vid int64) *utils.ServiceError {
+	// TODO: validate in use or not (has used by order_product)!
+
+	if err := service.repository.DeleteProductVariant(ctx, pid, vid); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
 func NewProductService(repository IProductRepository) IProductService {
 	return &productService{repository: repository}
 }

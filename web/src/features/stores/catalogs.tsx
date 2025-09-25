@@ -17,21 +17,26 @@ import {AddonActionAdd, AddonActionAddModalState} from "@/features/stores/compon
 import {ProductActionDeleteModal} from "@/features/stores/components/catalog/product-action-delete";
 import {AddonActionEdit} from "@/features/stores/components/catalog/addon-action-edit";
 import {AddonActionDelete} from "@/features/stores/components/catalog/addon-action-delete";
-import {useProductAddonList} from "@/hooks/use-product";
+import {useProductAddonList, useProductList} from "@/hooks/use-product";
 import {useProductState} from "@/states/product-state";
 
 export function ProductCatalogPage() {
   const { setBoolState } = useActionState();
   const [activeTab, setActiveTab] = useState("products");
   const navigate = useNavigate();
+  const {data: products} = useProductList();
   const {data: addons} = useProductAddonList();
-  const {setAddons} = useProductState();
+  const {setProducts, setAddons} = useProductState();
 
   useEffect(() => {
+    if (products?.data) {
+      setProducts(products.data);
+    }
+
     if (addons?.data) {
       setAddons(addons.data);
     }
-  }, [addons?.data]);
+  }, [products?.data, addons?.data]);
 
   async function onAddNewItem() {
     if (activeTab === "products") {

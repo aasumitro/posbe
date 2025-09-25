@@ -2,6 +2,8 @@ package catalog
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -89,6 +91,260 @@ func (repository productRepository) UpdateAddon(ctx context.Context, form *Addon
 func (repository productRepository) DeleteAddon(ctx context.Context, id int64) error {
 	q := "DELETE FROM product_addons WHERE id = $1"
 	_, err := repository.db.Exec(ctx, q, id)
+	return err
+}
+
+func (repository productRepository) GetAllProduct(ctx context.Context) ([]*model.Product, error) {
+	q := `
+		SELECT 
+		  p.id, p.category_id, p.subcategory_id, p.sku, 
+		  p.image, p.name, p.description,
+			
+          -- embed category as JSON
+		  json_build_object(
+		    'id', c.id,
+		    'name', c.name
+		  ) AS category,
+
+		  -- embed subcategory as JSON
+		  json_build_object(
+		    'id', sc.id,
+		    'name', sc.name
+		  ) AS subcategory,
+
+		  COALESCE(
+		    json_agg(
+		      json_build_object(
+		        'id', pv.id,
+		        'product_id', pv.product_id,
+		        'unit_id', pv.unit_id,
+		        'unit_size', pv.unit_size,
+		        'type', pv.type,
+		        'name', pv.name,
+		        'description', pv.description,
+		        'price', pv.price,
+				'unit', json_build_object(
+				 'id', u.id,
+				 'magnitude', u.magnitude,
+				 'name', u.name,
+				 'symbol', u.symbol
+				)
+		      )
+		    ) FILTER (WHERE pv.id IS NOT NULL), '[]'
+		  ) AS variants
+		FROM products p
+		LEFT JOIN categories c ON p.category_id = c.id
+		LEFT JOIN subcategories sc ON p.subcategory_id = sc.id
+		LEFT JOIN product_variants pv ON p.id = pv.product_id
+		LEFT JOIN units u ON pv.unit_id = u.id
+		GROUP BY p.id, c.id, sc.id
+		ORDER BY p.id;
+	`
+	rows, err := repository.db.Query(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	type productRow struct {
+		ID            int64           `json:"id"`
+		CategoryID    int64           `json:"category_id"`
+		SubcategoryID int64           `json:"subcategory_id"`
+		SKU           string          `json:"sku"`
+		Image         sql.NullString  `json:"image"`
+		Name          string          `json:"name"`
+		Description   sql.NullString  `json:"description"`
+		Category      json.RawMessage `json:"category"`
+		Subcategory   json.RawMessage `json:"subcategory"`
+		Variants      json.RawMessage `json:"variants"`
+	}
+	var products []*model.Product
+
+	for rows.Next() {
+		var r productRow
+		if err := rows.Scan(
+			&r.ID, &r.CategoryID, &r.SubcategoryID, &r.SKU,
+			&r.Image, &r.Name, &r.Description,
+			&r.Category, &r.Subcategory, &r.Variants,
+		); err != nil {
+			return nil, err
+		}
+
+		var category *model.Category
+		if len(r.Category) > 0 {
+			_ = json.Unmarshal(r.Category, &category)
+		}
+
+		var subcategory *model.Subcategory
+		if len(r.Subcategory) > 0 {
+			_ = json.Unmarshal(r.Subcategory, &subcategory)
+		}
+
+		var variants []*model.Variant
+		if len(r.Variants) > 0 {
+			_ = json.Unmarshal(r.Variants, &variants)
+		}
+
+		products = append(products, &model.Product{
+			ID: r.ID, CategoryID: r.CategoryID, SubcategoryID: r.SubcategoryID,
+			SKU: r.SKU, Image: r.Image.String, Name: r.Name, Description: r.Description.String,
+			Category: category, Subcategory: subcategory, Variants: variants,
+		})
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
+
+func (repository productRepository) GetProductDetail(ctx context.Context, id int64) (*model.Product, error) {
+	q := `
+		SELECT 
+		  p.id, p.category_id, p.subcategory_id, p.sku, 
+		  p.image, p.name, p.description,
+			
+		  -- embed category as JSON
+		  json_build_object(
+		    'id', c.id,
+		    'name', c.name
+		  ) AS category,
+
+		  -- embed subcategory as JSON
+		  json_build_object(
+		    'id', sc.id,
+		    'name', sc.name
+		  ) AS subcategory,
+
+		  COALESCE(
+		    json_agg(
+		      json_build_object(
+		        'id', pv.id,
+		        'product_id', pv.product_id,
+		        'unit_id', pv.unit_id,
+		        'unit_size', pv.unit_size,
+		        'type', pv.type,
+		        'name', pv.name,
+		        'description', pv.description,
+		        'price', pv.price,
+				'unit', json_build_object(
+				 'id', u.id,
+				 'magnitude', u.magnitude,
+				 'name', u.name,
+				 'symbol', u.symbol
+				)
+		      )
+		    ) FILTER (WHERE pv.id IS NOT NULL), '[]'
+		  ) AS variants
+		FROM products p
+		LEFT JOIN categories c ON p.category_id = c.id
+		LEFT JOIN subcategories sc ON p.subcategory_id = sc.id
+		LEFT JOIN product_variants pv ON p.id = pv.product_id
+		LEFT JOIN units u ON pv.unit_id = u.id
+		WHERE p.id = $1
+		GROUP BY p.id, c.id, sc.id
+	`
+	row := repository.db.QueryRow(ctx, q, id)
+
+	type productRow struct {
+		ID            int64           `json:"id"`
+		CategoryID    int64           `json:"category_id"`
+		SubcategoryID int64           `json:"subcategory_id"`
+		SKU           string          `json:"sku"`
+		Image         sql.NullString  `json:"image"`
+		Name          string          `json:"name"`
+		Description   sql.NullString  `json:"description"`
+		Category      json.RawMessage `json:"category"`
+		Subcategory   json.RawMessage `json:"subcategory"`
+		Variants      json.RawMessage `json:"variants"`
+	}
+
+	var r productRow
+	if err := row.Scan(
+		&r.ID, &r.CategoryID, &r.SubcategoryID, &r.SKU,
+		&r.Image, &r.Name, &r.Description,
+		&r.Category, &r.Subcategory, &r.Variants,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // not found
+		}
+		return nil, err
+	}
+
+	var category *model.Category
+	if len(r.Category) > 0 {
+		_ = json.Unmarshal(r.Category, &category)
+	}
+
+	var subcategory *model.Subcategory
+	if len(r.Subcategory) > 0 {
+		_ = json.Unmarshal(r.Subcategory, &subcategory)
+	}
+
+	var variants []*model.Variant
+	if len(r.Variants) > 0 {
+		_ = json.Unmarshal(r.Variants, &variants)
+	}
+
+	return &model.Product{
+		ID:            r.ID,
+		CategoryID:    r.CategoryID,
+		SubcategoryID: r.SubcategoryID,
+		SKU:           r.SKU,
+		Image:         r.Image.String,
+		Name:          r.Name,
+		Description:   r.Description.String,
+		Category:      category,
+		Subcategory:   subcategory,
+		Variants:      variants,
+	}, nil
+}
+
+func (repository productRepository) CreateProduct(ctx context.Context, form *NewProductForm) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (repository productRepository) UpdateProduct(ctx context.Context, form *ProductUpdateForm) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (repository productRepository) DeleteProduct(ctx context.Context, id int64) error {
+	tx, err := repository.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if tx != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	// First delete variants under this product
+	if _, err := tx.Exec(ctx, "DELETE FROM product_variants WHERE product_id = $1", id); err != nil {
+		return err
+	}
+
+	// Then delete the product itself
+	if _, err := tx.Exec(ctx, "DELETE FROM products WHERE id = $1", id); err != nil {
+		return err
+	}
+
+	// Commit transaction
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+
+	// set tx = nil so rollback is skipped
+	tx = nil
+	return nil
+}
+
+func (repository productRepository) DeleteProductVariant(ctx context.Context, pid, vid int64) error {
+	q := "DELETE FROM product_variants WHERE product_id = $1 AND id = $2"
+	_, err := repository.db.Exec(ctx, q, pid, vid)
 	return err
 }
 

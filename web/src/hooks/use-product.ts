@@ -1,7 +1,7 @@
 import type {HTTPResponse} from "@/types/http-response";
 import {api, API_PATH, catchHTTPError} from "@/lib/api";
-import {useMutation, useSuspenseQuery} from "@tanstack/react-query";
-import type {ProductAddon} from "@/types/product";
+import {useMutation, useQuery, useSuspenseQuery} from "@tanstack/react-query";
+import type {Product, ProductAddon} from "@/types/product";
 
 export function useProductAddonList() {
   const addons = async (): Promise<HTTPResponse<ProductAddon[]>> => {
@@ -67,4 +67,68 @@ export function useDeleteProductAddon() {
   };
 
   return useMutation({ mutationFn: deleteAddon })
+}
+
+export function useProductList() {
+  const products = async (): Promise<HTTPResponse<Product[]>> => {
+    try {
+      const url = API_PATH.CATALOG.PRODUCTS.BASE
+      const response =
+        await api.get<HTTPResponse<Product[]>>(url);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useSuspenseQuery({ queryKey: ['products'], queryFn: products })
+}
+
+export function useProductDetail(id?: number) {
+  const product = async (): Promise<HTTPResponse<Product>> => {
+    try {
+      const url = `${API_PATH.CATALOG.PRODUCTS.BASE}/${id}`
+      const response =
+        await api.get<HTTPResponse<Product>>(url);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useQuery({ queryKey: ["product", id], queryFn: product,  enabled: !!id, })
+}
+
+export function useDeleteProduct() {
+  const deleteProduct = async (
+    id?: number
+  ): Promise<HTTPResponse<null>> => {
+    try {
+      const url = `${ API_PATH.CATALOG.PRODUCTS.BASE}/${id}`
+      const response =
+        await api.delete<HTTPResponse<null>>(url);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: deleteProduct })
+}
+
+export function useDeleteProductVariant() {
+  const deleteVariant = async (
+    {pid, vid}: {pid?: number, vid: number}
+  ): Promise<HTTPResponse<null>> => {
+    try {
+      const url = `${ API_PATH.CATALOG.PRODUCTS.BASE}/${pid}/variants/${vid}`
+      const response =
+        await api.delete<HTTPResponse<null>>(url);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: deleteVariant })
 }

@@ -39,12 +39,12 @@ type IProductRepository interface {
 	UpdateAddon(ctx context.Context, form *AddonForm) error
 	DeleteAddon(ctx context.Context, id int64) error
 
-	//GetAllProduct(ctx context.Context) ([]*model.Product, error)
-	//GetProductDetail(ctx context.Context, id int64) ([]*model.Product, error)
-	//CreateProduct(ctx context.Context, form *NewCategoryForm) error
-	//UpdateProduct(ctx context.Context, form *EditCategoryForm) error
-	//DeleteProduct(ctx context.Context, id int64) error
-	//DeleteProductVariant(ctx context.Context, pid, vid int64) error
+	GetAllProduct(ctx context.Context) ([]*model.Product, error)
+	GetProductDetail(ctx context.Context, id int64) (*model.Product, error)
+	CreateProduct(ctx context.Context, form *NewProductForm) error
+	UpdateProduct(ctx context.Context, form *ProductUpdateForm) error
+	DeleteProduct(ctx context.Context, id int64) error
+	DeleteProductVariant(ctx context.Context, pid, vid int64) error
 }
 
 type IProductService interface {
@@ -52,4 +52,11 @@ type IProductService interface {
 	CreateAddon(ctx context.Context, form *AddonForm) *utils.ServiceError
 	UpdateAddon(ctx context.Context, form *AddonForm) *utils.ServiceError
 	DeleteAddon(ctx context.Context, id int64) *utils.ServiceError
+
+	ProductList(ctx context.Context) ([]*model.Product, *utils.ServiceError)
+	ProductDetail(ctx context.Context, id int64) (*model.Product, *utils.ServiceError)
+	CreateProduct(ctx context.Context, form *NewProductForm) *utils.ServiceError
+	UpdateProduct(ctx context.Context, form *ProductUpdateForm) *utils.ServiceError
+	DeleteProduct(ctx context.Context, id int64) *utils.ServiceError
+	DeleteProductVariant(ctx context.Context, pid, vid int64) *utils.ServiceError
 }

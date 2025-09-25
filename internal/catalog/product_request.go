@@ -32,15 +32,16 @@ func (f *AddonForm) Validate(ctx *gin.Context) interface{} {
 	return g.ComplexValidator(r).Validate(ctx, f)
 }
 
-type ProductForm struct {
+type NewProductForm struct {
 }
 
-func (f *ProductForm) Validate(ctx *gin.Context) interface{} {
+func (f *NewProductForm) Validate(ctx *gin.Context) interface{} {
 	g := galidator.New()
 	return g.ComplexValidator(galidator.Rules{}).Validate(ctx, f)
 }
 
 type ProductUpdateForm struct {
+	ID int64 `form:"-" json:"-"`
 }
 
 func (f *ProductUpdateForm) Validate(ctx *gin.Context) interface{} {

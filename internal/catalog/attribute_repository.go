@@ -278,12 +278,12 @@ func (repository attributeRepository) DeleteCategory(ctx context.Context, id int
 		}
 	}()
 
-	// First delete tables under this floor
+	// First delete subcategories under this category
 	if _, err := tx.Exec(ctx, "DELETE FROM subcategories WHERE category_id = $1", id); err != nil {
 		return err
 	}
 
-	// Then delete the floor itself
+	// Then delete the category itself
 	if _, err := tx.Exec(ctx, "DELETE FROM categories WHERE id = $1", id); err != nil {
 		return err
 	}
