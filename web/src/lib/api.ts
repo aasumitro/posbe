@@ -4,7 +4,9 @@ import {isJWTExpired} from "@/lib/jwt";
 import type {HTTPResponse} from "@/types/http-response";
 
 const host =  process.env.NODE_ENV === 'production' ? window.location.host : "localhost:8000"
-const SERVER_URL = `${window.location.protocol}//${host}/api/v1`
+const SERVER_URL = `${window.location.protocol}//${host}`
+const API_URL = `${SERVER_URL}/api/v1`
+export const ASSET_URL = `${SERVER_URL}/assets`
 
 export const AuthPath = {
   SIGN_IN: "login",
@@ -50,7 +52,7 @@ export const HTTP_STATUS_CODE = {
 }
 
 export const api = axios.create({
-  baseURL: SERVER_URL,
+  baseURL: API_URL,
   timeout: process.env.NODE_ENV === 'production' ? 3000 : 10000,
   headers: {"Content-Type": "application/json"},
 });
@@ -68,7 +70,7 @@ api.interceptors.request.use(async  (config) => {
   // Handle refresh
   if (shouldRefresh) {
     try {
-      const refreshTokenURL = SERVER_URL+API_PATH.ACCOUNT.AUTH(AuthPath.REFRESH_TOKEN)
+      const refreshTokenURL = API_URL+API_PATH.ACCOUNT.AUTH(AuthPath.REFRESH_TOKEN)
       const response = await axios.post(refreshTokenURL, {},
         {headers: {"X-REFRESH-TOKEN": auth.refreshToken}});
 

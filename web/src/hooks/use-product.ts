@@ -99,6 +99,23 @@ export function useProductDetail(id?: number) {
   return useQuery({ queryKey: ["product", id], queryFn: product,  enabled: !!id, })
 }
 
+export function useNewProduct() {
+  const newProduct = async (
+    body: string
+  ): Promise<HTTPResponse<Product>> => {
+    try {
+      const url = API_PATH.CATALOG.PRODUCTS.BASE
+      const response =
+        await api.post<HTTPResponse<Product>>(url, body);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: newProduct })
+}
+
 export function useDeleteProduct() {
   const deleteProduct = async (
     id?: number

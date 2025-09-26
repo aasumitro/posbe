@@ -76,4 +76,4 @@ ALTER TABLE order_product_addons ADD CONSTRAINT fk_order_product_addons_order
 ALTER TABLE order_product_addons ADD CONSTRAINT fk_order_product_addons_product
     FOREIGN KEY (order_product_id) REFERENCES order_products(id);
 ALTER TABLE order_product_addons ADD CONSTRAINT fk_order_product_addons_addon
-    FOREIGN KEY (addon_id) REFERENCES addons(id);
+    FOREIGN KEY (addon_id) REFERENCES product_addons(id);

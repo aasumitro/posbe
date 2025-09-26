@@ -302,8 +302,109 @@ func (repository productRepository) GetProductDetail(ctx context.Context, id int
 }
 
 func (repository productRepository) CreateProduct(ctx context.Context, form *NewProductForm) error {
-	//TODO implement me
-	panic("implement me")
+	tx, err := repository.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if tx != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	// build insert items
+	var columns []string
+	var placeholders []string
+	args := make([]any, 0)
+	argPos := 1
+
+	// set the status
+	columns = append(columns, "status")
+	placeholders = append(placeholders, "$"+strconv.Itoa(argPos))
+	args = append(args, form.Status)
+	argPos++
+	// set the image
+	if form.Image != "" {
+		columns = append(columns, "image")
+		placeholders = append(placeholders, "$"+strconv.Itoa(argPos))
+		args = append(args, form.Image)
+		argPos++
+	}
+	// set the sku
+	columns = append(columns, "sku")
+	placeholders = append(placeholders, "$"+strconv.Itoa(argPos))
+	args = append(args, form.SKU)
+	argPos++
+	// set the name
+	columns = append(columns, "name")
+	placeholders = append(placeholders, "$"+strconv.Itoa(argPos))
+	args = append(args, form.Name)
+	argPos++
+	// set the category_id
+	columns = append(columns, "category_id")
+	placeholders = append(placeholders, "$"+strconv.Itoa(argPos))
+	args = append(args, form.CategoryID)
+	argPos++
+	// set the subcategory_id
+	columns = append(columns, "subcategory_id")
+	placeholders = append(placeholders, "$"+strconv.Itoa(argPos))
+	args = append(args, form.SubcategoryID)
+	argPos++
+	// set the description
+	if form.Description != "" {
+		columns = append(columns, "description")
+		placeholders = append(placeholders, "$"+strconv.Itoa(argPos))
+		args = append(args, form.Description)
+		argPos++
+	}
+
+	var productID int64
+	q := fmt.Sprintf(
+		`INSERT INTO products (%s) VALUES (%s) RETURNING id`,
+		strings.Join(columns, ", "), strings.Join(placeholders, ", "))
+	if err = tx.QueryRow(ctx, q, args...).Scan(&productID); err != nil {
+		return err
+	}
+
+	if len(form.Variants) > 0 {
+		rows := make([]string, 0, len(form.Variants))
+		varArgs := make([]interface{}, 0, len(form.Variants)*6) // 6 fields per variant
+		varArgPos := 1
+		for _, sub := range form.Variants {
+			var unitID any = nil
+			if sub.UnitID > 0 {
+				unitID = sub.UnitID
+			}
+
+			// normalize UnitSize → nil if not set
+			var unitSize any = nil
+			if sub.UnitSize > 0 {
+				unitSize = sub.UnitSize
+			}
+
+			// placeholders: ($1, $2, $3, $4, $5, $6, $7) per row
+			rows = append(rows, fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d, $%d)",
+				varArgPos+1, varArgPos+2, varArgPos+3, varArgPos+4, varArgPos+5, varArgPos+6))
+			varArgs = append(varArgs, sub.Type, sub.Name, sub.Description, sub.Price, unitID, unitSize)
+			varArgPos += 6
+		}
+		varArgs = append([]interface{}{productID}, varArgs...)
+		query := fmt.Sprintf(
+			"INSERT INTO product_variants (product_id, type, name, description, price, unit_id, unit_size) VALUES %s",
+			strings.Join(rows, ","))
+		if _, err = tx.Exec(ctx, query, varArgs...); err != nil {
+			return err
+		}
+	}
+
+	// Commit transaction
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+
+	// set tx = nil so rollback is skipped
+	tx = nil
+	return nil
 }
 
 func (repository productRepository) UpdateProduct(ctx context.Context, form *ProductUpdateForm) error {

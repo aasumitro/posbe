@@ -18,6 +18,8 @@ import {useStoreState} from "@/states/store-state";
 import {useProductState} from "@/states/product-state";
 import {formatShortNumber} from "@/lib/numbers";
 import type {Product, ProductVariant} from "@/types/product";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {ASSET_URL} from "@/lib/api";
 
 export function  ProductContainer() {
   const {settings} = useStoreState();
@@ -33,7 +35,7 @@ export function  ProductContainer() {
       return <Coffee />
     }
 
-    return <img src={product.image} alt={product.name} />
+    return <img src={`${ASSET_URL}/${product.image}`} alt={product.name} />
   }
 
   function renderName(product: Product) {
@@ -171,7 +173,7 @@ export function  ProductContainer() {
   }
 
   function renderVariants(product: Product) {
-    if (!product.variants || product.variants.length === 0) return null;
+    if (!product.variants || product.variants.length === 1) return null;
 
     // Group variants by type
     const grouped = product.variants.reduce<
@@ -187,19 +189,20 @@ export function  ProductContainer() {
         {Object.entries(grouped).map(([type, variants]) => (
           <div key={type} className="flex flex-col gap-2">
             <p className="text-sm font-medium">
-              {type === "size"
-                ? "Size Options"
-                : type === "none"
-                  ? (variants[0]?.description
-                    ? variants[0].description.charAt(0).toUpperCase() + variants[0].description.slice(1)
-                    : "Other Options")
-                  : type.charAt(0).toUpperCase() + type.slice(1)}
+              {type.charAt(0).toUpperCase() + type.slice(1)}
             </p>
             <div className="flex flex-row gap-2 flex-wrap">
               {variants.map((v) => (
-                <Badge key={v.id} variant="outline">
-                  {v.name.toUpperCase()}
-                </Badge>
+                <Tooltip key={v.id} >
+                  <TooltipTrigger asChild>
+                    <Badge variant="outline">
+                      {v.name.toUpperCase()}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{v.description}</p>
+                  </TooltipContent>
+                </Tooltip>
               ))}
             </div>
           </div>

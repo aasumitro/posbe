@@ -3,6 +3,8 @@ package catalog
 import (
 	"context"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
@@ -58,6 +60,29 @@ func (service productService) ProductDetail(ctx context.Context, id int64) (*mod
 }
 
 func (service productService) CreateProduct(ctx context.Context, form *NewProductForm) *utils.ServiceError {
+	if len(form.Variants) == 1 && form.Variants[0].Price <= 0 {
+		return &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "invalid product price: when there is only 1 variant, price must be greater than 0",
+		}
+	}
+
+	if form.Status == "publish" {
+		form.Status = "active"
+	}
+
+	if form.Image != "" {
+		nn := strconv.FormatInt(time.Now().UnixMicro(), 10) // unique name
+		filePath, err := utils.UploadBase64Asset(form.Image, "products", nn)
+		if err != nil {
+			return &utils.ServiceError{
+				Code:    http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+		}
+		form.Image = filePath
+	}
+
 	if err := service.repository.CreateProduct(ctx, form); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,

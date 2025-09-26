@@ -22,4 +22,4 @@ VALUES
     ('service_category', 'standard'),
     ('tax_rate', '10'), -- in percentage
     ('tax_category', 'standard'),
-    ('feature_floor', '1'),  -- true or false
+    ('feature_floor', '1');  -- true or false

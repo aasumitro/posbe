@@ -1,3 +1,5 @@
+CREATE TYPE product_status AS ENUM ('active', 'inactive', 'draft', 'in-stock', 'out-of-stock');
+
 CREATE TABLE IF NOT EXISTS products (
     id BIGSERIAL PRIMARY KEY NOT NULL,
     category_id BIGINT NOT NULL,
@@ -6,6 +8,7 @@ CREATE TABLE IF NOT EXISTS products (
     image VARCHAR(255),
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
+    status PRODUCT_STATUS DEFAULT 'draft',
     -- we don't need it (price), let's put this item into variant
     -- by default when user create new item we will add new base variant
     -- price NUMERIC NOT NULL,
