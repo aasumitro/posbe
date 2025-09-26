@@ -211,8 +211,6 @@ export function ProductActionAdd({categories, units}: ProductActionAddProps) {
         }
       },
     });
-
-    console.log(body, status)
   }
 
   return (

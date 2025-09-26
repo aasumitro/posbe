@@ -85,6 +85,15 @@ func (service productService) CreateProduct(ctx context.Context, form *NewProduc
 	}
 
 	if err := service.repository.CreateProduct(ctx, form); err != nil {
+		// rollback image if DB update fails
+		if form.Image != "" {
+			parts := strings.Split(form.Image, "/")
+			if len(parts) == 2 {
+				folder, name := parts[0], parts[1]
+				_ = utils.DeleteAsset(folder, name)
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
@@ -94,12 +103,61 @@ func (service productService) CreateProduct(ctx context.Context, form *NewProduc
 }
 
 func (service productService) UpdateProduct(ctx context.Context, form *ProductUpdateForm) *utils.ServiceError {
+	if len(form.Variants) == 1 && form.Variants[0].Price <= 0 {
+		return &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "invalid product price: when there is only 1 variant, price must be greater than 0",
+		}
+	}
+
+	if form.Status == "publish" {
+		form.Status = "active"
+	}
+
+	if form.Image != "" {
+		// validate old image to be removed
+		product, errSvc := service.ProductDetail(ctx, form.ID)
+		if errSvc != nil {
+			return errSvc
+		}
+
+		// upload new image
+		nn := strconv.FormatInt(time.Now().UnixMicro(), 10) // unique name
+		filePath, err := utils.UploadBase64Asset(form.Image, "products", nn)
+		if err != nil {
+			return &utils.ServiceError{
+				Code:    http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+		}
+		form.Image = filePath
+
+		// remove the old image
+		if product.Image != "" {
+			parts := strings.Split(product.Image, "/")
+			if len(parts) == 2 {
+				folder, name := parts[0], parts[1]
+				_ = utils.DeleteAsset(folder, name)
+			}
+		}
+	}
+
 	if err := service.repository.UpdateProduct(ctx, form); err != nil {
+		// rollback image if DB update fails
+		if form.Image != "" {
+			parts := strings.Split(form.Image, "/")
+			if len(parts) == 2 {
+				folder, name := parts[0], parts[1]
+				_ = utils.DeleteAsset(folder, name)
+			}
+		}
+
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
+
 	return nil
 }
 

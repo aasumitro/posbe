@@ -408,8 +408,175 @@ func (repository productRepository) CreateProduct(ctx context.Context, form *New
 }
 
 func (repository productRepository) UpdateProduct(ctx context.Context, form *ProductUpdateForm) error {
-	//TODO implement me
-	panic("implement me")
+	tx, err := repository.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if tx != nil {
+			_ = tx.Rollback(ctx)
+		}
+	}()
+
+	// update the product
+	var setPrClauses []string
+	var prArgs []any
+	prArgPos := 1
+
+	if form.Status != "" {
+		setPrClauses = append(setPrClauses, fmt.Sprintf("status = $%d", prArgPos))
+		prArgs = append(prArgs, form.Status)
+		prArgPos++
+	}
+	if form.Image != "" {
+		setPrClauses = append(setPrClauses, fmt.Sprintf("image = $%d", prArgPos))
+		prArgs = append(prArgs, form.Image)
+		prArgPos++
+	}
+	if form.SKU != "" {
+		setPrClauses = append(setPrClauses, fmt.Sprintf("sku = $%d", prArgPos))
+		prArgs = append(prArgs, form.SKU)
+		prArgPos++
+	}
+	if form.Name != "" {
+		setPrClauses = append(setPrClauses, fmt.Sprintf("name = $%d", prArgPos))
+		prArgs = append(prArgs, form.Name)
+		prArgPos++
+	}
+	if form.CategoryID > 0 {
+		setPrClauses = append(setPrClauses, fmt.Sprintf("category_id = $%d", prArgPos))
+		prArgs = append(prArgs, form.CategoryID)
+		prArgPos++
+	}
+	if form.SubcategoryID > 0 {
+		setPrClauses = append(setPrClauses, fmt.Sprintf("subcategory_id = $%d", prArgPos))
+		prArgs = append(prArgs, form.SubcategoryID)
+		prArgPos++
+	}
+	if form.Description != "" {
+		setPrClauses = append(setPrClauses, fmt.Sprintf("description = $%d", prArgPos))
+		prArgs = append(prArgs, form.Description)
+		prArgPos++
+	}
+	if len(setPrClauses) > 0 {
+		prArgs = append(prArgs, form.ID)
+		q := fmt.Sprintf(`UPDATE products SET %s WHERE id = $%d`,
+			strings.Join(setPrClauses, ", "), prArgPos)
+		if _, err := tx.Exec(ctx, q, prArgs...); err != nil {
+			return err
+		}
+	}
+
+	// update exist variants
+	// For EditVariants, we need to run an UPDATE per variant,
+	// because each variant might update different fields and has its own id.
+	// It’s not practical to build one big bulk UPDATE like we did with the INSERT.
+	// update existing variants
+	if len(form.EditVariants) > 0 {
+		for _, sub := range form.EditVariants {
+			var setClauses []string
+			var args []any
+			argPos := 1
+
+			// always include product_id in args to ensure ownership
+			args = append(args, form.ID)
+
+			if sub.Type != "" {
+				setClauses = append(setClauses, fmt.Sprintf("type = $%d", argPos+1))
+				args = append(args, sub.Type)
+				argPos++
+			}
+			if sub.Name != "" {
+				setClauses = append(setClauses, fmt.Sprintf("name = $%d", argPos+1))
+				args = append(args, sub.Name)
+				argPos++
+			}
+			if sub.Description != "" {
+				setClauses = append(setClauses, fmt.Sprintf("description = $%d", argPos+1))
+				args = append(args, sub.Description)
+				argPos++
+			}
+			if sub.Price > 0 {
+				setClauses = append(setClauses, fmt.Sprintf("price = $%d", argPos+1))
+				args = append(args, sub.Price)
+				argPos++
+			}
+
+			// normalize UnitID
+			var unitID any = nil
+			if sub.UnitID > 0 {
+				unitID = sub.UnitID
+			}
+			setClauses = append(setClauses, fmt.Sprintf("unit_id = $%d", argPos+1))
+			args = append(args, unitID)
+			argPos++
+
+			// normalize UnitSize
+			var unitSize any = nil
+			if sub.UnitSize > 0 {
+				unitSize = sub.UnitSize
+			}
+			setClauses = append(setClauses, fmt.Sprintf("unit_size = $%d", argPos+1))
+			args = append(args, unitSize)
+			argPos++
+
+			// add variant id at the end
+			args = append(args, sub.ID)
+
+			if len(setClauses) == 0 {
+				continue
+			}
+
+			q := fmt.Sprintf(
+				"UPDATE product_variants SET %s WHERE product_id = $1 AND id = $%d",
+				strings.Join(setClauses, ", "), argPos+1,
+			)
+			if _, err := tx.Exec(ctx, q, args...); err != nil {
+				return err
+			}
+		}
+	}
+
+	// create new variants for selected product
+	if len(form.NewVariants) > 0 {
+		rows := make([]string, 0, len(form.NewVariants))
+		varArgs := make([]interface{}, 0, len(form.NewVariants)*6) // 6 fields per variant
+		varArgPos := 1
+		for _, sub := range form.NewVariants {
+			var unitID any = nil
+			if sub.UnitID > 0 {
+				unitID = sub.UnitID
+			}
+
+			// normalize UnitSize → nil if not set
+			var unitSize any = nil
+			if sub.UnitSize > 0 {
+				unitSize = sub.UnitSize
+			}
+
+			// placeholders: ($1, $2, $3, $4, $5, $6, $7) per row
+			rows = append(rows, fmt.Sprintf("($1, $%d, $%d, $%d, $%d, $%d, $%d)",
+				varArgPos+1, varArgPos+2, varArgPos+3, varArgPos+4, varArgPos+5, varArgPos+6))
+			varArgs = append(varArgs, sub.Type, sub.Name, sub.Description, sub.Price, unitID, unitSize)
+			varArgPos += 6
+		}
+		varArgs = append([]interface{}{form.ID}, varArgs...)
+		query := fmt.Sprintf(
+			"INSERT INTO product_variants (product_id, type, name, description, price, unit_id, unit_size) VALUES %s",
+			strings.Join(rows, ","))
+		if _, err = tx.Exec(ctx, query, varArgs...); err != nil {
+			return err
+		}
+	}
+
+	// Commit transaction
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+
+	// set tx = nil so rollback is skipped
+	tx = nil
+	return nil
 }
 
 func (repository productRepository) DeleteProduct(ctx context.Context, id int64) error {

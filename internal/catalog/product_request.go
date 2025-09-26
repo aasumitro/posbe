@@ -72,18 +72,7 @@ func (f *NewProductForm) Validate(ctx *gin.Context) interface{} {
 	}
 
 	if f.Variants != nil {
-		rules := galidator.Rules{
-			"Type":        g.R("type").Required(),
-			"Name":        g.R("name").Required(),
-			"Description": g.R("description").Required(),
-			"Price":       g.R("price").Optional(),
-			"UnitID":      g.R("unit_id").Optional(),
-			"UnitSize": g.R("unit_size").Optional().
-				WhenExistOne("UnitID").SpecificMessages(galidator.Messages{
-				"when_exist_one": "unit size is required",
-			}),
-		}
-		validator := g.ComplexValidator(rules)
+		validator := NewVariantRules()
 
 		for _, sub := range f.Variants {
 			if err := validator.Validate(ctx, sub); err != nil {
@@ -97,9 +86,64 @@ func (f *NewProductForm) Validate(ctx *gin.Context) interface{} {
 
 type ProductUpdateForm struct {
 	ID int64 `form:"-" json:"-"`
+	NewProductForm
+	NewVariants  []*NewProductVariantForm  `form:"new_variants" json:"new_variants"`
+	EditVariants []*EditProductVariantForm `form:"edit_variants" json:"edit_variants"`
+}
+
+type EditProductVariantForm struct {
+	ID int64 `form:"form" json:"form"`
+	NewProductVariantForm
 }
 
 func (f *ProductUpdateForm) Validate(ctx *gin.Context) interface{} {
 	g := galidator.New()
-	return g.ComplexValidator(galidator.Rules{}).Validate(ctx, f)
+	r := galidator.Rules{
+		"Status": g.R("status").Optional().
+			Choices("draft", "publish", "inactive"),
+		"Image":       g.R("image").Optional(),
+		"SKU":         g.R("sku").Optional(),
+		"Name":        g.R("name").Optional(),
+		"Description": g.R("description").Optional(),
+		"CategoryID": g.R("category_id").Optional().Min(1).
+			SpecificMessages(galidator.Messages{"min": "for published product, category_id is required"}),
+		"SubcategoryID": g.R("subcategory_id").Optional().Min(1).
+			SpecificMessages(galidator.Messages{"min": "for published product, subcategory_id required"}),
+	}
+
+	if err := g.ComplexValidator(r).Validate(ctx, f); err != nil {
+		return err
+	}
+
+	if f.EditVariants != nil {
+		// TODO: some validation
+	}
+
+	if f.NewVariants != nil {
+		validator := NewVariantRules()
+
+		for _, sub := range f.NewVariants {
+			if err := validator.Validate(ctx, sub); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func NewVariantRules() galidator.Validator {
+	g := galidator.New()
+	rules := galidator.Rules{
+		"Type":        g.R("type").Required(),
+		"Name":        g.R("name").Required(),
+		"Description": g.R("description").Required(),
+		"Price":       g.R("price").Optional(),
+		"UnitID":      g.R("unit_id").Optional(),
+		"UnitSize": g.R("unit_size").Optional().
+			WhenExistOne("UnitID").SpecificMessages(galidator.Messages{
+			"when_exist_one": "unit size is required",
+		}),
+	}
+	return g.ComplexValidator(rules)
 }
