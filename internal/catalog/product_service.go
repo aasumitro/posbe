@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aasumitro/posbe/internal/model"
@@ -103,14 +104,28 @@ func (service productService) UpdateProduct(ctx context.Context, form *ProductUp
 }
 
 func (service productService) DeleteProduct(ctx context.Context, id int64) *utils.ServiceError {
+	product, err := service.ProductDetail(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	// TODO: validate in use or not (has used by product)!
 
-	if err := service.repository.DeleteProduct(ctx, id); err != nil {
+	if product.Image != "" {
+		parts := strings.Split(product.Image, "/")
+		if len(parts) == 2 {
+			folder, name := parts[0], parts[1]
+			_ = utils.DeleteAsset(folder, name)
+		}
+	}
+
+	if err := service.repository.DeleteProduct(ctx, product.ID); err != nil {
 		return &utils.ServiceError{
 			Code:    http.StatusInternalServerError,
 			Message: err.Error(),
 		}
 	}
+
 	return nil
 }
 
@@ -123,6 +138,7 @@ func (service productService) DeleteProductVariant(ctx context.Context, pid, vid
 			Message: err.Error(),
 		}
 	}
+
 	return nil
 }
 

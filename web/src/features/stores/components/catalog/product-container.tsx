@@ -23,7 +23,7 @@ import {ASSET_URL} from "@/lib/api";
 
 export function  ProductContainer() {
   const {settings} = useStoreState();
-  const {products} = useProductState();
+  const {products, setSelectedProduct} = useProductState();
   const {setBoolState} = useActionState();
   const navigate = useNavigate();
 
@@ -125,7 +125,8 @@ export function  ProductContainer() {
           {/*<DropdownMenuItem>set status</DropdownMenuItem>*/}
           <DropdownMenuItem variant="destructive" onClick={(e) => {
             e.preventDefault();
-            setBoolState(ProductActionDeleteModalState, true)
+            setSelectedProduct(product);
+            setBoolState(ProductActionDeleteModalState, true);
           }}>Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
