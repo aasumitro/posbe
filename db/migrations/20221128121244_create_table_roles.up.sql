@@ -6,4 +6,7 @@ CREATE TABLE IF NOT EXISTS roles (
 
 ALTER TABLE users ADD COLUMN role_id BIGINT;
 
-ALTER TABLE users ADD CONSTRAINT fk_users_roles FOREIGN KEY (role_id) REFERENCES roles(id);
+ALTER TABLE users
+    ADD CONSTRAINT fk_users_roles
+        FOREIGN KEY (role_id) REFERENCES roles(id)
+            ON DELETE SET NULL;

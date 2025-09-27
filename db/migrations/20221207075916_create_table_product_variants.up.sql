@@ -11,8 +11,12 @@ CREATE TABLE IF NOT EXISTS product_variants(
     updated_at BIGINT
 );
 
-ALTER TABLE product_variants ADD CONSTRAINT fk_products_product_variants
-    FOREIGN KEY (product_id) REFERENCES products(id);
+ALTER TABLE product_variants
+    ADD CONSTRAINT fk_products_product_variants
+        FOREIGN KEY (product_id) REFERENCES products(id)
+            ON DELETE CASCADE;
 
-ALTER TABLE product_variants ADD CONSTRAINT fk_units_product_variants
-    FOREIGN KEY (unit_id) REFERENCES units(id);
+ALTER TABLE product_variants
+    ADD CONSTRAINT fk_units_product_variants
+        FOREIGN KEY (unit_id) REFERENCES units(id)
+            ON DELETE SET NULL;

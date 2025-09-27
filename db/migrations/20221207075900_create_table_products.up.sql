@@ -2,8 +2,8 @@ CREATE TYPE product_status AS ENUM ('active', 'inactive', 'draft', 'in-stock', '
 
 CREATE TABLE IF NOT EXISTS products (
     id BIGSERIAL PRIMARY KEY NOT NULL,
-    category_id BIGINT NOT NULL,
-    subcategory_id BIGINT NOT NULL,
+    category_id BIGINT,
+    subcategory_id BIGINT,
     sku VARCHAR(255) UNIQUE NOT NULL,
     image VARCHAR(255),
     name VARCHAR(255) NOT NULL,
@@ -16,8 +16,12 @@ CREATE TABLE IF NOT EXISTS products (
     updated_at BIGINT
 );
 
-ALTER TABLE products ADD CONSTRAINT fk_products_categories
-    FOREIGN KEY (category_id) REFERENCES categories(id);
+ALTER TABLE products
+    ADD CONSTRAINT fk_products_categories
+        FOREIGN KEY (category_id) REFERENCES categories(id)
+            ON DELETE SET NULL;
 
-ALTER TABLE products ADD CONSTRAINT fk_products_subcategories
-    FOREIGN KEY (subcategory_id) REFERENCES subcategories(id);
+ALTER TABLE products
+    ADD CONSTRAINT fk_products_subcategories
+        FOREIGN KEY (subcategory_id) REFERENCES subcategories(id)
+            ON DELETE SET NULL;
