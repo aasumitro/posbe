@@ -17,6 +17,7 @@ type (
 		Image         string `json:"image"`
 		Name          string `json:"name"`
 		Description   string `json:"description"`
+		Status        string `json:"status"`
 		// embedding data
 		Category    *Category    `json:"category,omitempty"`
 		Subcategory *Subcategory `json:"subcategory,omitempty"`

@@ -21,11 +21,62 @@ import type {Product, ProductVariant} from "@/types/product";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import {ASSET_URL} from "@/lib/api";
 
-export function  ProductContainer() {
+interface ProductContainerProps {
+  sort?: Record<string, "asc" | "desc">;
+  status?: "draft" | "active" | "inactive";
+}
+
+export function  ProductContainer({status, sort}: ProductContainerProps) {
   const {settings} = useStoreState();
   const {products, setSelectedProduct} = useProductState();
   const {setBoolState} = useActionState();
   const navigate = useNavigate();
+
+  let sortedProducts = [...(products ?? [])];
+
+  if (sort) {
+    const [field, order] = Object.entries(sort)[0] ?? [];
+    if (field && order) {
+      sortedProducts.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        if (field === "price") {
+          const getLowestPrice = (product: Product) => {
+            if (!product.variants || product.variants.length === 0) return 0;
+            const nonZero = product.variants.filter(v => v.price > 0);
+            const lowestVariant = nonZero.length > 0
+              ? nonZero.reduce((min, v) => v.price < min.price ? v : min)
+              : product.variants[0];
+            return lowestVariant.price;
+          };
+          aValue = getLowestPrice(a);
+          bValue = getLowestPrice(b);
+        } else {
+          aValue = a[field as keyof typeof a];
+          bValue = b[field as keyof typeof b];
+        }
+
+        // Now compare strings
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return order === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+
+        // Compare numbers (including price)
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return order === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        return 0;
+      });
+    }
+  }
+
+  if (status) {
+    sortedProducts = sortedProducts.filter((product) => product.status === status)
+  }
 
   function renderImage(product: Product) {
     if (!product.image && product.category) {
@@ -214,7 +265,7 @@ export function  ProductContainer() {
 
   return (
     <div className="grid gap-4 grid-cols-2 2xl:grid-cols-3 auto-rows-fr mt-4">
-      {products?.map((product) => (
+      {sortedProducts?.map((product) => (
         <div
           key={product.id}
           className="border-1 rounded-xl p-4 space-y-6 select-none flex flex-col h-full"

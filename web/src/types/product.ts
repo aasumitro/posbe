@@ -17,6 +17,7 @@ export interface Product {
   image: string,
   name: string,
   description: string,
+  status: string,
   category: Category | null,
   subcategory: Subcategory | null,
   variants: ProductVariant[] | null,

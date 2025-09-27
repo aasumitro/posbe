@@ -17,14 +17,42 @@ import {AddonActionDeleteModalState} from "@/features/stores/components/catalog/
 import {useProductState} from "@/states/product-state";
 import {useStoreState} from "@/states/store-state";
 
-export function AddonContainer() {
+interface AddonContainerProps {
+  sort?: Record<string, "asc" | "desc">;
+}
+
+export function AddonContainer({sort}: AddonContainerProps) {
   const { setBoolState } = useActionState();
   const {settings} = useStoreState();
   const {addons, setSelectedAddon} = useProductState();
 
+  let sortedAddons = [...(addons ?? [])];
+
+  if (sort) {
+    const [field, order] = Object.entries(sort)[0] ?? [];
+    if (field && order) {
+      sortedAddons.sort((a, b) => {
+        const aValue = a[field as keyof typeof a];
+        const bValue = b[field as keyof typeof b];
+
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return order === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return order === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        return 0;
+      });
+    }
+  }
+
   return (
     <div className="grid gap-4 grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 auto-rows-fr mt-4">
-      {addons?.map((addon, index) => (
+      {sortedAddons?.map((addon, index) => (
         <div
           key={index}
           className="border-1 rounded-xl p-4 space-y-6 select-none flex flex-col h-full"

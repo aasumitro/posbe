@@ -19,6 +19,7 @@ import {useNewProduct} from "@/hooks/use-product";
 import {isHTTPResponse} from "@/lib/api";
 import {toast} from "sonner";
 import {useQueryClient} from "@tanstack/react-query";
+import {Route} from "@/routes/_authenticated/stores/route";
 
 interface ProductActionAddProps {
   categories?: Category[] | null;
@@ -186,7 +187,11 @@ export function ProductActionAdd({categories, units}: ProductActionAddProps) {
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: ['products'] })
         toast.success("Product add successfully");
-        await navigate({to: "/stores/catalogs"})
+        await navigate({
+          from:Route.fullPath,
+          to: "/stores/catalogs",
+          search: {tab: "products"}
+        })
       },
       onError: (error) => {
         if (error && isHTTPResponse<null>(error)) {
@@ -223,7 +228,11 @@ export function ProductActionAdd({categories, units}: ProductActionAddProps) {
               className="w-8 h-8 cursor-pointer"
               onClick={async (e) => {
                 e.preventDefault();
-                await navigate({to: "/stores/catalogs"})
+                await navigate({
+                  from:Route.fullPath,
+                  to: "/stores/catalogs",
+                  search: {tab: "products"}
+                })
               }}
             >
               <IconChevronLeft className="w-4 h-4" />

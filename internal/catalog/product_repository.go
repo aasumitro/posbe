@@ -98,7 +98,7 @@ func (repository productRepository) GetAllProduct(ctx context.Context) ([]*model
 	q := `
 		SELECT 
 		  p.id, p.category_id, p.subcategory_id, p.sku, 
-		  p.image, p.name, p.description,
+		  p.image, p.name, p.description, p.status,
 			
           -- embed category as JSON
 		  json_build_object(
@@ -154,6 +154,7 @@ func (repository productRepository) GetAllProduct(ctx context.Context) ([]*model
 		Image         sql.NullString  `json:"image"`
 		Name          string          `json:"name"`
 		Description   sql.NullString  `json:"description"`
+		Status        string          `json:"status"`
 		Category      json.RawMessage `json:"category"`
 		Subcategory   json.RawMessage `json:"subcategory"`
 		Variants      json.RawMessage `json:"variants"`
@@ -164,7 +165,7 @@ func (repository productRepository) GetAllProduct(ctx context.Context) ([]*model
 		var r productRow
 		if err := rows.Scan(
 			&r.ID, &r.CategoryID, &r.SubcategoryID, &r.SKU,
-			&r.Image, &r.Name, &r.Description,
+			&r.Image, &r.Name, &r.Description, &r.Status,
 			&r.Category, &r.Subcategory, &r.Variants,
 		); err != nil {
 			return nil, err
@@ -187,7 +188,8 @@ func (repository productRepository) GetAllProduct(ctx context.Context) ([]*model
 
 		products = append(products, &model.Product{
 			ID: r.ID, CategoryID: r.CategoryID, SubcategoryID: r.SubcategoryID,
-			SKU: r.SKU, Image: r.Image.String, Name: r.Name, Description: r.Description.String,
+			SKU: r.SKU, Image: r.Image.String, Name: r.Name,
+			Description: r.Description.String, Status: r.Status,
 			Category: category, Subcategory: subcategory, Variants: variants,
 		})
 	}
@@ -203,7 +205,7 @@ func (repository productRepository) GetProductDetail(ctx context.Context, id int
 	q := `
 		SELECT 
 		  p.id, p.category_id, p.subcategory_id, p.sku, 
-		  p.image, p.name, p.description,
+		  p.image, p.name, p.description, p.status,
 			
 		  -- embed category as JSON
 		  json_build_object(
@@ -255,6 +257,7 @@ func (repository productRepository) GetProductDetail(ctx context.Context, id int
 		Image         sql.NullString  `json:"image"`
 		Name          string          `json:"name"`
 		Description   sql.NullString  `json:"description"`
+		Status        string          `json:"status"`
 		Category      json.RawMessage `json:"category"`
 		Subcategory   json.RawMessage `json:"subcategory"`
 		Variants      json.RawMessage `json:"variants"`
@@ -263,7 +266,7 @@ func (repository productRepository) GetProductDetail(ctx context.Context, id int
 	var r productRow
 	if err := row.Scan(
 		&r.ID, &r.CategoryID, &r.SubcategoryID, &r.SKU,
-		&r.Image, &r.Name, &r.Description,
+		&r.Image, &r.Name, &r.Description, &r.Status,
 		&r.Category, &r.Subcategory, &r.Variants,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -295,6 +298,7 @@ func (repository productRepository) GetProductDetail(ctx context.Context, id int
 		Image:         r.Image.String,
 		Name:          r.Name,
 		Description:   r.Description.String,
+		Status:        r.Status,
 		Category:      category,
 		Subcategory:   subcategory,
 		Variants:      variants,

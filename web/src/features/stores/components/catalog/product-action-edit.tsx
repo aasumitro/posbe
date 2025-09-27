@@ -16,6 +16,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import {useEffect, useState} from "react";
 import {ASSET_URL} from "@/lib/api";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
+import {Route} from "@/routes/_authenticated/stores/route";
 
 interface ProductActionEditProps {
   product?: Product | null;
@@ -157,8 +158,6 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
         }))
       }))
     })
-
-    // how to build the product.variant?
   }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -175,7 +174,11 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
               className="w-8 h-8 cursor-pointer"
               onClick={async (e) => {
                 e.preventDefault();
-                await navigate({to: "/stores/catalogs"})
+                await navigate({
+                  from:Route.fullPath,
+                  to: "/stores/catalogs",
+                  search: {tab: "products"}
+                })
               }}
             >
               <IconChevronLeft className="w-4 h-4" />
