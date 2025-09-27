@@ -30,11 +30,7 @@ export const useAttributeState = create<States & Actions>((set) => {
       if (selectedCategory) {
         const found = categories.find((c) =>
           c.id === selectedCategory?.id);
-        if (found) {
-          selectedCategory = found;
-        } else {
-          selectedCategory = null;
-        }
+        selectedCategory = found ?? null;
       }
 
       return {categories, selectedCategory}

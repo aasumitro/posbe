@@ -103,7 +103,12 @@ func (service productService) CreateProduct(ctx context.Context, form *NewProduc
 }
 
 func (service productService) UpdateProduct(ctx context.Context, form *ProductUpdateForm) *utils.ServiceError {
-	if len(form.Variants) == 1 && form.Variants[0].Price <= 0 {
+	product, errSvc := service.ProductDetail(ctx, form.ID)
+	if errSvc != nil {
+		return errSvc
+	}
+
+	if len(product.Variants) == 1 && len(form.Variants) == 1 && form.Variants[0].Price <= 0 {
 		return &utils.ServiceError{
 			Code:    http.StatusBadRequest,
 			Message: "invalid product price: when there is only 1 variant, price must be greater than 0",
@@ -115,12 +120,6 @@ func (service productService) UpdateProduct(ctx context.Context, form *ProductUp
 	}
 
 	if form.Image != "" {
-		// validate old image to be removed
-		product, errSvc := service.ProductDetail(ctx, form.ID)
-		if errSvc != nil {
-			return errSvc
-		}
-
 		// upload new image
 		nn := strconv.FormatInt(time.Now().UnixMicro(), 10) // unique name
 		filePath, err := utils.UploadBase64Asset(form.Image, "products", nn)
@@ -131,15 +130,6 @@ func (service productService) UpdateProduct(ctx context.Context, form *ProductUp
 			}
 		}
 		form.Image = filePath
-
-		// remove the old image
-		if product.Image != "" {
-			parts := strings.Split(product.Image, "/")
-			if len(parts) == 2 {
-				folder, name := parts[0], parts[1]
-				_ = utils.DeleteAsset(folder, name)
-			}
-		}
 	}
 
 	if err := service.repository.UpdateProduct(ctx, form); err != nil {
@@ -158,6 +148,15 @@ func (service productService) UpdateProduct(ctx context.Context, form *ProductUp
 		}
 	}
 
+	// remove the old image
+	if form.Image != "" && product.Image != "" {
+		parts := strings.Split(product.Image, "/")
+		if len(parts) == 2 {
+			folder, name := parts[0], parts[1]
+			_ = utils.DeleteAsset(folder, name)
+		}
+	}
+
 	return nil
 }
 
@@ -167,7 +166,12 @@ func (service productService) DeleteProduct(ctx context.Context, id int64) *util
 		return err
 	}
 
-	// TODO: validate in use or not (has used by product)!
+	if err := service.repository.DeleteProduct(ctx, product.ID); err != nil {
+		return &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
 
 	if product.Image != "" {
 		parts := strings.Split(product.Image, "/")
@@ -177,18 +181,21 @@ func (service productService) DeleteProduct(ctx context.Context, id int64) *util
 		}
 	}
 
-	if err := service.repository.DeleteProduct(ctx, product.ID); err != nil {
-		return &utils.ServiceError{
-			Code:    http.StatusInternalServerError,
-			Message: err.Error(),
-		}
-	}
-
 	return nil
 }
 
 func (service productService) DeleteProductVariant(ctx context.Context, pid, vid int64) *utils.ServiceError {
-	// TODO: validate in use or not (has used by order_product)!
+	product, err := service.ProductDetail(ctx, pid)
+	if err != nil {
+		return err
+	}
+
+	if len(product.Variants) == 1 {
+		return &utils.ServiceError{
+			Code:    http.StatusBadRequest,
+			Message: "a product needs at least one variant for its base price",
+		}
+	}
 
 	if err := service.repository.DeleteProductVariant(ctx, pid, vid); err != nil {
 		return &utils.ServiceError{

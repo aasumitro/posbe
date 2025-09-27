@@ -33,14 +33,9 @@ export const useStoreState = create<States & Actions>((set) => {
       let selectedShift = state.selectedShift;
 
       if (selectedShift) {
-        // try to find the updated shift by ID
         const found = shifts.find((s) =>
           s.id === selectedShift?.id);
-        if (found) {
-          selectedShift = found;
-        } else {
-          selectedShift = null;
-        }
+        selectedShift =found ?? null;
       }
 
       return { shifts, selectedShift };
