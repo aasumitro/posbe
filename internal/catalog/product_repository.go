@@ -123,12 +123,15 @@ func (repository productRepository) GetAllProduct(ctx context.Context) ([]*model
 		        'name', pv.name,
 		        'description', pv.description,
 		        'price', pv.price,
-				'unit', json_build_object(
-				 'id', u.id,
-				 'magnitude', u.magnitude,
-				 'name', u.name,
-				 'symbol', u.symbol
-				)
+				'unit', CASE 
+				  WHEN u.id IS NULL THEN NULL
+				  ELSE json_build_object(
+				    'id', u.id,
+				    'magnitude', u.magnitude,
+				    'name', u.name,
+				    'symbol', u.symbol
+				  )
+				END
 		      )
 		    ) FILTER (WHERE pv.id IS NOT NULL), '[]'
 		  ) AS variants
@@ -230,12 +233,15 @@ func (repository productRepository) GetProductDetail(ctx context.Context, id int
 		        'name', pv.name,
 		        'description', pv.description,
 		        'price', pv.price,
-				'unit', json_build_object(
-				 'id', u.id,
-				 'magnitude', u.magnitude,
-				 'name', u.name,
-				 'symbol', u.symbol
-				)
+				'unit', CASE 
+				  WHEN u.id IS NULL THEN NULL
+				  ELSE json_build_object(
+				    'id', u.id,
+				    'magnitude', u.magnitude,
+				    'name', u.name,
+				    'symbol', u.symbol
+				  )
+				END
 		      )
 		    ) FILTER (WHERE pv.id IS NOT NULL), '[]'
 		  ) AS variants

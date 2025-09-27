@@ -190,10 +190,27 @@ func (service productService) DeleteProductVariant(ctx context.Context, pid, vid
 		return err
 	}
 
+	// Verify variant exists
+	var found bool
+	for _, v := range product.Variants {
+		if v.ID == vid {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return &utils.ServiceError{
+			Code:    http.StatusNotFound,
+			Message: "variant not found",
+		}
+	}
+
+	// Prevent deleting last variant
 	if len(product.Variants) == 1 {
 		return &utils.ServiceError{
 			Code:    http.StatusBadRequest,
-			Message: "a product needs at least one variant for its base price",
+			Message: "a product must always have at least one variant",
 		}
 	}
 

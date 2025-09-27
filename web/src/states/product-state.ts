@@ -23,7 +23,17 @@ export const useProductState = create<States & Actions>((set) => {
     selectedProduct: null,
     setAddons: (addons: ProductAddon[] | null) => set({addons}),
     setSelectedAddon: (selectedAddon: ProductAddon | null) => set({selectedAddon}),
-    setProducts: (products: Product[] | null) => set({products}),
+    setProducts: (products: Product[] | null) => set((state) => {
+      let selectedProduct = state.selectedProduct;
+
+      if (selectedProduct) {
+        const found = products?.find((p) =>
+          p.id === selectedProduct?.id);
+        selectedProduct = found ?? null;
+      }
+
+      return {products, selectedProduct}
+    }),
     setSelectedProduct: (selectedProduct: Product | null) => set({selectedProduct})
   }
 })

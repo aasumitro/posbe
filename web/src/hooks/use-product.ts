@@ -116,6 +116,23 @@ export function useNewProduct() {
   return useMutation({ mutationFn: newProduct })
 }
 
+export function useUpdateProduct() {
+  const editProduct = async (
+    {id, body}: {id?: number, body: string}
+  ): Promise<HTTPResponse<Product>> => {
+    try {
+      const url = `${API_PATH.CATALOG.PRODUCTS.BASE}/${id}`
+      const response =
+        await api.patch<HTTPResponse<Product>>(url, body);
+      return response.data;
+    } catch (error: unknown) {
+      return catchHTTPError(error);
+    }
+  };
+
+  return useMutation({ mutationFn: editProduct })
+}
+
 export function useDeleteProduct() {
   const deleteProduct = async (
     id?: number

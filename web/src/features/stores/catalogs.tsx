@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {type ReactElement, useEffect, useState} from "react";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {ProductContainer} from "@/features/stores/components/catalog/product-container";
 import {AddonContainer} from "@/features/stores/components/catalog/addon-container";
@@ -20,12 +20,15 @@ import {AddonActionDelete} from "@/features/stores/components/catalog/addon-acti
 import {useProductAddonList, useProductList} from "@/hooks/use-product";
 import {useProductState} from "@/states/product-state";
 import {Route} from "@/routes/_authenticated/stores/route";
+import {useCategoryList} from "@/hooks/use-attribute";
+import {IconSort09, IconSort90, IconSortAZ, IconSortZA} from "@tabler/icons-react";
 
 interface CatalogPageProps {
   query: {
     tab: "products" | "addons";
     sort?: Record<string, "asc" | "desc">;
     status?: "draft" | "active" | "inactive";
+    category?: string;
   };
 }
 
@@ -33,9 +36,10 @@ export function ProductCatalogPage({query}: CatalogPageProps) {
   const { setBoolState } = useActionState();
   const [activeTab, setActiveTab] = useState<string>(query.tab);
   const navigate = useNavigate();
-  const { sort: rawSort, status } = useSearch({from: '/_authenticated/stores/catalogs'});
+  const { sort: rawSort, status, category } = useSearch({from: '/_authenticated/stores/catalogs'});
   const {data: products} = useProductList();
   const {data: addons} = useProductAddonList();
+  const {data: categories} = useCategoryList();
   const {setProducts, setAddons} = useProductState();
 
   useEffect(() => {
@@ -48,52 +52,44 @@ export function ProductCatalogPage({query}: CatalogPageProps) {
       await navigate({to: "/stores/products"})
       return;
     }
+
     setBoolState(AddonActionAddModalState, true);
   }
 
   const handleTabChange = async (value: string) => {
     setActiveTab(value);
-    await navigate({
-      from:Route.fullPath,
-      search: {
-        tab: value,
-        sort: rawSort ? decodeURIComponent(rawSort) : undefined,
-        status: status
-      }
-    });
+    await navigate({from:Route.fullPath, search: {tab: value}});
   }
 
-  const statusQuery = async (status: string) => {
-    let search: {tab: string; sort?: string; status?: string} = {
+  const updateSearchQuery = async (
+    updates: { status?: string; category?: string; sort?: string }
+  ) => {
+    let search: { tab: string; sort?: string; status?: string; category?: string } = {
       tab: activeTab,
       sort: rawSort ? decodeURIComponent(rawSort) : undefined,
+      status,
+      category,
+    };
+
+    search = { ...search, ...updates };
+
+    if (updates.category) {
+      delete search.status;
     }
 
-    if (status) {
-      search.status = status;
+    if (updates.status) {
+      delete search.category;
     }
 
-    await navigate({
-      from:Route.fullPath,
-      search
+    Object.keys(search).forEach((key) => {
+      if (search[key as keyof typeof search] === "" ||
+        search[key as keyof typeof search] === undefined) {
+        delete search[key as keyof typeof search];
+      }
     });
-  }
 
-  const sortQuery = async (sort: string) => {
-    let search: {tab: string; sort?: string; status?: string} = {
-      tab: activeTab,
-      status: status
-    }
-
-    if (sort) {
-      search.sort = sort;
-    }
-
-    await navigate({
-      from:Route.fullPath,
-      search
-    });
-  }
+    await navigate({from: Route.fullPath, search});
+  };
 
   const FilterDropdown = ({tab}: {tab: string}) => {
     if (tab !== "products") return null;
@@ -113,33 +109,78 @@ export function ProductCatalogPage({query}: CatalogPageProps) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Filter by</DropdownMenuLabel>
           <DropdownMenuSeparator/>
-          <DropdownMenuLabel className="text-muted-foreground text-xs">
-            Status
-          </DropdownMenuLabel>
-          <DropdownMenuCheckboxItem
+
+          <DropdownMenuLabel className="text-muted-foreground text-xs">Status</DropdownMenuLabel>
+          {(["all", "draft", "active", "inactive"] as const).map((s) => (
+            <DropdownMenuCheckboxItem
+              key={s}
+              className="cursor-pointer"
+              checked={s === "all" ? !status : status === s}
+              onClick={async () => {
+                if (s === "all") {
+                  await updateSearchQuery({ status: "" });
+                } else {
+                  await updateSearchQuery({ status: s });
+                }
+              }}
+            >
+              {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
+            </DropdownMenuCheckboxItem>
+          ))}
+
+          {categories.data && categories.data.length > 0 && (
+            <>
+              <DropdownMenuLabel className="text-muted-foreground text-xs">
+                Category
+              </DropdownMenuLabel>
+              {categories?.data?.map((c) => (
+                <DropdownMenuCheckboxItem
+                  key={c.id}
+                  className="cursor-pointer"
+                  checked={category === c.name}
+                  onClick={() => updateSearchQuery({category: c.name})}
+                >
+                  {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </>
+          )}
+
+          <DropdownMenuSeparator/>
+          <DropdownMenuItem
             className="cursor-pointer"
-            checked={!status}
-            onClick={() => statusQuery("")}
-          >All</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            className="cursor-pointer"
-            checked={status === "draft"}
-            onClick={() => statusQuery("draft")}
-          >Draft</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            className="cursor-pointer"
-            checked={status === "active"}
-            onClick={() => statusQuery("active")}
-          >Active</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            className="cursor-pointer"
-            checked={status === "inactive"}
-            onClick={() => statusQuery("inactive")}
-          >Inactive</DropdownMenuCheckboxItem>
+            variant="destructive"
+            onClick={async () => {
+              await navigate({
+                from:Route.fullPath,
+                search: {
+                  tab: activeTab,
+                  sort: rawSort ? decodeURIComponent(rawSort) : undefined,
+                }
+              });
+            }}
+          >Clear</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     )
   }
+
+  const renderSortOptions = (
+    options: string[], icons: [ReactElement, ReactElement]
+  ) => options.map((filter, index) => (
+      <DropdownMenuCheckboxItem
+        key={filter}
+        className="cursor-pointer"
+        checked={rawSort === filter}
+        onClick={() => updateSearchQuery({ sort: filter })}
+      >
+        {index === 0 ? (
+          <>{icons[0]} Ascending</>
+        ) : (
+          <>{icons[1]} Descending</>
+        )}
+      </DropdownMenuCheckboxItem>
+  ));
 
   const SortDropdown = ({tab}: {tab: string}) => {
     return (
@@ -158,49 +199,17 @@ export function ProductCatalogPage({query}: CatalogPageProps) {
           <DropdownMenuLabel>Sort by</DropdownMenuLabel>
           <DropdownMenuSeparator/>
 
-          <DropdownMenuLabel className="text-muted-foreground text-xs">
-            Name
-          </DropdownMenuLabel>
-          <DropdownMenuCheckboxItem
-            className="cursor-pointer"
-            checked={rawSort === "name:asc"}
-            onClick={() => sortQuery("name:asc")}
-          >asc</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            className="cursor-pointer"
-            checked={rawSort === "name:desc"}
-            onClick={() => sortQuery("name:desc")}
-          >desc</DropdownMenuCheckboxItem>
+          <DropdownMenuLabel className="text-muted-foreground text-xs">Name</DropdownMenuLabel>
+          {renderSortOptions(["name:asc", "name:desc"], [<IconSortAZ />, <IconSortZA />])}
 
-          <DropdownMenuLabel className="text-muted-foreground text-xs">
-            Price
-          </DropdownMenuLabel>
-          <DropdownMenuCheckboxItem
-            className="cursor-pointer"
-            checked={rawSort === "price:asc"}
-            onClick={() => sortQuery("price:asc")}
-          >asc</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            className="cursor-pointer"
-            checked={rawSort === "price:desc"}
-            onClick={() => sortQuery("price:desc")}
-          >desc</DropdownMenuCheckboxItem>
+
+          <DropdownMenuLabel className="text-muted-foreground text-xs">Price</DropdownMenuLabel>
+          {renderSortOptions(["price:asc", "price:desc"], [<IconSort09 />, <IconSort90 />])}
 
           {tab === "addons" && (
             <>
-              <DropdownMenuLabel className="text-muted-foreground text-xs">
-                Total Orders
-              </DropdownMenuLabel>
-              <DropdownMenuCheckboxItem
-                className="cursor-pointer"
-                checked={rawSort === "usage:asc"}
-                onClick={() => sortQuery("usage:asc")}
-              >asc</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                className="cursor-pointer"
-                checked={rawSort === "usage:desc"}
-                onClick={() => sortQuery("usage:desc")}
-              >desc</DropdownMenuCheckboxItem>
+              <DropdownMenuLabel className="text-muted-foreground text-xs">Orders</DropdownMenuLabel>
+              {renderSortOptions(["usage:asc", "usage:desc"], [<IconSort09 />, <IconSort90 />])}
             </>
           )}
 
@@ -208,7 +217,7 @@ export function ProductCatalogPage({query}: CatalogPageProps) {
           <DropdownMenuItem
             className="cursor-pointer"
             variant="destructive"
-            onClick={() => sortQuery("")}
+            onClick={() => updateSearchQuery({sort: ""})}
           >Clear</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -280,7 +289,11 @@ export function ProductCatalogPage({query}: CatalogPageProps) {
           </div>
 
           <TabsContent value="products">
-            <ProductContainer sort={query.sort} status={query.status} />
+            <ProductContainer
+              sort={query.sort}
+              status={query.status}
+              category={query.category}
+            />
             <ProductActionDeleteModal />
           </TabsContent>
           <TabsContent value="addons">

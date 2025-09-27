@@ -1,7 +1,7 @@
 import {Button} from "@/components/ui/button";
 import {formatShortNumber} from "@/lib/numbers";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import {IconDotsVertical, IconPuzzle} from "@tabler/icons-react";
+import {IconBoxOff, IconDotsVertical, IconPuzzle} from "@tabler/icons-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,6 +49,21 @@ export function AddonContainer({sort}: AddonContainerProps) {
       });
     }
   }
+
+  if (sortedAddons.length < 1) {
+    return (
+      <div className="text-center py-12">
+        <IconBoxOff className="my-8 w-24 h-24 mx-auto"/>
+        <h4 className="text-primary text-xl font-bold tracking-tight">
+          No Addons Found
+        </h4>
+        <p className="text-secondary-foreground text-md font-normal">
+          No addons exist yet. Add your first addon!
+        </p>
+      </div>
+    )
+  }
+
 
   return (
     <div className="grid gap-4 grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 auto-rows-fr mt-4">

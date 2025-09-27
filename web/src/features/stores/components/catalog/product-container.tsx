@@ -1,4 +1,4 @@
-import {Coffee, Soup} from "lucide-react";
+import {Box, Coffee, Soup} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import {Separator} from "@/components/ui/separator";
 import {
@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import {IconDotsVertical} from "@tabler/icons-react";
+import {IconBoxOff, IconDotsVertical} from "@tabler/icons-react";
 import {useActionState} from "@/states/action-state";
 import {ProductActionDeleteModalState} from "@/features/stores/components/catalog/product-action-delete";
 import {useNavigate} from "@tanstack/react-router";
@@ -24,9 +24,10 @@ import {ASSET_URL} from "@/lib/api";
 interface ProductContainerProps {
   sort?: Record<string, "asc" | "desc">;
   status?: "draft" | "active" | "inactive";
+  category?: string;
 }
 
-export function  ProductContainer({status, sort}: ProductContainerProps) {
+export function  ProductContainer({status, sort, category}: ProductContainerProps) {
   const {settings} = useStoreState();
   const {products, setSelectedProduct} = useProductState();
   const {setBoolState} = useActionState();
@@ -75,7 +76,13 @@ export function  ProductContainer({status, sort}: ProductContainerProps) {
   }
 
   if (status) {
-    sortedProducts = sortedProducts.filter((product) => product.status === status)
+    sortedProducts = sortedProducts
+      .filter((product) => product.status === status)
+  }
+
+  if (category) {
+    sortedProducts = sortedProducts
+      .filter((product) => product.category?.name === category)
   }
 
   function renderImage(product: Product) {
@@ -83,7 +90,12 @@ export function  ProductContainer({status, sort}: ProductContainerProps) {
       if (product.category.name === "foods") {
         return <Soup />
       }
-      return <Coffee />
+
+      if (product.category.name === "beverages") {
+        return <Coffee />
+      }
+
+      return <Box />
     }
 
     return <img src={`${ASSET_URL}/${product.image}`} alt={product.name} />
@@ -141,9 +153,11 @@ export function  ProductContainer({status, sort}: ProductContainerProps) {
         </span>
           <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none text-green-500">
             {currency} {formatShortNumber(lowestVariant.price)}
-            <span className="text-sm font-normal text-muted-foreground">
-            / {lowestVariant.unit_size}{lowestVariant.unit?.symbol}
-          </span>
+            {lowestVariant.unit && (
+              <span className="text-sm font-normal text-muted-foreground">
+                / {lowestVariant.unit_size}{lowestVariant.unit?.symbol}
+              </span>
+            )}
           </div>
         </section>
       );
@@ -261,6 +275,24 @@ export function  ProductContainer({status, sort}: ProductContainerProps) {
         ))}
       </div>
     );
+  }
+
+  if (sortedProducts.length < 1) {
+    return (
+      <div className="text-center py-12">
+        <IconBoxOff className="my-8 w-24 h-24 mx-auto"/>
+        <h4 className="text-primary text-xl font-bold tracking-tight">
+          No Products Found
+        </h4>
+        <p className="text-secondary-foreground text-md font-normal">
+          {products?.length === 0
+            ? "No products exist yet. Add your first product!"
+            : status !== undefined
+              ? "There are no products available in this filter at the moment."
+              : "No products match the current selection."}
+        </p>
+      </div>
+    )
   }
 
   return (

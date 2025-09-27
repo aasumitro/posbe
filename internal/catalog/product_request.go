@@ -92,7 +92,7 @@ type ProductUpdateForm struct {
 }
 
 type EditProductVariantForm struct {
-	ID int64 `form:"form" json:"form"`
+	ID int64 `form:"id" json:"id"`
 	NewProductVariantForm
 }
 
@@ -101,14 +101,12 @@ func (f *ProductUpdateForm) Validate(ctx *gin.Context) interface{} {
 	r := galidator.Rules{
 		"Status": g.R("status").Optional().
 			Choices("draft", "publish", "inactive"),
-		"Image":       g.R("image").Optional(),
-		"SKU":         g.R("sku").Optional(),
-		"Name":        g.R("name").Optional(),
-		"Description": g.R("description").Optional(),
-		"CategoryID": g.R("category_id").Optional().Min(1).
-			SpecificMessages(galidator.Messages{"min": "for published product, category_id is required"}),
-		"SubcategoryID": g.R("subcategory_id").Optional().Min(1).
-			SpecificMessages(galidator.Messages{"min": "for published product, subcategory_id required"}),
+		"Image":         g.R("image").Optional(),
+		"SKU":           g.R("sku").Optional(),
+		"Name":          g.R("name").Optional(),
+		"Description":   g.R("description").Optional(),
+		"CategoryID":    g.R("category_id").Optional(),
+		"SubcategoryID": g.R("subcategory_id").Optional(),
 	}
 
 	if err := g.ComplexValidator(r).Validate(ctx, f); err != nil {
@@ -116,7 +114,14 @@ func (f *ProductUpdateForm) Validate(ctx *gin.Context) interface{} {
 	}
 
 	if f.EditVariants != nil {
-		// TODO: some validation
+		rules := galidator.Rules{"ID": g.R("id").Required()}
+		validator := g.ComplexValidator(rules)
+
+		for _, sub := range f.EditVariants {
+			if err := validator.Validate(ctx, sub); err != nil {
+				return err
+			}
+		}
 	}
 
 	if f.NewVariants != nil {

@@ -1,4 +1,3 @@
-import type {Category} from "@/types/category";
 import type {Unit} from "@/types/unit";
 import {z} from "zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
@@ -14,26 +13,30 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import ReactQuill from "react-quill-new";
 import 'react-quill-new/dist/quill.snow.css';
 import {useEffect, useState} from "react";
-import {ASSET_URL} from "@/lib/api";
+import {ASSET_URL, isHTTPResponse} from "@/lib/api";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {Route} from "@/routes/_authenticated/stores/route";
-
-interface ProductActionEditProps {
-  product?: Product | null;
-  categories?: Category[] | null;
-  units?: Unit[] | null;
-}
+import {useProductState} from "@/states/product-state";
+import {useAttributeState} from "@/states/attribute-state";
+import {useDeleteProductVariant, useUpdateProduct} from "@/hooks/use-product";
+import {toast} from "sonner";
+import {useQueryClient} from "@tanstack/react-query";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {PopoverClose} from "@radix-ui/react-popover";
 
 interface VariantContainerProps {
   control: Control<z.infer<typeof FormSchema>>,
   units?: Unit[] | null
+  product?: Product | null
 }
 
 interface VariantGroupProps {
   control: Control<z.infer<typeof FormSchema>>;
   groupIndex: number;
   onRemoveGroup: () => void;
+  onRemoveVariant: (variantId: number) => void;
   units?: Unit[] | null;
+  product?: Product | null;
 }
 
 const FormSchema = z.object({
@@ -42,20 +45,27 @@ const FormSchema = z.object({
     .refine(
       (file) => {
         if (!file) return true;
-        return file instanceof File;
+        return file instanceof File || typeof file === "string";
       },
       { message: "Invalid file." }
     )
     .refine(
       (file) => {
         if (!file) return true;
-        return ["image/jpeg", "image/png", "image/jpg"].includes(file.type);
+        // Only check type if it's a File
+        if (file instanceof File) {
+          return ["image/jpeg", "image/png", "image/jpg"].includes(file.type);
+        }
+        // If it's a string (existing URL), skip type check
+        return typeof file === "string";
       },
       { message: "Only .jpeg, .jpg, .png files are allowed." }
     )
     .refine(
       async (file) => {
-        if (!file) return true;
+        // If file is empty or a string (existing URL), skip validation
+        if (!file || typeof file === "string") return true;
+        if (!(file instanceof File)) return false;
 
         const img = await new Promise<HTMLImageElement>(
           (resolve, reject) => {
@@ -88,6 +98,7 @@ const FormSchema = z.object({
       variants: z.array(
         z.object({
           id: z.coerce.number(),
+          _id: z.coerce.number(),
           name: z.string().min(1, "Name is required"),
           description: z.string().min(3, "Description is required").max(200),
           unit_id: z.coerce.number().optional(),
@@ -108,8 +119,12 @@ const FormSchema = z.object({
   ).optional(),
 })
 
-export function ProductActionEdit({product, categories, units}: ProductActionEditProps) {
+export function ProductActionEdit() {
   const navigate = useNavigate();
+  const {selectedProduct: product, setSelectedProduct} = useProductState();
+  const {categories, units} = useAttributeState();
+  const {mutate: editProduct, isPending} = useUpdateProduct();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -128,16 +143,15 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
   }, [product])
 
   const reset: (product?: Product | null) => void = () => {
-    const grouped = (product?.variants || []).reduce<Record<string, ProductVariant[]>>(
+    const grouped = (product?.variants || [])
+      .reduce<Record<string, ProductVariant[]>>(
       (acc, variant) => {
         if (!acc[variant.type]) {
           acc[variant.type] = [];
         }
         acc[variant.type].push(variant);
         return acc;
-      },
-      {}
-    );
+      }, {});
 
     form.reset({
       image: product?.image ? `${ASSET_URL}/${product?.image}` : "",
@@ -150,6 +164,7 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
         type,
         variants: variants?.sort((a, b) => a.id - b.id).map(v => ({
           id: v.id,
+          _id: v.id,
           name: v.name,
           description: v.description,
           unit_id: v.unit_id,
@@ -158,10 +173,130 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
         }))
       }))
     })
+
+    setTimeout(() => {
+      form.setValue(
+        "subcategory_id",
+        Number(product?.subcategory_id)
+      );
+    }, 100);
   }
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data, product, categories, units);
+    if (!product) return;
+
+    const body: Record<string, unknown> = {};
+    // Handle image only if user uploaded a new file
+    if (data.image instanceof File) {
+      body.image = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(data.image);
+      });
+    }
+    // Only update fields if they actually changed
+    if (data.code !== product.sku) body.sku = data.code;
+    if (data.name !== product.name) body.name = data.name;
+    if (data.category_id !== product.category_id) body.category_id = data.category_id;
+    if (data.subcategory_id !== product.subcategory_id) body.subcategory_id = data.subcategory_id;
+    if (data.description !== product.description) body.description = data.description;
+    // validate the new variant or updated variant
+    if (Array.isArray(data.variant_groups) && data.variant_groups.length > 0) {
+      // collect new variants
+      const newVariants: {
+        type: string, name: string, description: string,
+        price: number, unit_id?: number, unit_size?: number
+      }[] = [];
+
+      // collect updated variants
+      const updatedVariants: {
+        id: number, type: string, name: string, description: string,
+        price: number, unit_id?: number, unit_size?: number
+      }[] = [];
+
+      data.variant_groups.forEach((group) => {
+        group.variants.forEach((variant) => {
+          if (variant.id < 0) {
+            // New variant
+            newVariants.push({
+              type: group.type,
+              name: variant.name,
+              description: variant.description,
+              price: variant.price,
+              unit_id: variant.unit_id,
+              unit_size: variant.unit_size,
+            });
+          } else {
+            // Existing variant, check if it changed compared to product.variants
+            const original = product?.variants
+              ?.find(v => v.id === variant.id);
+
+            if (original) {
+              if (
+                original.name !== variant.name ||
+                original.description !== variant.description ||
+                original.price !== variant.price ||
+                original.unit_id !== variant.unit_id ||
+                original.unit_size !== variant.unit_size ||
+                original.type !== group.type
+              ) {
+                updatedVariants.push({
+                  id: variant.id,
+                  type: group.type,
+                  name: variant.name,
+                  description: variant.description,
+                  price: variant.price,
+                  unit_id: variant.unit_id,
+                  unit_size: variant.unit_size,
+                });
+              }
+            }
+          }
+        });
+      });
+
+      if (newVariants.length > 0) body.new_variants = newVariants;
+      if (updatedVariants.length > 0) body.edit_variants = updatedVariants;
+    }
+
+   // early validation
+    if (Object.keys(body).length === 0) {
+      toast.warning("You haven’t made any changes");
+      return;
+    }
+
+    editProduct({
+      id: product.id, body: JSON.stringify(body)
+    }, {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['products'] })
+        await queryClient.invalidateQueries({ queryKey: ['product', product.id] })
+        toast.success("Product update successfully");
+      },
+      onError: (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          if (typeof error.data === "string") {
+            toast.error(error.data);
+            return;
+          }
+
+          if (typeof error.data === "object" && error.data !== null) {
+            // TODO: apply this
+            // const data = error.data as ProductErrorResponse;
+            //
+            // if (data.name && data.name.length > 0) {
+            //   form.setError("name", {type: "manual", message: data.name[0]})
+            // }
+          }
+        }
+
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      },
+    })
   }
 
   return (
@@ -174,6 +309,7 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
               className="w-8 h-8 cursor-pointer"
               onClick={async (e) => {
                 e.preventDefault();
+                setSelectedProduct(null);
                 await navigate({
                   from:Route.fullPath,
                   to: "/stores/catalogs",
@@ -199,7 +335,7 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
             <Button
               className="cursor-pointer"
               type="submit"
-              // disabled={isPending}
+              disabled={isPending}
             >
               Save Update
             </Button>
@@ -381,7 +517,7 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
           </div>
 
           <div className="w-full space-y-4">
-            <VariantContainer control={form.control} units={units} />
+            <VariantContainer control={form.control} units={units} product={product} />
           </div>
         </div>
       </form>
@@ -389,14 +525,69 @@ export function ProductActionEdit({product, categories, units}: ProductActionEdi
   )
 }
 
-function VariantContainer({ control, units }: VariantContainerProps) {
+function VariantContainer({ control, units, product }: VariantContainerProps) {
+  const {mutateAsync: deleteVariant} = useDeleteProductVariant();
+  const queryClient = useQueryClient();
+
   const { fields: groupFields, append: addGroup, remove: removeGroup } =
-    useFieldArray({
-      control,
-      name: "variant_groups",
-    });
+    useFieldArray({control, name: "variant_groups"});
 
   const [openGroup, setOpenGroup] = useState(`group-0`);
+
+  const onDeleteVariantGroup = async (groupIdx: number) => {
+    const ids = groupFields[groupIdx]?.variants
+      ?.map((v) => v._id)
+      ?.sort((a, b) => b - a);
+
+    if (ids.length > 0 && product) {
+      try {
+        await Promise.all(
+          ids.map((id) =>
+            deleteVariant({
+              pid: product.id,
+              vid: id,
+            })
+          )
+        );
+      } catch (error) {
+        if (error && isHTTPResponse<null>(error)) {
+          toast.error(error.data);
+          return;
+        }
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      } finally {
+        await queryClient.invalidateQueries({ queryKey: ['product', product.id] })
+      }
+
+      return;
+    }
+
+    removeGroup(groupIdx);
+  }
+
+  const onDeleteVariant = async (variantId: number) => {
+    if (!product || !variantId) return;
+
+    await deleteVariant({
+      pid: product.id,
+      vid: variantId,
+    }, {
+      onSuccess: async () => {
+        toast.success("Variant remove successfully");
+        await queryClient.invalidateQueries({ queryKey: ['product', product.id] })
+      },
+      onError: async (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          toast.error(error.data);
+          return;
+        }
+        toast.error(error.message);
+      }
+    })
+  }
 
   return (
     <div className="w-full space-y-4">
@@ -430,8 +621,10 @@ function VariantContainer({ control, units }: VariantContainerProps) {
             key={group.id}
             control={control}
             groupIndex={groupIndex}
-            onRemoveGroup={() => removeGroup(groupIndex)}
             units={units}
+            product={product}
+            onRemoveGroup={() => onDeleteVariantGroup(groupIndex)}
+            onRemoveVariant={onDeleteVariant}
           />
         ))}
       </Accordion>
@@ -439,7 +632,7 @@ function VariantContainer({ control, units }: VariantContainerProps) {
   );
 }
 
-function VariantGroup({control, groupIndex, onRemoveGroup, units}: VariantGroupProps) {
+function VariantGroup({control, groupIndex, onRemoveGroup, onRemoveVariant, units}: VariantGroupProps) {
   const { errors } = useFormState({ control });
 
   const { fields: variantFields, append: addVariant, remove: removeVariant } =
@@ -492,17 +685,61 @@ function VariantGroup({control, groupIndex, onRemoveGroup, units}: VariantGroupP
             <div key={variant.id} className="mt-4 border rounded-xl">
               <div className="rounded-t-xl flex items-center justify-between bg-gray-50 p-4">
                 <h4 className="text-md">{nameValue}</h4>
-                <Button
-                  variant="ghost"
-                  type="button"
-                  className="text-red-500 cursor-pointer"
-                  onClick={() => removeVariant(variantIndex)}
-                >
-                  <IconTrash className="w-4 h-4" />
-                </Button>
+
+                {variant._id < 0 ? (
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      className="text-red-500 cursor-pointer"
+                      onClick={() => removeVariant(variantIndex)}
+                    >
+                      <IconTrash className="w-4 h-4" />
+                    </Button>
+                  ) : (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          type="button"
+                          className="text-red-500 cursor-pointer"
+                        >
+                          <IconTrash className="w-4 h-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                        <div className="grid gap-4 mb-4">
+                          <div className="space-y-2">
+                            <h4 className="leading-none font-medium">Confirm Delete</h4>
+                            <p className="text-muted-foreground text-sm">
+                              Are you sure you want to delete this variant?
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right space-x-2">
+                          <PopoverClose asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="cursor-pointer"
+                            >Cancel</Button>
+                          </PopoverClose>
+                          <PopoverClose asChild>
+                            <Button
+                              type="button"
+                              className="bg-red-500 hover:bg-red-600 text-white"
+                              onClick={() => onRemoveVariant(variant._id)}
+                            >
+                              Confirm
+                            </Button>
+                          </PopoverClose>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )
+                }
               </div>
 
-              <div className="px-4 py-6 space-y-4">
+              <section className="px-4 py-6 space-y-4">
                 <FormField
                   control={control}
                   name={`variant_groups.${groupIndex}.variants.${variantIndex}.name`}
@@ -618,7 +855,7 @@ function VariantGroup({control, groupIndex, onRemoveGroup, units}: VariantGroupP
                     </FormItem>
                   )}
                 />
-              </div>
+              </section>
             </div>
           )
         })}
@@ -633,21 +870,54 @@ function VariantGroup({control, groupIndex, onRemoveGroup, units}: VariantGroupP
               const minId = variantArray && variantArray.length > 0
                 ? Math.min(...variantArray.map(v => v?.id ?? 0)) : 0;
               const newId = minId <= 0 ? minId - 1 : -1;
+
               // generate new empty variant
-              addVariant({id: newId, name: "", unit_size: 0, price: 0, description: "", unit_id: 0})
+              addVariant({id: newId, _id: newId, name: "",
+                unit_size: 0, price: 0, description: "", unit_id: 0})
             }}
           >
             <IconPlus className="w-4 h-4" /> Add Variant
           </Button>
 
-          <Button
-            type="button"
-            variant="ghost"
-            className="text-red-500 cursor-pointer"
-            onClick={onRemoveGroup}
-          >
-            <IconTrash className="w-4 h-4" /> Delete Group
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-red-500 cursor-pointer"
+              >
+                <IconTrash className="w-4 h-4" /> Delete Group
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="grid gap-4 mb-4">
+                <div className="space-y-2">
+                  <h4 className="leading-none font-medium">Confirm Delete</h4>
+                  <p className="text-muted-foreground text-sm">
+                    Are you sure you want to delete this variant group?
+                  </p>
+                </div>
+              </div>
+              <div className="text-right space-x-2">
+                <PopoverClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="cursor-pointer"
+                  >Cancel</Button>
+                </PopoverClose>
+                <PopoverClose asChild>
+                  <Button
+                    className="bg-red-500 hover:bg-red-600 text-white"
+                    type="button"
+                    onClick={onRemoveGroup}
+                  >
+                    Confirm
+                  </Button>
+                </PopoverClose>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </AccordionContent>
     </AccordionItem>

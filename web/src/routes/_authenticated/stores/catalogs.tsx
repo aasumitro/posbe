@@ -13,6 +13,7 @@ const catalogSearchSchema = z.object({
       return `${key}:${order}` as const;  // keep as string "name:asc" for the URL
     }),
   status: z.enum(["draft", "active", "inactive"]).optional(),
+  category: z.string().optional()
 })
 
 export const Route = createFileRoute("/_authenticated/stores/catalogs")({
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/stores/catalogs")({
 })
 
 function CatalogPageRoute() {
-  const { tab, sort, status } = useSearch({from: '/_authenticated/stores/catalogs'})
+  const { tab, sort, status, category } = useSearch({from: '/_authenticated/stores/catalogs'})
 
   let sortObj: Record<string, "asc" | "desc"> = {};
   if (sort) {
@@ -31,5 +32,5 @@ function CatalogPageRoute() {
     }
   }
 
-  return <ProductCatalogPage query={{ tab, sort: sortObj, status }}  />
+  return <ProductCatalogPage query={{ tab, sort: sortObj, status, category }}  />
 }
