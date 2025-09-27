@@ -65,7 +65,10 @@ export function CategoryActionEdit() {
         name: selectedCategory.name,
       })
 
-      if (!selectedCategory.subcategories) return;
+      if (!selectedCategory.subcategories) {
+        setSubcategories([{id: -1, category_id: selectedCategory.id, name: ""}]);
+        return;
+      }
 
       setSubcategories([...selectedCategory.subcategories])
     }
@@ -79,8 +82,6 @@ export function CategoryActionEdit() {
 
   const handleAddSubcategory = () => {
     if (!selectedCategory) return;
-    setSubcategories([...subcategories,
-      {id: -1, category_id: selectedCategory?.id, name: ""}]);
 
     // generate a new negative id (temporary client id)
     const minId = subcategories.length > 0

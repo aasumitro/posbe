@@ -211,19 +211,22 @@ func (handler seatingHandler) destroyTable(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func NewSeatingHandler(service IStoreSeatingService, router gin.IRoutes) {
+func NewSeatingHandler(service IStoreSeatingService, router *gin.RouterGroup) {
 	handler := seatingHandler{service: service}
-	authz := router.Use(utils.AuthZ([]string{"admin"}))
-	// store floors endpoint
-	authz.GET("/floors", handler.fetchFloor)
-	authz.GET("/floors/:id", handler.showFloor)
-	authz.GET("/floors/:id/tables", handler.fetchFloorTable)
-	authz.POST("/floors", handler.addFloor)
-	authz.PATCH("/floors/:id", handler.editFloor)
-	authz.DELETE("/floors/:id", handler.destroyFloor)
-	// table mgmt endpoint
-	authz.GET("/tables/:id", handler.showTable)
-	authz.POST("/tables", handler.addTable)
-	authz.PATCH("/tables/:id", handler.editTable)
-	authz.DELETE("/tables/:id", handler.destroyTable)
+	authz := router.Group("")
+	authz.Use(utils.AuthZ([]string{"admin"}))
+	{
+		// store floors endpoint
+		authz.GET("/floors", handler.fetchFloor)
+		authz.GET("/floors/:id", handler.showFloor)
+		authz.GET("/floors/:id/tables", handler.fetchFloorTable)
+		authz.POST("/floors", handler.addFloor)
+		authz.PATCH("/floors/:id", handler.editFloor)
+		authz.DELETE("/floors/:id", handler.destroyFloor)
+		// table mgmt endpoint
+		authz.GET("/tables/:id", handler.showTable)
+		authz.POST("/tables", handler.addTable)
+		authz.PATCH("/tables/:id", handler.editTable)
+		authz.DELETE("/tables/:id", handler.destroyTable)
+	}
 }

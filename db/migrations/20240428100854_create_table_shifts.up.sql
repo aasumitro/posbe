@@ -20,5 +20,7 @@ CREATE TABLE IF NOT EXISTS active_shifts(
     updated_at BIGINT
 );
 
-ALTER TABLE active_shifts ADD CONSTRAINT fk_shift_active_shifts
-    FOREIGN KEY (shift_id) REFERENCES shifts(id);
+ALTER TABLE active_shifts
+    ADD CONSTRAINT fk_shift_active_shifts
+        FOREIGN KEY (shift_id) REFERENCES shifts(id)
+            ON DELETE CASCADE;

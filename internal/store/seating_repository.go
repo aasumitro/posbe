@@ -188,7 +188,8 @@ func (repository seatingRepository) CreateTable(ctx context.Context, form *Seati
 			capacity, type, created_at
 		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	`
-	_, err := repository.db.Exec(ctx, q, form.FloorID, form.Name, form.XPos, form.YPos, form.WSize, form.HSize, form.DSize, form.Capacity, form.Type, time.Now().Unix())
+	_, err := repository.db.Exec(ctx, q, form.FloorID, form.Name, form.XPos, form.YPos,
+		form.WSize, form.HSize, form.DSize, form.Capacity, form.Type, time.Now().Unix())
 	return err
 }
 

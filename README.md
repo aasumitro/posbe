@@ -1,57 +1,28 @@
-# Point of Sales
+# POSBE – Simple Point of Sale for Restaurants, Bars, and Coffee Shops
 
-### Authentication
+##### Features
 
-The important part here is in the Login function where we set that sacred JWT Token in a Cookie.
+1. **Product Management**  
+   Easily create, update, and organize products with categories, variant pricing, and availability controls.
 
-so wee dont need Bearer token in our authorization header.
+2. **User & Customer Management**  
+   Manage staff roles, permissions, and customer profiles to streamline operations and build customer loyalty.
 
-### Create Mocks
+3. **Floor Plan Designer**  
+   Interactive drag-and-drop table and seating layout builder for managing dine-in orders efficiently.
 
-#### Required tools:
-- [Mockery](https://github.com/vektra/mockery)
+4. **Dine-In or Takeaway Ordering**  
+   Flexible order flow with quick access for takeaway or full dine-in service, designed to speed up checkout.
 
-#### How to use
-```bash
-mockery
-  --dir=internal/account/repository/mysql
-  --name=RoleSqlRepository
-  --filename=role_sql_repository.go
-  --output=domain/mocks --outpkg=mocks
-```
+5. **Shift Management**  
+   Track staff shifts, manage schedules, and monitor work hours for smoother operations.
 
-more info read the [docs](https://pkg.go.dev/github.com/stretchr/testify/mock).
+6. **Simple UI & Easy Navigation**  
+   Clean, intuitive interface with streamlined navigation that reduces the learning curve and gives quick access to core features for faster daily operations.
 
-### Database Migration
+##### Preview 
 
-#### Required tools:
-- [Golang Migrate](https://github.com/golang-migrate/migrate)
-
-#### How to use
-
-- Add new migration
-    ```bash
-    migrate create -ext sql -dir db/migrations example_table
-    ```
-- Run Migration
-
-    `POSTGRESQL_URL: 'postgresql://postgres:@localhost:5432/posbe?sslmode=disable'`
-
-  - set version (dirty state) (version: -1 before last migrate)
-    ```bash
-     migrate -database ${PG_DSN} -path db/migrations force ${VERSION}
-    ```
-  - up
-    ```bash
-    migrate -database ${PG_DSN} -path db/migrations up
-    ```
-  - down
-    ```bash
-    migrate -database ${PG_DSN} -path db/migrations down
-    ```
-
-more info read the [docs](https://pkg.go.dev/github.com/golang-migrate/migrate/v4).
-
-
-https://copperchips.com/understanding-resolving-problem-dual-api-calling-reactjs/
-https://refine.dev/docs/guides-concepts/data-fetching/#updating-data
+<p align="center">
+  <img src="./assets/preview-floor-designer.png" alt="preview-designer" width="45%">
+  <img src="./assets/preview-attributes.png" alt="preview-attributes" width="45%">
+</p>

@@ -52,7 +52,7 @@ func TestUploadAndDeleteAssetsUtils(t *testing.T) {
 	// Upload
 	name := "test-upload-renamed"
 	folder := "test-products"
-	savedPath, err := utils.UploadAsset(name, folder, fileHeader)
+	savedPath, err := utils.UploadFileAsset(name, folder, fileHeader)
 	if err != nil {
 		t.Fatalf("UploadAsset failed: %v", err)
 	}

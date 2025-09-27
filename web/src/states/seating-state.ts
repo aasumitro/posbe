@@ -21,7 +21,17 @@ export const useSeatingState = create<States & Actions>((set) => {
     tables: null,
     selectedFloor: null,
     selectedTableId: null,
-    setFloors: (floors: Floor[] | null) => set({floors}),
+    setFloors: (floors: Floor[] | null) => set((state) => {
+      let selectedFloor= state.selectedFloor;
+
+      if (selectedFloor) {
+        const floor = floors?.find((f) =>
+          f.id === selectedFloor?.id)
+        selectedFloor = floor ?? null;
+      }
+
+      return {floors, selectedFloor}
+    }),
     setTables: (tables: Table[] | null) => set({tables}),
     setSelectedFloor: (selectedFloor: Floor | null) => set({selectedFloor}),
     setSelectedTableId: (selectedTableId: number | null) => set({selectedTableId}),

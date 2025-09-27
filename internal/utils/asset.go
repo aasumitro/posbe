@@ -1,17 +1,66 @@
 package utils
 
 import (
+	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type IAssetUtil interface {
-	UploadAsset(name, folder string, fileHeader *multipart.FileHeader) (string, error)
+	UploadBase64Asset(base64Str, folder, name string) (string, error)
+	UploadFileAsset(name, folder string, fileHeader *multipart.FileHeader) (string, error)
 	DeleteAsset(folder, name string) error
 	ProjectRootDir() (string, error)
+}
+
+func UploadBase64Asset(base64Str, folder, name string) (string, error) {
+	// Split "data:image/png;base64,..."
+	parts := strings.SplitN(base64Str, ",", 2)
+	if len(parts) != 2 {
+		return "", errors.New("invalid base64 image")
+	}
+
+	data, err := base64.StdEncoding.DecodeString(parts[1])
+	if err != nil {
+		return "", err
+	}
+
+	// Determine extension from MIME
+	mimeType := strings.TrimPrefix(strings.SplitN(parts[0], ";", 2)[0], "data:")
+	ext := ""
+	switch mimeType {
+	case "image/png":
+		ext = ".png"
+	case "image/jpeg":
+		ext = ".jpg"
+	default:
+		return "", errors.New("unsupported MIME type")
+	}
+
+	// Ensure upload folder exists
+	root, err := ProjectRootDir()
+	if err != nil {
+		return "", err
+	}
+	uploadDir := filepath.Join(root, "uploads", folder)
+	if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
+		return "", err
+	}
+
+	// Write temp file
+	filePath := filepath.Join(uploadDir, name+ext)
+	if err := os.WriteFile(filePath, data, 0644); err != nil {
+		return "", err
+	}
+
+	// return filePath, nil
+	finalName := name + ext
+	return fmt.Sprintf("%s/%s", folder, finalName), nil
 }
 
 // UploadAsset - upload assets (file: pdf, excel | image: png, img)
@@ -48,7 +97,7 @@ type IAssetUtil interface {
 //		                scheme, ctx.Request.Host, savedPath),
 //		        })
 //	     })
-func UploadAsset(name, folder string, fileHeader *multipart.FileHeader) (string, error) {
+func UploadFileAsset(name, folder string, fileHeader *multipart.FileHeader) (string, error) {
 	// Clean and build full path relative to project root's ./uploads
 	root, err := ProjectRootDir()
 	if err != nil {

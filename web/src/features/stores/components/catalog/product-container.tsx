@@ -1,196 +1,329 @@
-import {Coffee, Soup} from "lucide-react";
+import {Box, Coffee, Soup} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import {Separator} from "@/components/ui/separator";
 import {
   DropdownMenu,
-  DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import {IconDotsVertical} from "@tabler/icons-react";
+import {IconBoxOff, IconDotsVertical} from "@tabler/icons-react";
 import {useActionState} from "@/states/action-state";
 import {ProductActionDeleteModalState} from "@/features/stores/components/catalog/product-action-delete";
 import {useNavigate} from "@tanstack/react-router";
+import {useStoreState} from "@/states/store-state";
+import {useProductState} from "@/states/product-state";
+import {formatShortNumber} from "@/lib/numbers";
+import type {Product, ProductVariant} from "@/types/product";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {ASSET_URL} from "@/lib/api";
 
-export function  ProductContainer() {
-  const products = [1,2]
-  const { setBoolState } = useActionState();
+interface ProductContainerProps {
+  sort?: Record<string, "asc" | "desc">;
+  status?: "draft" | "active" | "inactive";
+  category?: string;
+}
+
+export function  ProductContainer({status, sort, category}: ProductContainerProps) {
+  const {settings} = useStoreState();
+  const {products, setSelectedProduct} = useProductState();
+  const {setBoolState} = useActionState();
   const navigate = useNavigate();
+
+  let sortedProducts = [...(products ?? [])];
+
+  if (sort) {
+    const [field, order] = Object.entries(sort)[0] ?? [];
+    if (field && order) {
+      sortedProducts.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        if (field === "price") {
+          const getLowestPrice = (product: Product) => {
+            if (!product.variants || product.variants.length === 0) return 0;
+            const nonZero = product.variants.filter(v => v.price > 0);
+            const lowestVariant = nonZero.length > 0
+              ? nonZero.reduce((min, v) => v.price < min.price ? v : min)
+              : product.variants[0];
+            return lowestVariant.price;
+          };
+          aValue = getLowestPrice(a);
+          bValue = getLowestPrice(b);
+        } else {
+          aValue = a[field as keyof typeof a];
+          bValue = b[field as keyof typeof b];
+        }
+
+        // Now compare strings
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return order === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+
+        // Compare numbers (including price)
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return order === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        return 0;
+      });
+    }
+  }
+
+  if (status) {
+    sortedProducts = sortedProducts
+      .filter((product) => product.status === status)
+  }
+
+  if (category) {
+    sortedProducts = sortedProducts
+      .filter((product) => product.category?.name === category)
+  }
+
+  function renderImage(product: Product) {
+    if (!product.image && product.category) {
+      if (product.category.name === "foods") {
+        return <Soup />
+      }
+
+      if (product.category.name === "beverages") {
+        return <Coffee />
+      }
+
+      return <Box />
+    }
+
+    return <img src={`${ASSET_URL}/${product.image}`} alt={product.name} />
+  }
+
+  function renderName(product: Product) {
+    const name = product?.name?.trim() ?? "";
+
+    // Capitalize every word
+    const formatted = name
+      .split(" ")
+      .filter(Boolean) // remove extra spaces
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    // Ensure it ends with a period
+    const formattedName = formatted.endsWith(".") ? formatted : formatted + ".";
+
+    return (
+      <h5 className="text-xl font-semibold">
+        {formattedName}
+      </h5>
+    );
+  }
+
+  function renderCategoryTags(product: Product) {
+    return (
+      <div className="text-muted-foreground text-xs flex gap-2">
+        {product.category && (<p>#{product.category.name}</p>)}
+        {product.subcategory && (<p>#{product.subcategory.name}</p>)}
+      </div>
+    )
+  }
+
+  function renderPrice(product: Product, currency: string | undefined) {
+    if (!product?.variants || product.variants.length === 0) {
+      return (
+        <h5 className="text-3xl font-semibold text-green-500">
+          N/A
+        </h5>
+      );
+    }
+
+    // If more than one variant → find lowest
+    if (product.variants.length > 1) {
+      const nonZero = product.variants.filter(v => v.price > 0);
+      const lowestVariant = nonZero.length > 0
+        ? nonZero.reduce((min, v) => v.price < min.price ? v : min)
+        : product.variants[0];
+
+      return (
+        <section className="flex">
+        <span className="text-sm font-normal text-muted-foreground mr-1">
+          from
+        </span>
+          <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none text-green-500">
+            {currency} {formatShortNumber(lowestVariant.price)}
+            {lowestVariant.unit && (
+              <span className="text-sm font-normal text-muted-foreground">
+                / {lowestVariant.unit_size}{lowestVariant.unit?.symbol}
+              </span>
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    // Exactly one variant
+    const variant = product.variants[0];
+    return (
+      <h5 className="text-3xl font-semibold text-green-500">
+        {currency} {formatShortNumber(variant.price)}
+      </h5>
+    );
+  }
+
+  function renderActionMenu(product: Product) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="ml-auto my-auto" variant="ghost">
+            <IconDotsVertical />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator/>
+          <DropdownMenuItem onClick={async (e) => {
+            e.preventDefault();
+            await navigate({to: `/stores/products/${product.id}`})
+          }}>Edit</DropdownMenuItem>
+          {/*<DropdownMenuItem>set status</DropdownMenuItem>*/}
+          <DropdownMenuItem variant="destructive" onClick={(e) => {
+            e.preventDefault();
+            setSelectedProduct(product);
+            setBoolState(ProductActionDeleteModalState, true);
+          }}>Delete</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+
+  function renderSales(product: Product) {
+    return (
+      <div className="flex w-full items-center gap-2">
+        <div className="grid flex-1 auto-rows-min gap-0.5">
+          <div className="text-xs text-muted-foreground">This Year</div>
+          <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
+            {product.sales_this_year}
+            <span className="text-sm font-normal text-muted-foreground">
+              sales
+            </span>
+          </div>
+        </div>
+
+        <Separator orientation="vertical" className="mx-2 h-10 w-px" />
+
+        <div className="grid flex-1 auto-rows-min gap-0.5">
+          <div className="text-xs text-muted-foreground">This Week</div>
+          <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
+            {product.sales_this_week}
+            <span className="text-sm font-normal text-muted-foreground">
+              sales
+            </span>
+          </div>
+        </div>
+
+        <Separator orientation="vertical" className="mx-2 h-10 w-px" />
+
+        <div className="grid flex-1 auto-rows-min gap-0.5">
+          <div className="text-xs text-muted-foreground">Today</div>
+          <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
+            {product.sales_today}
+            <span className="text-sm font-normal text-muted-foreground">
+              sales
+            </span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  function renderVariants(product: Product) {
+    if (!product.variants || product.variants.length === 1) return null;
+
+    // Group variants by type
+    const grouped = product.variants.reduce<
+      Record<string, ProductVariant[]>
+    >((acc, v) => {
+      if (!acc[v.type]) acc[v.type] = [];
+      acc[v.type].push(v);
+      return acc;
+    }, {});
+
+    return (
+      <div className="grid grid-cols-2 gap-4">
+        {Object.entries(grouped).map(([type, variants]) => (
+          <div key={type} className="flex flex-col gap-2">
+            <p className="text-sm font-medium">
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </p>
+            <div className="flex flex-row gap-2 flex-wrap">
+              {variants.map((v) => (
+                <Tooltip key={v.id} >
+                  <TooltipTrigger asChild>
+                    <Badge variant="outline">
+                      {v.name.toUpperCase()}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{v.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (sortedProducts.length < 1) {
+    return (
+      <div className="text-center py-12">
+        <IconBoxOff className="my-8 w-24 h-24 mx-auto"/>
+        <h4 className="text-primary text-xl font-bold tracking-tight">
+          No Products Found
+        </h4>
+        <p className="text-secondary-foreground text-md font-normal">
+          {products?.length === 0
+            ? "No products exist yet. Add your first product!"
+            : status !== undefined
+              ? "There are no products available in this filter at the moment."
+              : "No products match the current selection."}
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="grid gap-4 grid-cols-2 2xl:grid-cols-3 auto-rows-fr mt-4">
-      {products.map((index) => (
+      {sortedProducts?.map((product) => (
         <div
-          key={index}
+          key={product.id}
           className="border-1 rounded-xl p-4 space-y-6 select-none flex flex-col h-full"
         >
           <div className="flex-grow space-y-6">
             <div className="flex gap-4">
               <div className="rounded-lg w-20 h-20 bg-gray-50/50 flex items-center justify-center">
-                {index % 2 == 0 ? <Soup /> : <Coffee />}
+                {renderImage(product)}
               </div>
+
               <div className="space-y-1">
-                <h5 className="text-xl font-semibold">
-                  {index % 2 == 0 ? "Daging Enak Banget" : "Teh Manis Banget"}
-                </h5>
+                {renderName(product)}
 
-                <div className="text-muted-foreground text-xs flex gap-2">
-                  {index % 2 == 0 ? (
-                    <>
-                      <p>#foods</p>
-                      <p>#meat</p>
-                    </>
-                  ) : (
-                    <>
-                      <p>#beverages</p>
-                      <p>#tea</p>
-                    </>
-                  )}
-                </div>
+                {renderCategoryTags(product)}
 
-                {index == 1 && (
-                  <h5 className="text-3xl font-semibold text-green-500">
-                    IDR 15K
-                  </h5>
-                )}
-
-                {index == 2 && (
-                  <section className="flex">
-                  <span className="text-sm font-normal text-muted-foreground mr-1">
-                    from
-                    {/*  if variant exists `start from` if no variants `$` */}
-                  </span>
-                    <div className="flex items-baseline gap-1 text-3xl font-bold tabular-nums leading-none text-green-500">
-                      {/* remove `$` if variant not exist */}
-                      IDR 99K <span className="text-sm font-normal text-muted-foreground">/ 150gr</span>
-                    </div>
-                  </section>
-                )}
+                {renderPrice(product, settings?.currency)}
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="ml-auto my-auto" variant="ghost">
-                    <IconDotsVertical />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuSeparator/>
-                  <DropdownMenuItem onClick={async (e) => {
-                    e.preventDefault();
-                    await navigate({to: `/stores/products/${index}`})
-                  }}>Edit</DropdownMenuItem>
-                  <DropdownMenuItem variant="destructive" onClick={(e) => {
-                    e.preventDefault();
-                    setBoolState(ProductActionDeleteModalState, true)
-                  }}>Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {renderActionMenu(product)}
             </div>
 
-            <div className="grid grid-cols-2 space-y-4">
-              <div className="flex flex-col gap-2">
-                <p className="text-sm">
-                  {index % 2 == 0 ? "Portion?" : " Cup Size?"}
-                </p>
-                <div className="flex flex-row gap-2">
-                  {index % 2 == 0 && (
-                    ["HALF", "NORMAL"].map((size) => (
-                      <Badge
-                        key={size}
-                        variant="outline"
-                      >
-                        {size}
-                      </Badge>
-                    ))
-                  )}
-
-                  {index % 2 != 0 && (
-                    ["S", "M", "L", "XL"].map((size) => (
-                      <Badge
-                        key={size}
-                        variant="outline"
-                      >
-                        {size}
-                      </Badge>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {index % 2 != 0 && (
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm">
-                    Hot or Cold?
-                  </p>
-                  <div className="flex flex-row gap-2">
-                    {["HOT", "COLD"].map((level) => (
-                      <Badge
-                        key={level}
-                        variant="outline"
-                      >
-                        {level}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {index % 2 != 0 && (
-                <div className="flex flex-col gap-2">
-                  <p className="text-sm">
-                    Ice Level (%)?
-                  </p>
-                  <div className="flex flex-row gap-2">
-                    {[10, 25, 50].map((level) => (
-                      <Badge
-                        key={level}
-                        variant="outline"
-                      >
-                        {level}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            {renderVariants(product)}
           </div>
 
           <div className="flex flex-row border-t p-4">
-            <div className="flex w-full items-center gap-2">
-              <div className="grid flex-1 auto-rows-min gap-0.5">
-                <div className="text-xs text-muted-foreground">This Year</div>
-                <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
-                  562
-                  <span className="text-sm font-normal text-muted-foreground">
-                  sales
-                </span>
-                </div>
-              </div>
-              <Separator orientation="vertical" className="mx-2 h-10 w-px" />
-              <div className="grid flex-1 auto-rows-min gap-0.5">
-                <div className="text-xs text-muted-foreground">This Week</div>
-                <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
-                  73
-                  <span className="text-sm font-normal text-muted-foreground">
-                  sales
-                </span>
-                </div>
-              </div>
-              <Separator orientation="vertical" className="mx-2 h-10 w-px" />
-              <div className="grid flex-1 auto-rows-min gap-0.5">
-                <div className="text-xs text-muted-foreground">Today</div>
-                <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
-                  14
-                  <span className="text-sm font-normal text-muted-foreground">
-                  sales
-                </span>
-                </div>
-              </div>
-            </div>
+            {renderSales(product)}
           </div>
         </div>
       ))}

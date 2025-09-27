@@ -1,6 +1,9 @@
 import type {StoreSetting} from "@/types/store";
 import {create} from "zustand";
 import type {StoreShift} from "@/types/shift";
+import Cookies from "js-cookie";
+
+const STORE_SETTINGS = 'posbe-store-settings'
 
 interface States {
   settings: StoreSetting | null;
@@ -15,23 +18,24 @@ interface Actions {
 }
 
 export const useStoreState = create<States & Actions>((set) => {
+  const storeSettingCookieState = Cookies.get(STORE_SETTINGS)
+  const initStoreSetting = storeSettingCookieState ? JSON.parse(storeSettingCookieState) : ''
+
   return {
-    settings: null,
+    settings: initStoreSetting,
     shifts: null,
     selectedShift: null,
-    setSettings: (settings: StoreSetting)  => set({settings}),
+    setSettings: (settings: StoreSetting)  => set((state) => {
+      Cookies.set(STORE_SETTINGS, JSON.stringify(settings))
+      return { ...state, settings }
+    }),
     setShifts: (shifts: StoreShift[]) => set((state) => {
       let selectedShift = state.selectedShift;
 
       if (selectedShift) {
-        // try to find the updated shift by ID
         const found = shifts.find((s) =>
           s.id === selectedShift?.id);
-        if (found) {
-          selectedShift = found;
-        } else {
-          selectedShift = null;
-        }
+        selectedShift =found ?? null;
       }
 
       return { shifts, selectedShift };

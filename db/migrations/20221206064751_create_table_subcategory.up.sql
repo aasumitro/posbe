@@ -4,5 +4,7 @@ CREATE TABLE IF NOT EXISTS subcategories (
     name VARCHAR(50)
 );
 
-ALTER TABLE subcategories ADD CONSTRAINT fk_categories_subcategories
-    FOREIGN KEY (category_id) REFERENCES categories(id);
+ALTER TABLE subcategories
+    ADD CONSTRAINT fk_categories_subcategories
+        FOREIGN KEY (category_id) REFERENCES categories(id)
+            ON DELETE SET NULL;

@@ -33,7 +33,7 @@ export function ServiceAndTaxRateSection() {
   const queryClient = useQueryClient();
 
   const getResetValues = (sett: typeof settings | null) => ({
-    currency: sett?.currency.toLocaleLowerCase() ?? "",
+    currency: sett?.currency?.toLocaleLowerCase() ?? "",
     service_category: sett?.service_category ?? "",
     service_rate: sett?.service_rate !== undefined && sett?.service_rate !== null && sett?.service_rate !== ""
       ? Number(sett.service_rate) : 0,

@@ -166,13 +166,16 @@ func (handler shiftHandler) active(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusOK, nil)
 }
 
-func NewShiftHandler(service IStoreShiftService, router gin.IRoutes) {
+func NewShiftHandler(service IStoreShiftService, router *gin.RouterGroup) {
 	handler := shiftHandler{service: service}
 	router.GET("/shifts", handler.fetch)
 	router.GET("/shifts/:id", handler.show)
-	authz := router.Use(utils.AuthZ([]string{"admin"}))
-	authz.POST("/shifts", handler.store)
-	authz.PATCH("/shifts/:id", handler.update)
-	authz.DELETE("/shifts/:id", handler.destroy)
-	authz.POST("/shifts/:id/:action", handler.active)
+	authz := router.Group("/shifts")
+	authz.Use(utils.AuthZ([]string{"admin"}))
+	{
+		authz.POST(utils.EmptyPath, handler.store)
+		authz.PATCH("/:id", handler.update)
+		authz.DELETE("/:id", handler.destroy)
+		authz.POST("/:id/:action", handler.active)
+	}
 }

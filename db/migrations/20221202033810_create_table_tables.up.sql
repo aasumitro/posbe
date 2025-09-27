@@ -15,5 +15,7 @@ CREATE TABLE IF NOT EXISTS tables (
     updated_at BIGINT
 );
 
-ALTER TABLE tables ADD CONSTRAINT fk_floors_tables
-    FOREIGN KEY (floor_id) REFERENCES floors(id);
+ALTER TABLE tables
+    ADD CONSTRAINT fk_floors_tables
+        FOREIGN KEY (floor_id) REFERENCES floors(id)
+            ON DELETE SET NULL;

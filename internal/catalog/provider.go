@@ -7,9 +7,16 @@ import (
 )
 
 func New(router *gin.RouterGroup) {
-	authn := router.Use(utils.AuthN())
 	attRepo := NewAttributeRepository(config.PgxPool)
 	attSvc := NewAttributeService(attRepo)
-	NewAttributeUnitHandler(attSvc, authn)
-	NewAttributeCategoryHandler(attSvc, authn)
+	prdRepo := NewProductRepository(config.PgxPool)
+	prdSvc := NewProductService(prdRepo)
+	authn := router.Group("")
+	authn.Use(utils.AuthN())
+	{
+		NewAttributeUnitHandler(attSvc, authn)
+		NewAttributeCategoryHandler(attSvc, authn)
+		NewProductAddonHandler(prdSvc, authn)
+		NewProductHandler(prdSvc, authn)
+	}
 }

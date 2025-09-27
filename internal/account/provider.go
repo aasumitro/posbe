@@ -17,9 +17,12 @@ func New(router *gin.RouterGroup) {
 	as := NewAccountService(repository)
 	shouldCacheData(context.Background(), repository)
 	NewAuthHandler(as, router)
-	authn := router.Use(utils.AuthN())
-	NewRoleHandler(as, authn)
-	NewUserHandler(as, authn)
+	authn := router.Group("")
+	authn.Use(utils.AuthN())
+	{
+		NewRoleHandler(as, authn)
+		NewUserHandler(as, authn)
+	}
 }
 
 func shouldCacheData(ctx context.Context, repository IAccountRepository) {
