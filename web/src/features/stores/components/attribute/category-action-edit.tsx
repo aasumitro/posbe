@@ -250,6 +250,7 @@ export function CategoryActionEdit() {
                                  type="button"
                                  variant="outline"
                                  disabled={isPendingDelete}
+                                 className="cursor-pointer"
                                >
                                  <IconTrash size={16} />
                                </Button>
@@ -273,7 +274,7 @@ export function CategoryActionEdit() {
                                    >Cancel</Button>
                                  </PopoverClose>
                                  <Button
-                                   className="bg-red-500 hover:bg-red-600 text-white"
+                                   className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
                                    type="submit"
                                    disabled={isPendingDelete}
                                    onClick={(e) => {
@@ -297,6 +298,7 @@ export function CategoryActionEdit() {
                            <Button
                              type="button"
                              variant="outline"
+                             className="cursor-pointer"
                              onClick={(e) => {
                                e.preventDefault();
                                onRemoveSubcategory(index)
@@ -311,6 +313,7 @@ export function CategoryActionEdit() {
                       <Button
                         type="button"
                         variant="outline"
+                        className="cursor-pointer"
                         onClick={handleAddSubcategory}
                       >
                         <IconPlus size={16} />
@@ -322,10 +325,10 @@ export function CategoryActionEdit() {
             </section>
 
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending}>
+              <AlertDialogCancel className="cursor-pointer" disabled={isPending}>
                 Cancel
               </AlertDialogCancel>
-              <Button type="submit" disabled={isPending}>
+              <Button type="submit" className="cursor-pointer" disabled={isPending}>
                 {isPending && <Loader2Icon className="w-4 animate-spin" />}
                 Save
               </Button>

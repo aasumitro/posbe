@@ -81,9 +81,10 @@ export function UnitActionDelete() {
             <AlertDialogCancel
               type="button"
               disabled={isPending}
+              className="cursor-pointer"
             >Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
               type="submit"
               disabled={isPending}
             >Delete</AlertDialogAction>

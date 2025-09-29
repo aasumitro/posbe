@@ -215,7 +215,7 @@ export function TableActionNew() {
                       >
                         {["circle", "rectangle"].map((table) => (
                           <Label
-                            className="has-[[data-state=checked]]:border-ring has-[[data-state=checked]]:bg-input/20 flex items-start gap-3 rounded-lg border p-8"
+                            className="has-[[data-state=checked]]:border-ring has-[[data-state=checked]]:bg-input/20 flex items-start gap-3 rounded-lg border p-8 cursor-pointer"
                             key={table}
                           >
                             <RadioGroupItem
@@ -311,7 +311,7 @@ export function TableActionNew() {
 
                   <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full cursor-pointer"
                     disabled={form.watch("label") === "" || form.watch("chair") <= 0 || isPending}
                   >
                     {isPending && <Loader2Icon className="w-4 animate-spin" />}

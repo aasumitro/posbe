@@ -37,7 +37,7 @@ export function UnitCard({
             aria-haspopup="true"
             size="icon"
             variant="ghost"
-            className="absolute top-5 right-5"
+            className="absolute top-5 right-5 cursor-pointer"
           >
             <IconDotsVertical className="h-4 w-4"/>
             <span className="sr-only">Toggle menu</span>

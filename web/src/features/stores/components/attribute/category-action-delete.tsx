@@ -76,11 +76,12 @@ export function CategoryActionDelete() {
         <form onSubmit={onSubmit}>
           <AlertDialogFooter>
             <AlertDialogCancel
+              className="cursor-pointer"
               type="button"
               disabled={isPending}
             >Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
               type="submit"
               disabled={isPending}
             >Delete</AlertDialogAction>

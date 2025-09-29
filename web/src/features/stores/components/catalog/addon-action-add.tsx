@@ -189,9 +189,11 @@ export function AddonActionAdd() {
             <AlertDialogFooter>
               <AlertDialogCancel
                 disabled={isPending}
+                className="cursor-pointer"
               >Cancel</AlertDialogCancel>
               <Button
                 type="submit"
+                className="cursor-pointer"
                 disabled={isPending}
               >
                 {isPending && <Loader2Icon className="w-4 animate-spin" />}

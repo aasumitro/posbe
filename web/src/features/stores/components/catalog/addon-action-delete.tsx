@@ -81,10 +81,11 @@ export function AddonActionDelete() {
           <AlertDialogFooter>
             <AlertDialogCancel
               type="button"
+              className="cursor-pointer"
               disabled={isPending}
             >Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
               type="submit"
               disabled={isPending}
             >Delete</AlertDialogAction>

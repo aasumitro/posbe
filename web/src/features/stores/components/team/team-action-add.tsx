@@ -233,9 +233,10 @@ export function TeamActionAdd() {
             </section>
 
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
               <Button
                 type="submit"
+                className="cursor-pointer"
                 disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
               >
                 {isPending && <Loader2Icon className="w-4 animate-spin" />}

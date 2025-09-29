@@ -90,6 +90,18 @@ func (service accountService) UpdateUser(
 
 	updateUser := model.User{ID: data.ID, RoleID: data.RoleID,
 		Name: data.Name, Username: data.Username, Email: data.Email}
+
+	if data.Password != "" {
+		pwd, err := utils.MakePassword(runtime.NumCPU(), data.Password)
+		if err != nil {
+			return nil, &utils.ServiceError{
+				Code:    http.StatusInternalServerError,
+				Message: err.Error(),
+			}
+		}
+		updateUser.Password = pwd
+	}
+
 	user, err = service.repository.UpdateUserByID(ctx, updateUser)
 
 	if err == nil {

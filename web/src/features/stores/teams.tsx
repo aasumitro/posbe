@@ -25,7 +25,7 @@ export function TeamMemberPage() {
         <div className="block">
           <h3 className="text-lg font-semibold mb-2">Teams</h3>
           <p className="text-sm text-muted-foreground">
-            Manage your organization's teams and their members. Add, view, and organize team structures to match your operational needs.
+            Manage your organization's teams. Add, view, and organize team structures to match your operational needs.
           </p>
         </div>
       </aside>

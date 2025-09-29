@@ -166,8 +166,13 @@ export function  ProductContainer({status, sort, category}: ProductContainerProp
     // Exactly one variant
     const variant = product.variants[0];
     return (
-      <h5 className="text-3xl font-semibold text-green-500">
+      <h5 className="text-3xl font-semibold text-green-500 flex items-baseline gap-1">
         {currency} {formatShortNumber(variant.price)}
+        {variant.unit && (
+          <span className="text-sm font-normal text-muted-foreground">
+            / {variant.unit.symbol}
+          </span>
+        )}
       </h5>
     );
   }
@@ -176,23 +181,30 @@ export function  ProductContainer({status, sort, category}: ProductContainerProp
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="ml-auto my-auto" variant="ghost">
+          <Button className="ml-auto my-auto cursor-pointer" variant="ghost">
             <IconDotsVertical />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator/>
-          <DropdownMenuItem onClick={async (e) => {
-            e.preventDefault();
-            await navigate({to: `/stores/products/${product.id}`})
-          }}>Edit</DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={async (e) => {
+              e.preventDefault();
+              await navigate({to: `/stores/products/${product.id}`})
+            }}
+          >Edit</DropdownMenuItem>
           {/*<DropdownMenuItem>set status</DropdownMenuItem>*/}
-          <DropdownMenuItem variant="destructive" onClick={(e) => {
-            e.preventDefault();
-            setSelectedProduct(product);
-            setBoolState(ProductActionDeleteModalState, true);
-          }}>Delete</DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            variant="destructive"
+            onClick={(e) => {
+              e.preventDefault();
+              setSelectedProduct(product);
+              setBoolState(ProductActionDeleteModalState, true);
+            }}
+          >Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     )

@@ -67,6 +67,7 @@ type UpdateUserForm struct {
 	Name     string `json:"name" form:"name"`
 	Username string `json:"username" form:"username"`
 	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
 }
 
 func (f *UpdateUserForm) Validate(ctx *gin.Context) interface{} {
@@ -76,5 +77,6 @@ func (f *UpdateUserForm) Validate(ctx *gin.Context) interface{} {
 		"Name":     g.R("name").Optional(),
 		"Username": g.R("username").Optional(),
 		"Email":    g.R("email").Optional().Email(),
+		"Password": g.R("password").Optional().Password(),
 	}).Validate(ctx, f)
 }

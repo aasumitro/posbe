@@ -171,7 +171,7 @@ export function UserPasswordActionSheet() {
 
             <Button
               type="submit"
-              className="ml-auto"
+              className="ml-auto cursor-pointer"
               disabled={!isFormValid || isPending}
             >
               {isPending && <Loader2Icon className="w-4 animate-spin" />}

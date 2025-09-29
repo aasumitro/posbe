@@ -1,6 +1,14 @@
+import {useState} from "react";
 import {CustomerContainer} from "@/features/stores/components/customer/customer-container";
+import {AppComingSoon} from "@/components/app-coming-soon";
 
 export function CustomersPage() {
+  const [soon] = useState(false);
+
+  if (!soon) {
+    return  <AppComingSoon feature="customers" type="page" />
+  }
+
   return (
     <div className="w-full pt-4 xl:pt-6 space-y-6">
       <aside className="flex items-center justify-between gap-4 px-8">
