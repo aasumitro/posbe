@@ -73,8 +73,8 @@ export function TeamConfirmDeleteAlertDialog({action}: {action: (state: boolean)
             >Cancel</Button>
           </PopoverClose>
           <Button
-            className="bg-red-500 hover:bg-red-600 text-white"
             type="submit"
+            className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
             disabled={isPending || isPending}
           >
             <Loader2Icon className={

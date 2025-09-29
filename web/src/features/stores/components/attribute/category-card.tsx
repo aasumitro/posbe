@@ -48,6 +48,7 @@ export function CategoryCard({
               aria-haspopup="true"
               size="icon"
               variant="ghost"
+              className="cursor-pointer"
             >
               <IconDotsVertical className="h-4 w-4"/>
               <span className="sr-only">Toggle menu</span>

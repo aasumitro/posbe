@@ -208,8 +208,8 @@ export function UnitActionEdit() {
             </section>
 
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-              <Button type="submit" disabled={isPending}>
+              <AlertDialogCancel className="cursor-pointer" disabled={isPending}>Cancel</AlertDialogCancel>
+              <Button type="submit" className="cursor-pointer" disabled={isPending}>
                 {isPending && <Loader2Icon className="w-4 animate-spin" />}
                 Save
               </Button>

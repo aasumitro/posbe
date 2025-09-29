@@ -182,7 +182,7 @@ export function UserProfileActionSheet() {
 
             <Button
               type="submit"
-              className="ml-auto mt-2"
+              className="ml-auto mt-2 cursor-pointer"
               disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
             >
               {isPending && <Loader2Icon className="w-4 animate-spin" />}

@@ -121,23 +121,30 @@ export function AddonContainer({sort}: AddonContainerProps) {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="ml-auto my-auto" variant="ghost">
+                  <Button className="ml-auto my-auto cursor-pointer" variant="ghost">
                     <IconDotsVertical />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuSeparator/>
-                  <DropdownMenuItem onClick={(e) => {
-                    e.preventDefault();
-                    setSelectedAddon(addon);
-                    setBoolState(AddonActionEditModalState, true);
-                  }}>Edit</DropdownMenuItem>
-                  <DropdownMenuItem variant="destructive" onClick={(e) => {
-                    e.preventDefault();
-                    setSelectedAddon(addon);
-                    setBoolState(AddonActionDeleteModalState, true);
-                  }}>Delete</DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectedAddon(addon);
+                      setBoolState(AddonActionEditModalState, true);
+                    }}
+                  >Edit</DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    variant="destructive"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSelectedAddon(addon);
+                      setBoolState(AddonActionDeleteModalState, true);
+                    }}
+                  >Delete</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

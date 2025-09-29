@@ -100,9 +100,9 @@ export function useNewUser() {
   return useMutation({ mutationFn: newUser })
 }
 
-export function useUpdateUser(id?: number) {
+export function useUpdateUser() {
   const editUser = async (
-    body: string
+    {id, body}: {id:number, body: string}
   ): Promise<HTTPResponse<User>> => {
     try {
       const url = `${API_PATH.ACCOUNT.USER}/${id}`

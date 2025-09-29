@@ -17,6 +17,7 @@ import {useAuthStore} from "@/states/auth-state";
 import {useLogout} from "@/hooks/use-auth";
 import {useNavigate} from "@tanstack/react-router";
 import {toast} from "sonner";
+import {HTTP_STATUS_CODE, isHTTPResponse} from "@/lib/api";
 
 export const LogoutModalState = "logout_modal_state"
 
@@ -38,15 +39,17 @@ export function LogoutAlertDialog() {
     setSubmitted(true);
 
     logout(undefined, {
-      onSuccess: async () => {
-        await toSignIn();
-      },
       onError: async (error) => {
+        setSubmitted(false);
         if (error instanceof Error) {
           const clientError = error as Error
           if (clientError.message.includes("401")) {
-            toast.error("Logout successfully!");
+            toast.success("Logout successfully!");
           }
+          await toSignIn();
+        }
+        if (error && isHTTPResponse<null>(error) && error.code === HTTP_STATUS_CODE.UNAUTHORIZED) {
+          toast.success("Logout successfully!");
           await toSignIn();
         }
       }
