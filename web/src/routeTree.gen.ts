@@ -14,19 +14,17 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedStoresRouteRouteImport } from './routes/_authenticated/stores/route'
+import { Route as AuthenticatedOrdersRouteRouteImport } from './routes/_authenticated/orders/route'
+import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders/index'
 import { Route as AuthenticatedStoresTransactionsRouteImport } from './routes/_authenticated/stores/transactions'
 import { Route as AuthenticatedStoresTeamsRouteImport } from './routes/_authenticated/stores/teams'
 import { Route as AuthenticatedStoresCustomersRouteImport } from './routes/_authenticated/stores/customers'
 import { Route as AuthenticatedStoresCatalogsRouteImport } from './routes/_authenticated/stores/catalogs'
 import { Route as AuthenticatedStoresAttributesRouteImport } from './routes/_authenticated/stores/attributes'
+import { Route as AuthenticatedOrdersMenusRouteImport } from './routes/_authenticated/orders/menus'
+import { Route as AuthenticatedOrdersFloorsRouteImport } from './routes/_authenticated/orders/floors'
 
 const AuthenticatedIndexLazyRouteImport = createFileRoute('/_authenticated/')()
-const AuthenticatedMenusLazyRouteImport = createFileRoute(
-  '/_authenticated/menus',
-)()
-const AuthenticatedFloorsLazyRouteImport = createFileRoute(
-  '/_authenticated/floors',
-)()
 const AuthenticatedStoresIndexLazyRouteImport = createFileRoute(
   '/_authenticated/stores/',
 )()
@@ -56,24 +54,16 @@ const AuthenticatedIndexLazyRoute = AuthenticatedIndexLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_authenticated/index.lazy').then((d) => d.Route),
 )
-const AuthenticatedMenusLazyRoute = AuthenticatedMenusLazyRouteImport.update({
-  id: '/menus',
-  path: '/menus',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any).lazy(() =>
-  import('./routes/_authenticated/menus.lazy').then((d) => d.Route),
-)
-const AuthenticatedFloorsLazyRoute = AuthenticatedFloorsLazyRouteImport.update({
-  id: '/floors',
-  path: '/floors',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any).lazy(() =>
-  import('./routes/_authenticated/floors.lazy').then((d) => d.Route),
-)
 const AuthenticatedStoresRouteRoute =
   AuthenticatedStoresRouteRouteImport.update({
     id: '/stores',
     path: '/stores',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOrdersRouteRoute =
+  AuthenticatedOrdersRouteRouteImport.update({
+    id: '/orders',
+    path: '/orders',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedStoresIndexLazyRoute =
@@ -84,6 +74,12 @@ const AuthenticatedStoresIndexLazyRoute =
   } as any).lazy(() =>
     import('./routes/_authenticated/stores/index.lazy').then((d) => d.Route),
   )
+const AuthenticatedOrdersIndexRoute =
+  AuthenticatedOrdersIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedOrdersRouteRoute,
+  } as any)
 const AuthenticatedStoresFloorsLazyRoute =
   AuthenticatedStoresFloorsLazyRouteImport.update({
     id: '/floors',
@@ -122,6 +118,18 @@ const AuthenticatedStoresAttributesRoute =
     path: '/attributes',
     getParentRoute: () => AuthenticatedStoresRouteRoute,
   } as any)
+const AuthenticatedOrdersMenusRoute =
+  AuthenticatedOrdersMenusRouteImport.update({
+    id: '/menus',
+    path: '/menus',
+    getParentRoute: () => AuthenticatedOrdersRouteRoute,
+  } as any)
+const AuthenticatedOrdersFloorsRoute =
+  AuthenticatedOrdersFloorsRouteImport.update({
+    id: '/floors',
+    path: '/floors',
+    getParentRoute: () => AuthenticatedOrdersRouteRoute,
+  } as any)
 const AuthenticatedStoresProductsIndexLazyRoute =
   AuthenticatedStoresProductsIndexLazyRouteImport.update({
     id: '/products/',
@@ -145,31 +153,34 @@ const AuthenticatedStoresProductsIdLazyRoute =
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
+  '/orders': typeof AuthenticatedOrdersRouteRouteWithChildren
   '/stores': typeof AuthenticatedStoresRouteRouteWithChildren
-  '/floors': typeof AuthenticatedFloorsLazyRoute
-  '/menus': typeof AuthenticatedMenusLazyRoute
   '/': typeof AuthenticatedIndexLazyRoute
+  '/orders/floors': typeof AuthenticatedOrdersFloorsRoute
+  '/orders/menus': typeof AuthenticatedOrdersMenusRoute
   '/stores/attributes': typeof AuthenticatedStoresAttributesRoute
   '/stores/catalogs': typeof AuthenticatedStoresCatalogsRoute
   '/stores/customers': typeof AuthenticatedStoresCustomersRoute
   '/stores/teams': typeof AuthenticatedStoresTeamsRoute
   '/stores/transactions': typeof AuthenticatedStoresTransactionsRoute
   '/stores/floors': typeof AuthenticatedStoresFloorsLazyRoute
+  '/orders/': typeof AuthenticatedOrdersIndexRoute
   '/stores/': typeof AuthenticatedStoresIndexLazyRoute
   '/stores/products/$id': typeof AuthenticatedStoresProductsIdLazyRoute
   '/stores/products': typeof AuthenticatedStoresProductsIndexLazyRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/floors': typeof AuthenticatedFloorsLazyRoute
-  '/menus': typeof AuthenticatedMenusLazyRoute
   '/': typeof AuthenticatedIndexLazyRoute
+  '/orders/floors': typeof AuthenticatedOrdersFloorsRoute
+  '/orders/menus': typeof AuthenticatedOrdersMenusRoute
   '/stores/attributes': typeof AuthenticatedStoresAttributesRoute
   '/stores/catalogs': typeof AuthenticatedStoresCatalogsRoute
   '/stores/customers': typeof AuthenticatedStoresCustomersRoute
   '/stores/teams': typeof AuthenticatedStoresTeamsRoute
   '/stores/transactions': typeof AuthenticatedStoresTransactionsRoute
   '/stores/floors': typeof AuthenticatedStoresFloorsLazyRoute
+  '/orders': typeof AuthenticatedOrdersIndexRoute
   '/stores': typeof AuthenticatedStoresIndexLazyRoute
   '/stores/products/$id': typeof AuthenticatedStoresProductsIdLazyRoute
   '/stores/products': typeof AuthenticatedStoresProductsIndexLazyRoute
@@ -178,16 +189,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/orders': typeof AuthenticatedOrdersRouteRouteWithChildren
   '/_authenticated/stores': typeof AuthenticatedStoresRouteRouteWithChildren
-  '/_authenticated/floors': typeof AuthenticatedFloorsLazyRoute
-  '/_authenticated/menus': typeof AuthenticatedMenusLazyRoute
   '/_authenticated/': typeof AuthenticatedIndexLazyRoute
+  '/_authenticated/orders/floors': typeof AuthenticatedOrdersFloorsRoute
+  '/_authenticated/orders/menus': typeof AuthenticatedOrdersMenusRoute
   '/_authenticated/stores/attributes': typeof AuthenticatedStoresAttributesRoute
   '/_authenticated/stores/catalogs': typeof AuthenticatedStoresCatalogsRoute
   '/_authenticated/stores/customers': typeof AuthenticatedStoresCustomersRoute
   '/_authenticated/stores/teams': typeof AuthenticatedStoresTeamsRoute
   '/_authenticated/stores/transactions': typeof AuthenticatedStoresTransactionsRoute
   '/_authenticated/stores/floors': typeof AuthenticatedStoresFloorsLazyRoute
+  '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
   '/_authenticated/stores/': typeof AuthenticatedStoresIndexLazyRoute
   '/_authenticated/stores/products/$id': typeof AuthenticatedStoresProductsIdLazyRoute
   '/_authenticated/stores/products/': typeof AuthenticatedStoresProductsIndexLazyRoute
@@ -196,31 +209,34 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
+    | '/orders'
     | '/stores'
-    | '/floors'
-    | '/menus'
     | '/'
+    | '/orders/floors'
+    | '/orders/menus'
     | '/stores/attributes'
     | '/stores/catalogs'
     | '/stores/customers'
     | '/stores/teams'
     | '/stores/transactions'
     | '/stores/floors'
+    | '/orders/'
     | '/stores/'
     | '/stores/products/$id'
     | '/stores/products'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
-    | '/floors'
-    | '/menus'
     | '/'
+    | '/orders/floors'
+    | '/orders/menus'
     | '/stores/attributes'
     | '/stores/catalogs'
     | '/stores/customers'
     | '/stores/teams'
     | '/stores/transactions'
     | '/stores/floors'
+    | '/orders'
     | '/stores'
     | '/stores/products/$id'
     | '/stores/products'
@@ -228,16 +244,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/orders'
     | '/_authenticated/stores'
-    | '/_authenticated/floors'
-    | '/_authenticated/menus'
     | '/_authenticated/'
+    | '/_authenticated/orders/floors'
+    | '/_authenticated/orders/menus'
     | '/_authenticated/stores/attributes'
     | '/_authenticated/stores/catalogs'
     | '/_authenticated/stores/customers'
     | '/_authenticated/stores/teams'
     | '/_authenticated/stores/transactions'
     | '/_authenticated/stores/floors'
+    | '/_authenticated/orders/'
     | '/_authenticated/stores/'
     | '/_authenticated/stores/products/$id'
     | '/_authenticated/stores/products/'
@@ -271,25 +289,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexLazyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/menus': {
-      id: '/_authenticated/menus'
-      path: '/menus'
-      fullPath: '/menus'
-      preLoaderRoute: typeof AuthenticatedMenusLazyRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/floors': {
-      id: '/_authenticated/floors'
-      path: '/floors'
-      fullPath: '/floors'
-      preLoaderRoute: typeof AuthenticatedFloorsLazyRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/stores': {
       id: '/_authenticated/stores'
       path: '/stores'
       fullPath: '/stores'
       preLoaderRoute: typeof AuthenticatedStoresRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/orders': {
+      id: '/_authenticated/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AuthenticatedOrdersRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/stores/': {
@@ -298,6 +309,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/stores/'
       preLoaderRoute: typeof AuthenticatedStoresIndexLazyRouteImport
       parentRoute: typeof AuthenticatedStoresRouteRoute
+    }
+    '/_authenticated/orders/': {
+      id: '/_authenticated/orders/'
+      path: '/'
+      fullPath: '/orders/'
+      preLoaderRoute: typeof AuthenticatedOrdersIndexRouteImport
+      parentRoute: typeof AuthenticatedOrdersRouteRoute
     }
     '/_authenticated/stores/floors': {
       id: '/_authenticated/stores/floors'
@@ -341,6 +359,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStoresAttributesRouteImport
       parentRoute: typeof AuthenticatedStoresRouteRoute
     }
+    '/_authenticated/orders/menus': {
+      id: '/_authenticated/orders/menus'
+      path: '/menus'
+      fullPath: '/orders/menus'
+      preLoaderRoute: typeof AuthenticatedOrdersMenusRouteImport
+      parentRoute: typeof AuthenticatedOrdersRouteRoute
+    }
+    '/_authenticated/orders/floors': {
+      id: '/_authenticated/orders/floors'
+      path: '/floors'
+      fullPath: '/orders/floors'
+      preLoaderRoute: typeof AuthenticatedOrdersFloorsRouteImport
+      parentRoute: typeof AuthenticatedOrdersRouteRoute
+    }
     '/_authenticated/stores/products/': {
       id: '/_authenticated/stores/products/'
       path: '/products'
@@ -357,6 +389,24 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedOrdersRouteRouteChildren {
+  AuthenticatedOrdersFloorsRoute: typeof AuthenticatedOrdersFloorsRoute
+  AuthenticatedOrdersMenusRoute: typeof AuthenticatedOrdersMenusRoute
+  AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
+}
+
+const AuthenticatedOrdersRouteRouteChildren: AuthenticatedOrdersRouteRouteChildren =
+  {
+    AuthenticatedOrdersFloorsRoute: AuthenticatedOrdersFloorsRoute,
+    AuthenticatedOrdersMenusRoute: AuthenticatedOrdersMenusRoute,
+    AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
+  }
+
+const AuthenticatedOrdersRouteRouteWithChildren =
+  AuthenticatedOrdersRouteRoute._addFileChildren(
+    AuthenticatedOrdersRouteRouteChildren,
+  )
 
 interface AuthenticatedStoresRouteRouteChildren {
   AuthenticatedStoresAttributesRoute: typeof AuthenticatedStoresAttributesRoute
@@ -391,16 +441,14 @@ const AuthenticatedStoresRouteRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedOrdersRouteRoute: typeof AuthenticatedOrdersRouteRouteWithChildren
   AuthenticatedStoresRouteRoute: typeof AuthenticatedStoresRouteRouteWithChildren
-  AuthenticatedFloorsLazyRoute: typeof AuthenticatedFloorsLazyRoute
-  AuthenticatedMenusLazyRoute: typeof AuthenticatedMenusLazyRoute
   AuthenticatedIndexLazyRoute: typeof AuthenticatedIndexLazyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedOrdersRouteRoute: AuthenticatedOrdersRouteRouteWithChildren,
   AuthenticatedStoresRouteRoute: AuthenticatedStoresRouteRouteWithChildren,
-  AuthenticatedFloorsLazyRoute: AuthenticatedFloorsLazyRoute,
-  AuthenticatedMenusLazyRoute: AuthenticatedMenusLazyRoute,
   AuthenticatedIndexLazyRoute: AuthenticatedIndexLazyRoute,
 }
 

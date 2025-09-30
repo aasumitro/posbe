@@ -1,8 +1,8 @@
 import {useEffect} from "react";
 import {ActionVisibleRightSidebarKey} from "@/components/app-right-sidebar";
 import { useActionState } from "@/states/action-state";
-import { OrderContainer } from "@/features/menus/components/order-container";
-import {MenuContainer} from "@/features/menus/components/menu-container";
+import { OrderContainer } from "@/features/orders/components/order-container";
+import {MenuContainer} from "@/features/orders/components/menu-container";
 
 export function MenuPage() {
   const { setBoolState } = useActionState();

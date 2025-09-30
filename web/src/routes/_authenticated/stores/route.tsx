@@ -1,7 +1,12 @@
-import {Outlet, createFileRoute, useRouterState} from '@tanstack/react-router'
+import {Outlet, createFileRoute, useRouterState, redirect} from '@tanstack/react-router'
 import {Navigation, NavigationInset} from "@/features/stores/components/navigation";
+import {useAuthStore} from "@/states/auth-state";
 
 export const Route = createFileRoute('/_authenticated/stores')({
+  beforeLoad: () => {
+    const authState = useAuthStore.getState().auth;
+    if (authState.user?.role?.name !== 'admin') throw redirect({to: "/", replace: true});
+  },
   component: StoreLayout,
 })
 

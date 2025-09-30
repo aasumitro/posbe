@@ -1,9 +1,9 @@
-import {CategoryFilter} from "@/features/menus/components/category-filter";
+import {CategoryFilter} from "@/features/orders/components/category-filter";
 import {Separator} from "@/components/ui/separator";
-import {SubcategoryFilter} from "@/features/menus/components/subcategory-filter";
+import {SubcategoryFilter} from "@/features/orders/components/subcategory-filter";
 import {Input} from "@/components/ui/input";
 import {IconSearch} from "@tabler/icons-react";
-import {MenuList} from "@/features/menus/components/menu-list";
+import {MenuList} from "@/features/orders/components/menu-list";
 
 export function MenuContainer() {
   return (

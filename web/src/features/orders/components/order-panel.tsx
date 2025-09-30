@@ -1,5 +1,5 @@
 import {useActionState} from "@/states/action-state";
-import {OrderListSheetState} from "@/features/floors/components/order-list-sheet";
+import {OrderListSheetState} from "@/features/orders/components/order-list-sheet";
 
 export function OrderPanel() {
   const { setBoolState } =useActionState();

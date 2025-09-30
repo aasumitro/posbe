@@ -1,6 +1,10 @@
 package order
 
-import "github.com/aasumitro/posbe/internal/model"
+import (
+	"context"
+
+	"github.com/aasumitro/posbe/internal/model"
+)
 
 type shiftRepository struct {
 	db model.IPgxPool

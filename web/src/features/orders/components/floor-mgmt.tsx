@@ -4,11 +4,11 @@ import { useState } from "react"
 import { type DraggableTableItem } from "@/components/table"
 import { ZoomableContainer } from "@/components/zoomable-container";
 import { Table } from "@/components/table";
-import TableStatusPanel from "@/features/floors/components/status-panel";
-import {FloorPanel} from "@/features/floors/components/floor-panel";
-import {TableMenu} from "@/features/floors/components/table-menu";
-import {OrderPanel} from "@/features/floors/components/order-panel";
-import {OrderListSheet} from "@/features/floors/components/order-list-sheet";
+import TableStatusPanel from "@/features/orders/components/status-panel";
+import {FloorPanel} from "@/features/orders/components/floor-panel";
+import {TableMenu} from "@/features/orders/components/table-menu";
+import {OrderPanel} from "@/features/orders/components/order-panel";
+import {OrderListSheet} from "@/features/orders/components/order-list-sheet";
 
 interface FloorManagementProps {
   tables: DraggableTableItem[]
@@ -34,13 +34,14 @@ export function FloorManagement({
                 top: table.yPos * scale,
               }}>
                 <Table
-                  name={table.id}
+                  id={table.id}
+                  name={table.name}
                   status={table.status}
                   customers={table.customers}
                   config={table.config}
                   menu={
                     <TableMenu
-                      name={table.id}
+                      name={table.name}
                       status={table.status}
                       shape={table.config.shape}
                     />

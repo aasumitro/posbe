@@ -1,6 +1,6 @@
 import {Sidebar} from "@/components/ui/sidebar";
 import * as React from "react";
-import {Cart} from "@/features/menus/components/cart";
+import {Cart} from "@/features/orders/components/cart";
 
 export function MenuSidebarSection({...props}: React.ComponentProps<typeof Sidebar>) {
   return (

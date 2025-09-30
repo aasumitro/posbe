@@ -19,16 +19,17 @@ import {cn} from "@/lib/utils";
 import {Link, useRouterState} from "@tanstack/react-router";
 import {BorderBeam} from "@/components/border-beam";
 import {UserMenu} from "@/components/user-menu";
+import {useAuthStore} from "@/states/auth-state";
 
 const items = [
   {
     title: "Menu orders",
-    url: "/menus",
+    url: "/orders/menus",
     icon: IconClipboardList,
   },
   {
     title: "Table orders",
-    url: "/floors",
+    url: "/orders/floors",
     icon: IconArmchair,
   }
 ]
@@ -36,6 +37,7 @@ const items = [
 export function AppLeftSidebar() {
   const { location } = useRouterState();
   const pathname = location.pathname;
+  const {auth} = useAuthStore();
 
   const MidIco = (
     <span className="relative">
@@ -107,22 +109,23 @@ export function AppLeftSidebar() {
 
       <SidebarFooter>
         <SidebarMenu>
-          {/* TODO: only display this to admin */}
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="cursor-pointer select-none mb-4"
-              tooltip="Store settings - Manage teams, products, and more."
-              isActive={pathname.startsWith('/stores')}
-              asChild
-            >
-              <Link to="/stores">
-                <IconBasketCog className={cn(
-                  pathname.startsWith('/stores') && "text-gray-500"
-                )} />
-                <span>Store settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {auth.user?.role?.name === "admin" && (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className="cursor-pointer select-none mb-4"
+                tooltip="Store settings - Manage teams, products, and more."
+                isActive={pathname.startsWith('/stores')}
+                asChild
+              >
+                <Link to="/stores">
+                  <IconBasketCog className={cn(
+                    pathname.startsWith('/stores') && "text-gray-500"
+                  )} />
+                  <span>Store settings</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
 
           <SidebarMenuItem>
             <UserMenu />

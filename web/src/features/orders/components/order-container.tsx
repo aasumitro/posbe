@@ -1,4 +1,4 @@
-import {OrderList} from "@/features/menus/components/order-list";
+import {OrderList} from "@/features/orders/components/order-list";
 
 export function OrderContainer() {
   return (
