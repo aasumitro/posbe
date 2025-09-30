@@ -1,10 +1,10 @@
-package transaction
+package report
 
 import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewTransactionModuleProvider(_ *gin.RouterGroup) {
+func New(_ *gin.RouterGroup) {
 	// Order
 	// OrderItem
 	// OrderBill

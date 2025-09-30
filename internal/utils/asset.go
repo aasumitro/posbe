@@ -18,6 +18,44 @@ type IAssetUtil interface {
 	ProjectRootDir() (string, error)
 }
 
+// UploadBase64Asset - upload assets (file: as base64 string)
+// example usage:
+//
+//	savedPath, err := UploadBase64Asset("xxxxxxx", "/products", "new-name")
+//
+// example with gin:
+//
+//				engine.POST("/assets-mgmt", func(ctx *gin.Context) {
+//	             // Get uploaded file
+//	             var form struct {
+//	                File string `json:"file"
+//	             }
+//
+//	              // bind user input
+//	              if err := ctx.ShouldBind(&form); err != nil {
+//	                 ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+//	                 return
+//	               }
+//
+//	                // Call UploadAsset
+//	                fn :=strconv.FormatInt(time.Now().UnixMicro(), 10)
+//	                savedPath, err := utils.UploadBase64Asset(form.file,
+//	                	ctx.Query("folder"), fn)
+//	                if err != nil {
+//	                	ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+//	                	return
+//	                }
+//
+//	                scheme := "http"
+//	                if ctx.Request.TLS != nil {
+//	                    scheme = "https"
+//	                }
+//	                ctx.JSON(http.StatusOK, gin.H{
+//	                    "message": "upload successful",
+//	                    "file_path": fmt.Sprintf("%s://%s/assets/%s",
+//	                        scheme, ctx.Request.Host, savedPath),
+//	                })
+//		 })
 func UploadBase64Asset(base64Str, folder, name string) (string, error) {
 	// Split "data:image/png;base64,..."
 	parts := strings.SplitN(base64Str, ",", 2)
@@ -63,11 +101,11 @@ func UploadBase64Asset(base64Str, folder, name string) (string, error) {
 	return fmt.Sprintf("%s/%s", folder, finalName), nil
 }
 
-// UploadAsset - upload assets (file: pdf, excel | image: png, img)
+// UploadFileAsset - upload assets (file: pdf, excel | image: png, img)
 //
 // example usage:
 //
-//	savedPath, err := Upload("product-sku-123", "/products", fileHeader)
+//	savedPath, err := UploadFileAsset("product-sku-123", "/products", fileHeader)
 //
 // example with gin:
 //
@@ -80,7 +118,7 @@ func UploadBase64Asset(base64Str, folder, name string) (string, error) {
 //			    }
 //
 //			    // Call UploadAsset
-//			    savedPath, err := utils.UploadAsset(ctx.Query("name"),
+//			    savedPath, err := utils.UploadFileAsset(ctx.Query("name"),
 //			    	ctx.Query("folder"), fileHeader)
 //			    if err != nil {
 //			    	ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

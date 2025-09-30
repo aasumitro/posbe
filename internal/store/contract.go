@@ -24,8 +24,6 @@ type IStoreShiftRepository interface {
 	Create(ctx context.Context, form *ShiftForm) error
 	Update(ctx context.Context, form *ShiftForm) error
 	Delete(ctx context.Context, id int64) error
-	Open(ctx context.Context, form *ActiveShiftForm) error
-	Close(ctx context.Context, form *ActiveShiftForm) error
 }
 
 type IStoreShiftService interface {
@@ -34,7 +32,6 @@ type IStoreShiftService interface {
 	CreateShift(ctx context.Context, form *ShiftForm) *utils.ServiceError
 	UpdateShift(ctx context.Context, form *ShiftForm) *utils.ServiceError
 	DeleteShift(ctx context.Context, id int64) *utils.ServiceError
-	ActiveShiftAction(ctx context.Context, form *ActiveShiftForm) *utils.ServiceError
 }
 
 type IStoreSeatingRepository interface {

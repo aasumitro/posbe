@@ -213,7 +213,7 @@ func (handler seatingHandler) destroyTable(ctx *gin.Context) {
 
 func NewSeatingHandler(service IStoreSeatingService, router *gin.RouterGroup) {
 	handler := seatingHandler{service: service}
-	authz := router.Group("")
+	authz := router.Group(utils.EmptyPath)
 	authz.Use(utils.AuthZ([]string{"admin"}))
 	{
 		// store floors endpoint

@@ -92,30 +92,6 @@ func (service shiftService) DeleteShift(ctx context.Context, id int64) *utils.Se
 	return nil
 }
 
-func (service shiftService) ActiveShiftAction(ctx context.Context, form *ActiveShiftForm) *utils.ServiceError {
-	if form.Action == "open" {
-		if err := service.repository.Open(ctx, form); err != nil {
-			return &utils.ServiceError{
-				Code:    http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-		}
-	}
-
-	if form.Action == "close" {
-		if err := service.repository.Close(ctx, form); err != nil {
-			return &utils.ServiceError{
-				Code:    http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-		}
-	}
-
-	config.RdpPool.Del(ctx, model.StoreShiftCacheKey)
-
-	return nil
-}
-
 func NewShiftService(repository IStoreShiftRepository) IStoreShiftService {
 	return &shiftService{repository: repository}
 }

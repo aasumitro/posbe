@@ -2,7 +2,6 @@ package store
 
 import (
 	"net/http"
-	"slices"
 
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -125,47 +124,6 @@ func (handler shiftHandler) destroy(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
-func (handler shiftHandler) active(ctx *gin.Context) {
-	id, ok := utils.GetIDParam(ctx, "id")
-	if !ok {
-		return
-	}
-
-	actionParams := ctx.Param("action")
-	if !slices.Contains([]string{"open", "close"}, actionParams) {
-		utils.NewHTTPRespond(ctx, http.StatusBadRequest, "invalid action parameter")
-		return
-	}
-
-	uid, ok := ctx.Get("user_id")
-	if !ok {
-		utils.NewHTTPRespond(ctx, http.StatusBadRequest, "invalid user id")
-		return
-	}
-
-	var form ActiveShiftForm
-	if err := ctx.ShouldBind(&form); err != nil {
-		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if val := form.Validate(ctx); val != nil {
-		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
-		return
-	}
-
-	form.ShiftID = id
-	form.Action = actionParams
-	form.UserID = int64(uid.(float64))
-
-	if err := handler.service.ActiveShiftAction(ctx, &form); err != nil {
-		utils.NewHTTPRespond(ctx, err.Code, err.Message)
-		return
-	}
-
-	utils.NewHTTPRespond(ctx, http.StatusOK, nil)
-}
-
 func NewShiftHandler(service IStoreShiftService, router *gin.RouterGroup) {
 	handler := shiftHandler{service: service}
 	router.GET("/shifts", handler.fetch)
@@ -176,6 +134,5 @@ func NewShiftHandler(service IStoreShiftService, router *gin.RouterGroup) {
 		authz.POST(utils.EmptyPath, handler.store)
 		authz.PATCH("/:id", handler.update)
 		authz.DELETE("/:id", handler.destroy)
-		authz.POST("/:id/:action", handler.active)
 	}
 }
