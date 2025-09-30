@@ -2,7 +2,9 @@ CREATE TABLE IF NOT EXISTS shifts(
     id BIGSERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(255) NOT NULL,
     start_time BIGINT NOT NULL,
+    is_prev_day_start BOOLEAN NOT NULL DEFAULT FALSE,
     end_time BIGINT NOT NULL,
+    is_next_day_end BOOLEAN NOT NULL DEFAULT FALSE,
     created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
     updated_at BIGINT
 );

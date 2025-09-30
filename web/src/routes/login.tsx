@@ -114,9 +114,9 @@ function LoginPage() {
                 />
 
                 <div className="flex justify-between">
-                  <Button variant="link" className="p-0 cursor-pointer" type="button" disabled={isPending}>
-                    Forgot password?
-                  </Button>
+                  {/*<Button variant="link" className="p-0 cursor-pointer" type="button" disabled={isPending}>*/}
+                  {/*  Forgot password?*/}
+                  {/*</Button>*/}
 
                   <Button
                     type="submit"
