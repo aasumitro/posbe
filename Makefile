@@ -50,7 +50,7 @@ mocks: $(MOCKERY)
 .PHONY: run
 run:
 	go mod tidy -compat=1.25
-	go run ./cmd/api/main.go
+	go run -race ./cmd/api/main.go
 
 .PHONY: watch
 watch:

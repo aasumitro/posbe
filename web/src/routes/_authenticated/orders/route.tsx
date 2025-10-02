@@ -1,7 +1,9 @@
 import {createFileRoute, Outlet} from '@tanstack/react-router'
+import {useEffect} from "react";
+// import {useCategoryList} from "@/hooks/use-attribute";
 
 export const Route = createFileRoute('/_authenticated/orders')({
-  beforeLoad: () => {},
+  // beforeLoad: () => {},
   component: OrderLayout,
 })
 
@@ -13,6 +15,13 @@ function OrderLayout() {
   // 4. load active orders
   // 5. load products
   // 6. load customers (api wip)
+
+  // const {data: categories} = useCategoryList()
+
+  useEffect(() => {
+
+  }, []);
+
   return (
     <Outlet />
   )

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"log"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -23,11 +24,24 @@ func PostgresConnection() Option {
 
 func RedisConnection() Option {
 	return func(cfg *Config) {
-		conn := redis.NewClient(&redis.Options{Addr: cfg.RedisDsnURL})
-		if err := conn.Ping(cfg.ctx).Err(); err != nil {
-			log.Fatalf("REDIS_ERROR: %s\n", err.Error())
-		}
+		RedisCache = initializeRedisClient(cfg.ctx, "CACHE", cfg.RedisDsnURL)
+		RedisPublisher = initializeRedisClient(cfg.ctx, "PUBLISHER", cfg.RedisDsnURL)
+		RedisSubscriber = initializeRedisClient(cfg.ctx, "SUBSCRIBER", cfg.RedisDsnURL)
 		log.Println("Redis connection ready!")
-		RdpPool = conn
 	}
+}
+
+func initializeRedisClient(
+	ctx context.Context,
+	connType, redisDsnURL string,
+) *redis.Client {
+	opts, err := redis.ParseURL(redisDsnURL)
+	if err != nil {
+		log.Fatalf("REDIS_%s_ERROR: %s\n", connType, err.Error())
+	}
+	client := redis.NewClient(opts)
+	if err := client.Ping(ctx).Err(); err != nil {
+		log.Fatalf("REDIS_%s_ERROR: %s\n", connType, err.Error())
+	}
+	return client
 }

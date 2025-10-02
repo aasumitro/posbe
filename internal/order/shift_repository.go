@@ -2,12 +2,18 @@ package order
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aasumitro/posbe/internal/model"
 )
 
 type shiftRepository struct {
 	db model.IPgxPool
+}
+
+func (repository shiftRepository) ActiveShift(ctx context.Context) (*model.ActiveShift, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (repository shiftRepository) Open(ctx context.Context, form *ActiveShiftForm) error {
@@ -24,7 +30,8 @@ func (repository shiftRepository) Open(ctx context.Context, form *ActiveShiftFor
 	//		form.ShiftID, time.Now().Unix(), form.UserID,
 	//		form.Cash, time.Now().Unix()).Err()
 
-	panic("implement me")
+	fmt.Println(form.UserID, form.ShiftID, form.ActiveShiftID, form.Cash)
+	return nil
 }
 
 func (repository shiftRepository) Close(ctx context.Context, form *ActiveShiftForm) error {
@@ -43,7 +50,8 @@ func (repository shiftRepository) Close(ctx context.Context, form *ActiveShiftFo
 	//		form.Cash, time.Now().Unix(),
 	//		form.ID, form.ShiftID).Err()
 
-	panic("implement me")
+	fmt.Println(form.UserID, form.ShiftID, form.ActiveShiftID, form.Cash)
+	return nil
 }
 
 func NewShiftRepository(db model.IPgxPool) IShiftRepository {

@@ -11,6 +11,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SseRouteImport } from './routes/sse'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedStoresRouteRouteImport } from './routes/_authenticated/stores/route'
@@ -38,6 +39,11 @@ const AuthenticatedStoresProductsIdLazyRouteImport = createFileRoute(
   '/_authenticated/stores/products/$id',
 )()
 
+const SseRoute = SseRouteImport.update({
+  id: '/sse',
+  path: '/sse',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -153,6 +159,7 @@ const AuthenticatedStoresProductsIdLazyRoute =
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
+  '/sse': typeof SseRoute
   '/orders': typeof AuthenticatedOrdersRouteRouteWithChildren
   '/stores': typeof AuthenticatedStoresRouteRouteWithChildren
   '/': typeof AuthenticatedIndexLazyRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/sse': typeof SseRoute
   '/': typeof AuthenticatedIndexLazyRoute
   '/orders/floors': typeof AuthenticatedOrdersFloorsRoute
   '/orders/menus': typeof AuthenticatedOrdersMenusRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
+  '/sse': typeof SseRoute
   '/_authenticated/orders': typeof AuthenticatedOrdersRouteRouteWithChildren
   '/_authenticated/stores': typeof AuthenticatedStoresRouteRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexLazyRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
+    | '/sse'
     | '/orders'
     | '/stores'
     | '/'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/sse'
     | '/'
     | '/orders/floors'
     | '/orders/menus'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/sse'
     | '/_authenticated/orders'
     | '/_authenticated/stores'
     | '/_authenticated/'
@@ -264,10 +276,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
+  SseRoute: typeof SseRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sse': {
+      id: '/sse'
+      path: '/sse'
+      fullPath: '/sse'
+      preLoaderRoute: typeof SseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -458,6 +478,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
+  SseRoute: SseRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

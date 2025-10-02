@@ -15,10 +15,12 @@ import (
 var (
 	configSingleton sync.Once
 
-	Instance  *Config
-	PgxPool   *pgxpool.Pool
-	RdpPool   *redis.Client
-	GinEngine *gin.Engine
+	Instance        *Config
+	PgxPool         *pgxpool.Pool
+	RedisCache      *redis.Client
+	RedisPublisher  *redis.Client
+	RedisSubscriber *redis.Client
+	GinEngine       *gin.Engine
 )
 
 type Config struct {

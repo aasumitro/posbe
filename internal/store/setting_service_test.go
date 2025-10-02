@@ -24,7 +24,7 @@ type settingServiceTestSuite struct {
 }
 
 func (suite *settingServiceTestSuite) SetupTest() {
-	config.RdpPool = redis.NewClient(&redis.Options{
+	config.RedisCache = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
 	suite.svcErr = &utils.ServiceError{

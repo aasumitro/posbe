@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
@@ -105,7 +106,7 @@ func logger() gin.HandlerFunc {
 			method, statusCode, path, requestID, userID)
 
 		// print log
-		go global.Logger.WithLevel(logLevel).
+		global.Logger.WithLevel(logLevel).
 			Str("client_ip", clientIP).
 			Str("request_id", requestID).
 			Str("protocol", protocol).
@@ -119,23 +120,19 @@ func logger() gin.HandlerFunc {
 			Msg(logMsg)
 
 		// store log
-		go func() {
+		go func(userID int, roleName, logMsg, errorMsg string, statusCode int) {
 			if userID == 0 || roleName == "-" {
-				ctx.Next()
 				return
 			}
 
 			desc := fmt.Sprintf("%s | %s", logMsg, errorMsg)
 			stmt := "INSERT INTO activity_logs (user_id, role, description, status_code, created_at) " +
 				"values ($1, $2, $3, $4, EXTRACT(EPOCH FROM NOW())::BIGINT)"
-			if _, err := PgxPool.Exec(ctx, stmt, userID, roleName, desc, statusCode); err != nil {
+			if _, err := PgxPool.Exec(context.Background(), stmt, userID, roleName, desc, statusCode); err != nil {
 				log.Println("failed to store activity log", err.Error())
-				ctx.Next()
 				return
 			}
-
-			ctx.Next()
-		}()
+		}(userID, roleName, logMsg, errorMsg, statusCode)
 	}
 }
 
@@ -168,7 +165,7 @@ func limiter(
 	if err != nil {
 		log.Fatalf("RATELIMITER_ERROR: %s\n", err.Error())
 	}
-	store, err := lsredis.NewStoreWithOptions(RdpPool, lm.StoreOptions{Prefix: serverName})
+	store, err := lsredis.NewStoreWithOptions(RedisCache, lm.StoreOptions{Prefix: serverName})
 	if err != nil {
 		log.Fatalf("RATELIMITER_ERROR: %s\n", err.Error())
 	}

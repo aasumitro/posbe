@@ -20,7 +20,7 @@ type accountService struct {
 func (service accountService) Roles(
 	ctx context.Context,
 ) ([]*model.Role, *utils.ServiceError) {
-	data, err := utils.CacheFirstData(ctx, config.RdpPool,
+	data, err := utils.CacheFirstData(ctx, config.RedisCache,
 		&utils.CacheDataSupplied[[]*model.Role]{
 			Key: model.RolesCacheKey, TTL: time.Hour * 1,
 			CbF: func() ([]*model.Role, error) {
@@ -35,7 +35,7 @@ func (service accountService) Roles(
 func (service accountService) Users(
 	ctx context.Context,
 ) ([]*model.User, *utils.ServiceError) {
-	data, err := utils.CacheFirstData(ctx, config.RdpPool,
+	data, err := utils.CacheFirstData(ctx, config.RedisCache,
 		&utils.CacheDataSupplied[[]*model.User]{
 			Key: model.UsersCacheKey, TTL: time.Minute * 10,
 			CbF: func() ([]*model.User, error) {
@@ -71,7 +71,7 @@ func (service accountService) CreateUser(
 		Email: data.Email, Password: hashPassword}
 	user, err := service.repository.InsertUser(ctx, newUser)
 	if err == nil {
-		config.RdpPool.Del(ctx, model.UsersCacheKey)
+		config.RedisCache.Del(ctx, model.UsersCacheKey)
 	}
 
 	return utils.HandleSingleResult[model.User]("user", user, err)
@@ -105,7 +105,7 @@ func (service accountService) UpdateUser(
 	user, err = service.repository.UpdateUserByID(ctx, updateUser)
 
 	if err == nil {
-		config.RdpPool.Del(ctx, model.UsersCacheKey)
+		config.RedisCache.Del(ctx, model.UsersCacheKey)
 	}
 
 	return utils.HandleSingleResult[model.User]("user", user, err)
@@ -173,7 +173,7 @@ func (service accountService) RemoveUser(
 	}
 
 	// clear cache
-	config.RdpPool.Del(ctx, model.UsersCacheKey)
+	config.RedisCache.Del(ctx, model.UsersCacheKey)
 
 	return nil
 }

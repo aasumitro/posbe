@@ -5,7 +5,7 @@ import type {HTTPResponse} from "@/types/http-response";
 
 const host =  process.env.NODE_ENV === 'production' ? window.location.host : "localhost:8000"
 const SERVER_URL = `${window.location.protocol}//${host}`
-const API_URL = `${SERVER_URL}/api/v1`
+export const API_URL = `${SERVER_URL}/api/v1`
 export const ASSET_URL = `${SERVER_URL}/assets`
 
 export const AuthPath = {

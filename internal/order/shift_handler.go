@@ -2,7 +2,6 @@ package order
 
 import (
 	"net/http"
-	"slices"
 
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -12,25 +11,25 @@ type shiftHandler struct {
 	service IShiftService
 }
 
-func (handler shiftHandler) active(ctx *gin.Context) {
-	id, ok := utils.GetIDParam(ctx, "id")
-	if !ok {
+func (handler shiftHandler) show(ctx *gin.Context) {
+	data, err := handler.service.CurrentActiveShift(ctx)
+	if err != nil {
+		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return
 	}
+	utils.NewHTTPRespond(ctx, http.StatusOK, data)
+}
 
-	actionParams := ctx.Param("action")
-	if !slices.Contains([]string{"open", "close"}, actionParams) {
-		utils.NewHTTPRespond(ctx, http.StatusBadRequest, "invalid action parameter")
-		return
-	}
+func (handler shiftHandler) action(ctx *gin.Context) {
+	var form ActiveShiftForm
 
 	uid, ok := ctx.Get("user_id")
 	if !ok {
 		utils.NewHTTPRespond(ctx, http.StatusBadRequest, "invalid user id")
 		return
 	}
+	form.UserID = int64(uid.(float64))
 
-	var form ActiveShiftForm
 	if err := ctx.ShouldBind(&form); err != nil {
 		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
 		return
@@ -40,10 +39,6 @@ func (handler shiftHandler) active(ctx *gin.Context) {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
 		return
 	}
-
-	form.ShiftID = id
-	form.Action = actionParams
-	form.UserID = int64(uid.(float64))
 
 	if err := handler.service.ActiveShiftAction(ctx, &form); err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
@@ -55,9 +50,10 @@ func (handler shiftHandler) active(ctx *gin.Context) {
 
 func NewShiftHandler(service IShiftService, router *gin.RouterGroup) {
 	handler := shiftHandler{service: service}
-	authz := router.Group("/shifts")
-	authz.Use(utils.AuthZ([]string{"admin"}))
+	shift := router.Group("shifts")
+	shift.GET(utils.EmptyPath, handler.show)
+	shift.Use(utils.AuthZ([]string{"admin"}))
 	{
-		authz.POST("/:id/:action", handler.active)
+		shift.POST(utils.EmptyPath, handler.action)
 	}
 }

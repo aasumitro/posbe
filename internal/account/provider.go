@@ -27,7 +27,7 @@ func New(router *gin.RouterGroup) {
 
 func shouldCacheData(ctx context.Context, repository IAccountRepository) {
 	// at first booting validate roles
-	err := config.RdpPool.Get(ctx, model.RolesCacheKey).Err()
+	err := config.RedisCache.Get(ctx, model.RolesCacheKey).Err()
 	if errors.Is(err, redis.Nil) && err != nil {
 		return
 	}
@@ -42,5 +42,5 @@ func shouldCacheData(ctx context.Context, repository IAccountRepository) {
 		return
 	}
 	// store data to redis
-	config.RdpPool.Set(ctx, model.RolesCacheKey, jsonData, 0)
+	config.RedisCache.Set(ctx, model.RolesCacheKey, jsonData, 0)
 }

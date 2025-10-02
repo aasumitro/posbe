@@ -26,6 +26,8 @@ func RunServer(ctx context.Context) {
 	ctx, stop := signal.NotifyContext(ctx,
 		syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
+	// init event stream
+	utils.InitEventStream(config.RedisPublisher, config.RedisSubscriber)
 	// router engine
 	routerEngine := config.GinEngine
 	// register public routes
@@ -63,7 +65,14 @@ func RunServer(ctx context.Context) {
 	// Close database connections
 	config.PgxPool.Close()
 	// Close redis connections
-	if err := config.RdpPool.Close(); err != nil {
+	utils.CloseEventStream(context.Background())
+	if err := config.RedisCache.Close(); err != nil {
+		log.Printf("Error shutting down redis connection: %v\n", err)
+	}
+	if err := config.RedisPublisher.Close(); err != nil {
+		log.Printf("Error shutting down redis connection: %v\n", err)
+	}
+	if err := config.RedisSubscriber.Close(); err != nil {
 		log.Printf("Error shutting down redis connection: %v\n", err)
 	}
 	// notify user of shutdown
