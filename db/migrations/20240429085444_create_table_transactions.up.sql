@@ -1,5 +1,7 @@
 CREATE TYPE order_status AS ENUM ('none', 'booking', 'order', 'bill', 'paid', 'cancel');
 
+CREATE TYPE payment_type as ENUM ('cash', 'card', 'e-wallet', 'qris');
+
 CREATE TABLE IF NOT EXISTS orders (
     id BIGSERIAL PRIMARY KEY NOT NULL,
     cashier_id BIGINT,
@@ -13,7 +15,7 @@ CREATE TABLE IF NOT EXISTS orders (
     net NUMERIC,
     tax NUMERIC,
     total NUMERIC,
-    type VARCHAR(255),
+    payment_type VARCHAR(255),
     payment NUMERIC,
     change NUMERIC,
     notes TEXT,
@@ -46,7 +48,7 @@ CREATE TABLE IF NOT EXISTS order_products (
     name VARCHAR(255),
     quantity INT DEFAULT 1,
     price NUMERIC,
-    netto NUMERIC,
+    net NUMERIC,
     notes TEXT,
     created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
     updated_at BIGINT
@@ -81,7 +83,7 @@ CREATE TABLE IF NOT EXISTS order_product_addons (
     name VARCHAR(255),
     quantity INT DEFAULT 1,
     price NUMERIC,
-    netto NUMERIC,
+    net NUMERIC,
     notes TEXT,
     created_at BIGINT NOT NULL DEFAULT extract(epoch from now()),
     updated_at BIGINT

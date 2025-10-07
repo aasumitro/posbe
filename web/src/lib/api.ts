@@ -37,6 +37,10 @@ export const API_PATH = {
       BASE: "/products",
       ADDONS: "/product-addons",
     }
+  },
+  ORDERS: {
+    BASE: "/orders",
+    SHIFTS: "/orders/shifts",
   }
 }
 

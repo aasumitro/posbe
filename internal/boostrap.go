@@ -27,7 +27,8 @@ func RunServer(ctx context.Context) {
 		syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	// init event stream
-	utils.InitEventStream(config.RedisPublisher, config.RedisSubscriber)
+	utils.InitEventStream(config.RedisPublisher,
+		config.RedisSubscriber)
 	// router engine
 	routerEngine := config.GinEngine
 	// register public routes

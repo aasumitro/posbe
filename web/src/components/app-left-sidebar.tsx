@@ -26,11 +26,13 @@ const items = [
     title: "Menu orders",
     url: "/orders/menus",
     icon: IconClipboardList,
+    access: ["admin", "cashier"],
   },
   {
     title: "Table orders",
     url: "/orders/floors",
     icon: IconArmchair,
+    access: ['admin', 'cashier', 'waiter'],
   }
 ]
 
@@ -85,22 +87,27 @@ export function AppLeftSidebar() {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      tooltip={item.title}
-                      isActive={pathname === item.url}
-                      asChild
-                    >
-                      <Link to={item.url}>
-                        <item.icon className={cn(
-                          pathname === item.url && "text-gray-500"
-                        )}/>
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {items.map((item) => {
+                  if (auth.user?.role?.name &&
+                    !item.access.includes(auth.user?.role?.name)) return;
+
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        tooltip={item.title}
+                        isActive={pathname === item.url}
+                        asChild
+                      >
+                        <Link to={item.url}>
+                          <item.icon className={cn(
+                            pathname === item.url && "text-gray-500"
+                          )}/>
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

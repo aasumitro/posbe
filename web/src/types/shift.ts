@@ -26,4 +26,5 @@ export interface ActiveShift {
   close_at: Int64R;
   close_by: Int64R;
   close_cash: Int64R;
+  shift?: StoreShift | null;
 }

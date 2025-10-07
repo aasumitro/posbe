@@ -33,7 +33,7 @@ func New(router *gin.RouterGroup) {
 			}
 			ctx.JSON(http.StatusCreated, "Notify sent . . .")
 		})
-		
+
 		eventRouterGroup.GET(utils.EmptyPath, func(ctx *gin.Context) {
 			ctx.Writer.Header().Set("Content-Type", "text/event-stream")
 			ctx.Writer.Header().Set("Cache-Control", "no-cache")
@@ -52,4 +52,8 @@ func New(router *gin.RouterGroup) {
 		NewShiftHandler(shiftSvc, orderRouterGroup)
 		NewTransactionHandler(trxSvc, orderRouterGroup)
 	}
+}
+
+func initTableStatus() {
+
 }

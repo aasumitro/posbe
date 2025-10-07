@@ -14,9 +14,7 @@ function AuthenticatedLayout() {
   const {data: user} = useUserDetail(auth.userId ?? undefined)
 
   useEffect(() => {
-    if (user?.data) {
-      auth.setUser(user.data)
-    }
+    if (user?.data) auth.setUser(user.data)
   }, [user?.data])
 
   return (

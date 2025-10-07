@@ -12,8 +12,9 @@ type shiftRepository struct {
 }
 
 func (repository shiftRepository) ActiveShift(ctx context.Context) (*model.ActiveShift, error) {
-	//TODO implement me
-	panic("implement me")
+	////TODO implement me
+	//panic("implement me")
+	return nil, nil
 }
 
 func (repository shiftRepository) Open(ctx context.Context, form *ActiveShiftForm) error {

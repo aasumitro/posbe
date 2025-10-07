@@ -52,7 +52,7 @@ func NewShiftHandler(service IShiftService, router *gin.RouterGroup) {
 	handler := shiftHandler{service: service}
 	shift := router.Group("shifts")
 	shift.GET(utils.EmptyPath, handler.show)
-	shift.Use(utils.AuthZ([]string{"admin"}))
+	shift.Use(utils.AuthZ([]string{"admin", "cashier"}))
 	{
 		shift.POST(utils.EmptyPath, handler.action)
 	}

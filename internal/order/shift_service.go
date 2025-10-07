@@ -14,8 +14,14 @@ type shiftService struct {
 }
 
 func (service shiftService) CurrentActiveShift(ctx context.Context) (*model.ActiveShift, *utils.ServiceError) {
-	//TODO implement me
-	panic("implement me")
+	data, err := service.repository.ActiveShift(ctx)
+	if err != nil {
+		return nil, &utils.ServiceError{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+	return utils.HandleSingleResult[model.ActiveShift]("active_shift", data, err)
 }
 
 func (service shiftService) ActiveShiftAction(ctx context.Context, form *ActiveShiftForm) *utils.ServiceError {
