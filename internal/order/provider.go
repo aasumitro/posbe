@@ -1,14 +1,12 @@
 package order
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/aasumitro/posbe/config"
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -25,9 +23,48 @@ func New(router *gin.RouterGroup) {
 	eventRouterGroup := orderRouterGroup.Group("events")
 	{
 		eventRouterGroup.POST(utils.EmptyPath, func(ctx *gin.Context) {
-			newNotifyID := uuid.New().String()
-			newMessage := fmt.Sprintf("[%d] New notify: %s", time.Now().Unix(), newNotifyID)
-			if err := utils.PublishEvent(ctx, SSEChannelKey, newMessage); err != nil {
+			var form struct {
+				Type string `json:"type" form:"type"`
+			}
+
+			// bind user input
+			if err := ctx.ShouldBind(&form); err != nil {
+				utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
+				return
+			}
+
+			if form.Type == "" {
+				utils.NewHTTPRespond(ctx, http.StatusBadRequest, "Type is required")
+				return
+			}
+
+			var payload interface{}
+			switch form.Type {
+			case "T1":
+				payload = map[string]interface{}{
+					"id": 1, "type": "table", "field": []string{"status", "customers"},
+					"status": "occupied", "customers": 3,
+				}
+			case "T3":
+				payload = map[string]interface{}{
+					"id": 3, "type": "table", "field": []string{"status", "customers"},
+					"status": "reserved", "customers": 1,
+				}
+			case "RELOAD":
+				payload = map[string]interface{}{"type": "reload"}
+			default:
+				utils.NewHTTPRespond(ctx, http.StatusBadRequest, "Unknown type")
+				return
+			}
+
+			dataBytes, err := json.Marshal(payload)
+			if err != nil {
+				utils.NewHTTPRespond(ctx, http.StatusInternalServerError, err.Error())
+				return
+			}
+			data := string(dataBytes)
+
+			if err := utils.PublishEvent(ctx, SSEChannelKey, data); err != nil {
 				ctx.JSON(http.StatusInternalServerError, err.Error())
 				return
 			}
@@ -40,8 +77,8 @@ func New(router *gin.RouterGroup) {
 			ctx.Writer.Header().Set("Connection", "keep-alive")
 			ctx.Writer.Header().Set("Transfer-Encoding", "chunked")
 			utils.SubscribeEvent(ctx.Request.Context(), SSEChannelKey, func(message *redis.Message) {
-				data := map[string]interface{}{"text": message.Payload}
-				ctx.SSEvent("update", data)
+				// status: "available" | "occupied" | "reserved" | "needs-cleaning"
+				ctx.SSEvent("update", message.Payload)
 				ctx.Writer.Flush()
 			})
 		})

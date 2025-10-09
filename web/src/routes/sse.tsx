@@ -28,7 +28,7 @@ function useFireEvent() {
   return useMutation({ mutationFn: fire })
 }
 
-type Message = { text: string }
+type Message = { id: number }
 
 function messageReducer(state: Message[], action: Message): Message[] {
   return [...state, action]
@@ -38,9 +38,9 @@ function SSETestPage() {
   const {mutate: fire} = useFireEvent();
   const [messages, addMessages] = useReducer(messageReducer, []);
 
-  const fireEvent = (e: FormEvent) => {
+  const fireEvent = (e: FormEvent, type: string) => {
     e.preventDefault();
-    fire("", {
+    fire(JSON.stringify({"type": type}), {
       onSuccess: (resp) => console.log(resp),
       onError: (err) => console.log(err),
     })
@@ -48,19 +48,31 @@ function SSETestPage() {
 
   const [eventSource] = useEventSource(`${API_URL}/orders/events`, true);
 
-  useEventSourceListener(eventSource, ["update"], [],
-    (evt) => addMessages(JSON.parse(evt.data)));
+  useEventSourceListener(eventSource, ["update"], (evt) =>
+    addMessages(JSON.parse(evt.data)), [addMessages]);
 
   return (
     <section className="relative flex flex-col items-center justify-center w-screen h-screen">
-      <Button
-        className="cursor-pointer"
-        onClick={fireEvent}
-      >Fire Event</Button>
+      <div className="flex gap-2">
+        <Button
+          className="cursor-pointer"
+          onClick={(e) => fireEvent(e, "T1")}
+        >Fire Table 1</Button>
+
+        <Button
+          className="cursor-pointer"
+          onClick={(e) => fireEvent(e, "T3")}
+        >Fire Table 3</Button>
+
+        <Button
+          className="cursor-pointer"
+          onClick={(e) => fireEvent(e, "RELOAD")}
+        >Fire Reload</Button>
+      </div>
 
       <ScrollArea className="h-96 w-96 mt-4 p-4 rounded-md border">
         {[...messages].reverse().map((msg, idx) => (
-          <div key={idx}>{msg.text}</div>
+          <div key={idx}>{msg.id}</div>
         ))}
       </ScrollArea>
     </section>

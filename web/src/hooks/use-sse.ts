@@ -35,8 +35,8 @@ export function useEventSource(url: string, withCredentials?: boolean, ESClass: 
 export function useEventSourceListener(
   source: EventSource | null,
   types: string[],
-  dependencies: any[] = [],
   listener: (e: EventSourceEvent) => void,
+  dependencies: any[] = [],
 ) {
   useEffect(() => {
     if (source) {
@@ -46,5 +46,3 @@ export function useEventSourceListener(
     return undefined;
   }, [source, ...dependencies]);
 }
-
-// https://github.com/Lusito/react-nano/blob/master/packages/use-event-source/docs/usage.md

@@ -61,6 +61,14 @@ func SubscribeEvent(ctx context.Context, channel string, handler func(*redis.Mes
 	for {
 		select {
 		case <-ctx.Done():
+			_ = subscription.Unsubscribe(
+				context.Background(), channel)
+			_ = subscription.Close()
+
+			mu.Lock()
+			delete(subscriptions, channel)
+			mu.Unlock()
+			
 			return
 		case msg, ok := <-ch:
 			if !ok {
