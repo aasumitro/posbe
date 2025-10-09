@@ -6,8 +6,8 @@ type (
 	Floor struct {
 		ID        int           `json:"id"`
 		Name      string        `json:"name"`
-		CreatedAt sql.NullInt64 `json:"created_at"`
-		UpdatedAt sql.NullInt64 `json:"updated_at"`
+		CreatedAt sql.NullInt64 `json:"-"`
+		UpdatedAt sql.NullInt64 `json:"-"`
 
 		// Embed
 		Tables []*Table `json:"tables,omitempty"`
@@ -28,7 +28,7 @@ type (
 		DSize     float64       `json:"d_size"`
 		Capacity  int           `json:"capacity"`
 		Type      string        `json:"type"`
-		CreatedAt sql.NullInt64 `json:"created_at"`
-		UpdatedAt sql.NullInt64 `json:"updated_at,omitempty"`
+		CreatedAt sql.NullInt64 `json:"-"`
+		UpdatedAt sql.NullInt64 `json:"-"`
 	}
 )

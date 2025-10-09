@@ -43,7 +43,7 @@ export const useAuthStore = create<AuthState>()((set) => {
   const initUserProfile = userProfileCookieState ? JSON.parse(userProfileCookieState) : ''
 
   const userIdCookieState = Cookies.get(USER_ID)
-  const initUserId = userIdCookieState ? JSON.parse(userIdCookieState) : ''
+  const initUserId = userIdCookieState ? Number(userIdCookieState) : null
 
   return {
     auth: {
@@ -70,7 +70,7 @@ export const useAuthStore = create<AuthState>()((set) => {
 
       userId: initUserId,
       setUserId: (userId) =>  set((state) => {
-        Cookies.set(USER_ID, JSON.stringify(userId))
+        Cookies.set(USER_ID, String(userId))
         return { ...state, auth: { ...state.auth, userId } }
       }),
 

@@ -7,22 +7,44 @@ import {
 } from "@/components/ui/sheet"
 import {useActionState} from "@/states/action-state";
 import {useEffect, useState} from "react";
-import {IconPointFilled} from "@tabler/icons-react";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {IconReceiptOff} from "@tabler/icons-react";
 import {Badge} from "@/components/ui/badge";
+import {useOrderState} from "@/states/order-state";
+import {HorizontalScrollItems} from "@/components/horizontal-scroll-items";
+import {OrderCard} from "@/features/orders/components/order-card";
 
 export const OrderListSheetState = "order_list_sheet_state"
 
+type FilterOption =
+  | "All"
+  | "Active"
+  | "Cancelled"
+  | "Completed";
+
+const filterOptions: FilterOption[] = [
+  "All",
+  "Active",
+  "Cancelled",
+  "Completed",
+];
+
 export function OrderListSheet() {
+  const [filter, setFilter] = useState<FilterOption>("All")
   const [openOrderListSheet, setOrderListSheetOpen] = useState(false);
   const { bool, setBoolState } = useActionState();
-  const orders = [1]
+  const { orders } =  useOrderState();
 
   useEffect(() => {
     if (bool[OrderListSheetState]){
       setOrderListSheetOpen(bool[OrderListSheetState])
     }
   }, [bool]);
+
+  const applyFilter = (filter: FilterOption) => {
+    setFilter(filter);
+
+    // TODO: apply for the data query
+  }
 
   function onOpenChange(newOpen: boolean) {
     setOrderListSheetOpen(newOpen);
@@ -35,46 +57,45 @@ export function OrderListSheet() {
     <Sheet open={openOrderListSheet} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Order List (20)</SheetTitle>
+          <SheetTitle>Order List ({orders?.length ?? 0})</SheetTitle>
           <SheetDescription>
             View all current orders in this session. You can review, update, or manage them from here.
           </SheetDescription>
         </SheetHeader>
 
-        <div className="px-4 space-y-2  overflow-y-auto mb-6">
-          {orders.map((index) => (
-            <div
-              key={index}
-              className={`flex flex-col p-4 rounded-xl w-full border cursor-pointer hover:bg-green-50`}
-            >
-              <div className="flex justify-between items-center w-full">
-                <h5 className="text-lg">Zeros Mardigu</h5>
-                <p className="text-muted-foreground text-sm">#0{index < 9 && "0"}{index}</p>
-              </div>
-              <div className="flex items-center w-full gap-1">
-                <p className="text-muted-foreground text-xs">3 items</p>
-                <IconPointFilled className="w-2 h-2 text-muted-foreground" />
-                <p className="text-muted-foreground text-xs">Table TA1</p>
-              </div>
-              <div className="mt-2">
-                <p className="text-sm">Order:</p>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <p className="text-xs text-muted-foreground truncate whitespace-nowrap overflow-hidden text-ellipsis">
-                      1x Daging Enak Banget - (normal), 1x Daging Enak Banget - (half), 2x Teh Manis Banget - (xl/25)
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      1x Daging Enak Banget - (normal), 1x Daging Enak Banget - (half), 2x Teh Manis Banget - (xl/25)
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-
-              </div>
-              <Badge variant="secondary" className="mt-4">Ready to serve</Badge>
+        <div className="px-4 space-y-2 overflow-y-auto mb-6">
+          {!orders && (
+            <div className="text-center py-12">
+              <IconReceiptOff className="my-4 w-14 h-14 mx-auto"/>
+              <h4 className="text-primary text-md font-bold tracking-tight">
+                No Orders Found
+              </h4>
+              <p className="text-secondary-foreground text-xs font-normal">
+                There are no active orders at the moment.
+              </p>
             </div>
-          ))}
+          )}
+
+          {orders && orders.length > 0 && (
+            <>
+              <HorizontalScrollItems>
+                <div className="flex gap-2 w-max select-none">
+                  {filterOptions.map((fl) => (
+                    <Badge
+                      key={fl}
+                      onClick={() => applyFilter(fl)}
+                      variant={(fl === filter) ? "default" : "outline"}
+                      className="hover:cursor-pointer h-8"
+                    >{fl}</Badge>
+                  ))}
+                </div>
+              </HorizontalScrollItems>
+
+              {orders?.map((order) => (
+                  <OrderCard order={order} className=" w-full" />
+              ))}
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>

@@ -1,43 +1,51 @@
 import {useEffect, useState} from "react";
 import type {DraggableTableItem} from "@/components/table";
 import {FloorManagement} from "@/features/orders/components/floor-mgmt";
+import {useOrderState} from "@/states/order-state";
+import {useFloorDetail} from "@/hooks/use-seating";
+import {AppLoading} from "@/components/app-loading";
+import type {Table} from "@/types/seating";
 
 export function FloorPage() {
-  const [tables, setTables] = useState<DraggableTableItem[]>([])
+  const {defaultFloorId} =  useOrderState();
+  const [draggableTable, setDraggableTable] = useState<DraggableTableItem[]>([])
+  const {data: floor, isFetching, isSuccess} = useFloorDetail(defaultFloorId);
 
-  // Load saved floor plan on component mount
   useEffect(() => {
-    const saved = localStorage.getItem("restaurantFloorPlan")
-    if (saved) {
-      try {
-        const data = JSON.parse(saved)
-        setTables(data.tables || [])
-      } catch (error) {
-        console.error("Failed to load saved floor plan:", error)
-        // Set default layout if loading fails
-        setDefaultLayout()
-      }
-    } else {
-      // Set default layout if no saved data
-      setDefaultLayout()
-    }
-  }, [])
+    if (floor?.data) setDefaultLayout(floor?.data?.tables || []);
+  }, [floor?.data])
 
-  const setDefaultLayout = () => {
-    const defaultTables: DraggableTableItem[] = [
-      {id: 1, floor_id: 1, name: "TA1", xPos: 0, yPos: 0, config: { shape: "rectangle", width: 100, height: 60, chairs: 6}, status: "occupied", customers: 6},
-      {id: 2, floor_id: 1, name: "TA2", xPos: 400, yPos: 0, config: { shape: "rectangle", width: 140, height: 60, chairs: 8}, status: "occupied", customers: 6},
-      {id: 3, floor_id: 1, name: "TB1", xPos: 0, yPos: 700, config: { shape: "circle", diameter: 60, chairs: 2}, status: "reserved", customers: 2},
-      {id: 4, floor_id: 1, name: "TB2", xPos: 0, yPos: 300, config: { shape: "circle", diameter: 60, chairs: 4}, status: "reserved", customers: 4},
-      {id: 5, floor_id: 1, name: "TC1", xPos: 400, yPos: 300, config: { shape: "rectangle", width: 60, height: 60, chairs: 4}, status: "needs-cleaning", customers: 3},
-      {id: 6, floor_id: 1, name: "TC2", xPos: 400, yPos: 650, config: { shape: "rectangle", width: 60, height: 60, chairs: 4}, status: "available", customers: 0}
-    ]
-    setTables(defaultTables)
+  const setDefaultLayout = (tables: Table[]) => {
+    const defaultTables: DraggableTableItem[] = tables.map((table) => ({
+      id: table.id,
+      floor_id: table.floor_id,
+      name: table.name,
+      xPos: table.x_pos,
+      yPos: table.y_pos,
+      config: table.type === "circle"
+        ? {
+          shape: "circle",
+          diameter: table.d_size,
+          chairs: table.capacity
+        }
+        : {
+          shape: "rectangle",
+          width: table.w_size,
+          height: table.h_size,
+          chairs: table.capacity
+        },
+      customers: table.capacity,
+      status: "available",
+    })) ?? []
+
+    setDraggableTable(defaultTables)
   }
+
+  if (isFetching && !isSuccess) return <AppLoading />;
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-2 p-2">
-      <FloorManagement tables={tables}  />
+      <FloorManagement tables={draggableTable}  />
     </div>
   )
 }

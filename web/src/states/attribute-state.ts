@@ -1,5 +1,5 @@
 import type {Unit} from "@/types/unit";
-import type {Category} from "@/types/category";
+import type {Category, Subcategory} from "@/types/category";
 import {create} from "zustand";
 
 interface States {
@@ -7,6 +7,7 @@ interface States {
   selectedUnit: Unit | null;
   categories: Category[] | null;
   selectedCategory: Category | null;
+  subcategories: Subcategory[] | null;
 }
 
 interface Actions {
@@ -14,6 +15,7 @@ interface Actions {
   setSelectedUnit(selectedUnit: Unit | null): void;
   setCategories(categories: Category[]): void;
   setSelectedCategory(selectedCategory: Category | null): void;
+  setSubcategories(subcategories: Subcategory[]): void;
 }
 
 export const useAttributeState = create<States & Actions>((set) => {
@@ -22,6 +24,7 @@ export const useAttributeState = create<States & Actions>((set) => {
     selectedUnit: null,
     categories: null,
     selectedCategory: null,
+    subcategories: null,
     setUnits: (units: Unit[]) => set({units}),
     setSelectedUnit: (selectedUnit: Unit | null) => set({selectedUnit}),
     setCategories: (categories: Category[])  => set((state) => {
@@ -33,8 +36,12 @@ export const useAttributeState = create<States & Actions>((set) => {
         selectedCategory = found ?? null;
       }
 
-      return {categories, selectedCategory}
+      // set the subcategory
+      const subcategories = categories.flatMap((c) => c.subcategories || []);
+
+      return {categories, selectedCategory, subcategories}
     }),
     setSelectedCategory: (selectedCategory: Category | null) => set({selectedCategory}),
+    setSubcategories: (subcategories: Subcategory[] | null) => set({subcategories}),
   }
 })

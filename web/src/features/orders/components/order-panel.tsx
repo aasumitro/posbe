@@ -2,7 +2,7 @@ import {useActionState} from "@/states/action-state";
 import {OrderListSheetState} from "@/features/orders/components/order-list-sheet";
 
 export function OrderPanel() {
-  const { setBoolState } =useActionState();
+  const { setBoolState } = useActionState();
 
   return (
     <div className="fixed top-0 bottom-0 right-2 lg:flex items-center z-50">

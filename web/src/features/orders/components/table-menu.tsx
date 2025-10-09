@@ -12,16 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import {BorderBeam} from "@/components/border-beam";
-import type { TableStatus } from "@/components/table";
+import type {DraggableTableItem, TableStatus} from "@/components/table";
 import { getLabelBgColorByStatus } from "@/lib/table";
 
-export function TableMenu({
-  name, status, shape
-}: {
-  name:string,
-  status: string,
-  shape: string
-}) {
+export function TableMenu(
+  {table}: { table: DraggableTableItem }
+) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -35,7 +31,7 @@ export function TableMenu({
           {/* Outer border beam */}
           <div className={cn(
             "absolute -inset-1 z-0",
-            shape === "circle" ? "rounded-full": "rounded-lg "
+            table.config.shape === "circle" ? "rounded-full": "rounded-lg "
           )}>
             <BorderBeam
               duration={5}
@@ -53,23 +49,24 @@ export function TableMenu({
             className={cn(
               "relative z-10 text-xs font-bold", // 👈 ensures it's above the beam
               "flex items-center justify-center text-center p-2 w-11 h-11",
-              status === "available" && "text-white",
-              shape === "circle" ? "rounded-full": "rounded-lg "
+              table.status === "available" && "text-white",
+              table.config.shape === "circle" ? "rounded-full": "rounded-lg",
+              table.config.shape === "rectangle" && table.config.chairs <= 2 && "-rotate-90"
             )}
-            style={{ background: getLabelBgColorByStatus(status as TableStatus) }}
+            style={{ background: getLabelBgColorByStatus(table.status as TableStatus) }}
           >
-            {name}
+            {table.name}
           </div>
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="start">
         <DropdownMenuGroup>
-          {status === "available" && (
+          {table.status === "available" && (
             <DropdownMenuItem>
               Place an order
             </DropdownMenuItem>
           )}
-          {status !== "available" && status !== "needs-cleaning" && (
+          {table.status !== "available" && table.status !== "needs-cleaning" && (
             <>
               <DropdownMenuItem>
                 Update order
@@ -79,7 +76,7 @@ export function TableMenu({
               </DropdownMenuItem>
             </>
           )}
-          {status !== "needs-cleaning" && (
+          {table.status !== "needs-cleaning" && (
             <DropdownMenuSeparator />
           )}
           <DropdownMenuSub>
@@ -88,7 +85,7 @@ export function TableMenu({
               <DropdownMenuSubContent>
                 <DropdownMenuItem>Occupied</DropdownMenuItem>
                 <DropdownMenuItem>Reserved</DropdownMenuItem>
-                {status !== "needs-cleaning" && (
+                {table.status !== "needs-cleaning" && (
                   <DropdownMenuItem>Need Cleaning</DropdownMenuItem>
                 )}
                 <DropdownMenuItem>Available</DropdownMenuItem>

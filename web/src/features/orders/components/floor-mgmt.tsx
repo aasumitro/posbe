@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { type DraggableTableItem } from "@/components/table"
 import { ZoomableContainer } from "@/components/zoomable-container";
 import { Table } from "@/components/table";
@@ -8,7 +7,8 @@ import TableStatusPanel from "@/features/orders/components/status-panel";
 import {FloorPanel} from "@/features/orders/components/floor-panel";
 import {TableMenu} from "@/features/orders/components/table-menu";
 import {OrderPanel} from "@/features/orders/components/order-panel";
-import {OrderListSheet} from "@/features/orders/components/order-list-sheet";
+import {getTableScale} from "@/lib/table";
+import {cn} from "@/lib/utils";
 
 interface FloorManagementProps {
   tables: DraggableTableItem[]
@@ -17,8 +17,6 @@ interface FloorManagementProps {
 export function FloorManagement({
   tables,
 }: FloorManagementProps) {
-  const [scale] = useState(1)
-
   return (
     <div
       className="relative h-full w-full overflow-hidden"
@@ -28,24 +26,28 @@ export function FloorManagement({
         <ZoomableContainer>
           {tables.map((table, index) => {
             return (
-              <div key={index} style={{
-                position: "absolute",
-                left: table.xPos * scale,
-                top: table.yPos * scale,
-              }}>
+              <div
+                key={index}
+                className={cn(
+                  "flex items-center justify-center",
+                  table.config.shape === "rectangle" &&
+                  table.config.chairs <= 2 && "rotate-90"
+                )}
+                style={{
+                  position: "absolute",
+                  left: table.xPos,
+                  top: table.yPos,
+                  transform: getTableScale(table.config.shape, table.config.chairs),
+                  transformOrigin: "center",
+                }}
+              >
                 <Table
                   id={table.id}
                   name={table.name}
                   status={table.status}
                   customers={table.customers}
                   config={table.config}
-                  menu={
-                    <TableMenu
-                      name={table.name}
-                      status={table.status}
-                      shape={table.config.shape}
-                    />
-                  }
+                  menu={<TableMenu table={table} />}
                 />
               </div>
             )
@@ -55,7 +57,6 @@ export function FloorManagement({
 
       <FloorPanel />
       <OrderPanel />
-      <OrderListSheet />
       <TableStatusPanel />
     </div>
   )

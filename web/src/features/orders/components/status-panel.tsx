@@ -12,8 +12,9 @@ export default function TableStatusPanel() {
   return (
     <div
       className={cn(
-        "absolute bottom-2 right-2 select-none",
-        "p-4 rounded-lg text-black bg-gray-100 w-52",
+        "absolute bottom-2 right-2 select-none shadow-md w-52 p-4 cursor-pointer",
+        "rounded-lg border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground",
+        open && "bg-accent",
       )}
     >
       {/* Header with toggle */}
