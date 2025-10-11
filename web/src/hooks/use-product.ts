@@ -90,7 +90,7 @@ export function useProductList(filter?: Record<string, unknown>) {
     }
   };
 
-  return useSuspenseQuery({ queryKey: ['products'], queryFn: products })
+  return useSuspenseQuery({ queryKey: ['products', filter], queryFn: products })
 }
 
 export function useProductDetail(id?: number) {
