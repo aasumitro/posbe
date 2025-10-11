@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
-import {CreditCard, Banknote, Edit2, Soup, Coffee} from "lucide-react"
-import {IconWallet} from "@tabler/icons-react";
+import {/*CreditCard, Banknote,*/ Edit2, Soup, Coffee} from "lucide-react"
+// import {IconWallet} from "@tabler/icons-react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {cn} from "@/lib/utils";
 import {Separator} from "@/components/ui/separator";
@@ -185,21 +185,21 @@ export function Cart() {
           </div>
         </div>
 
-        {/* TODO: hide this if items for dine in or ask to display pay now or others */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          <Button variant="outline" className="flex flex-col items-center py-2 h-16  gap-0 cursor-pointer hover:bg-green-50 hover:text-green-600">
-            <Banknote className="h-4 w-4 mb-1" />
-            <span className="text-xs font-light">Cash</span>
-          </Button>
-          <Button variant="outline" className="flex flex-col items-center py-2 h-16 gap-0 cursor-pointer hover:bg-green-50 hover:text-green-600">
-            <CreditCard className="h-4 w-4 mb-1" />
-            <span className="text-xs font-light">Card</span>
-          </Button>
-          <Button variant="outline" className="flex flex-col items-center py-2 h-16 gap-0 cursor-pointer hover:bg-green-50 hover:text-green-600">
-            <IconWallet className="h-4 w-4 mb-1" />
-            <span className="text-xs font-light">E-Wallet</span>
-          </Button>
-        </div>
+        {/*/!* TODO: hide this if items for dine in or ask to display pay now or others *!/*/}
+        {/*<div className="grid grid-cols-3 gap-2 mb-4">*/}
+        {/*  <Button variant="outline" className="flex flex-col items-center py-2 h-16  gap-0 cursor-pointer hover:bg-green-50 hover:text-green-600">*/}
+        {/*    <Banknote className="h-4 w-4 mb-1" />*/}
+        {/*    <span className="text-xs font-light">Cash</span>*/}
+        {/*  </Button>*/}
+        {/*  <Button variant="outline" className="flex flex-col items-center py-2 h-16 gap-0 cursor-pointer hover:bg-green-50 hover:text-green-600">*/}
+        {/*    <CreditCard className="h-4 w-4 mb-1" />*/}
+        {/*    <span className="text-xs font-light">Card</span>*/}
+        {/*  </Button>*/}
+        {/*  <Button variant="outline" className="flex flex-col items-center py-2 h-16 gap-0 cursor-pointer hover:bg-green-50 hover:text-green-600">*/}
+        {/*    <IconWallet className="h-4 w-4 mb-1" />*/}
+        {/*    <span className="text-xs font-light">E-Wallet</span>*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
 
         <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-12 cursor-pointer">
           Make Order

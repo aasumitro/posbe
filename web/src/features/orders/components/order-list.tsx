@@ -11,7 +11,7 @@ export function OrderList() {
   return (
     <div className="flex gap-3 overflow-x-auto pb-4 px-5 ml-[-12px] mr-[-12px]">
       {orders?.map((order) => (
-        <OrderCard order={order} className="w-[300px]" />)
+        <OrderCard key={order.id} order={order} className="w-[300px]" />)
       )}
 
       <Button

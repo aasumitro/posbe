@@ -35,6 +35,7 @@ export function CategoryFilter(
 
       {categories?.map((category) => (
         <div
+          key={category.id}
           onClick={() => category.usage && category.usage > 0 && setSelectedCategoryId(category.id)}
           className={cn(
             "flex flex-col items-center justify-center p-3 rounded-xl min-w-[100px] border transition-colors",
