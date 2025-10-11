@@ -4,7 +4,7 @@ type EventSourceConstructor = { new (url: string, eventSourceInitDict?: EventSou
 
 export type EventSourceStatus = "init" | "open" | "closed" | "error";
 
-export type EventSourceEvent = Event & { data: string };
+export type EventSourceData = Event & { data: string };
 
 export function useEventSource(url: string, withCredentials?: boolean, ESClass: EventSourceConstructor = EventSource) {
   const source = useRef<EventSource | null>(null);
@@ -35,7 +35,7 @@ export function useEventSource(url: string, withCredentials?: boolean, ESClass: 
 export function useEventSourceListener(
   source: EventSource | null,
   types: string[],
-  listener: (e: EventSourceEvent) => void,
+  listener: (e: EventSourceData) => void,
   dependencies: any[] = [],
 ) {
   useEffect(() => {

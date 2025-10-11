@@ -12,7 +12,19 @@ type productHandler struct {
 }
 
 func (handler productHandler) fetch(ctx *gin.Context) {
-	data, err := handler.service.ProductList(ctx)
+	var q ProductQuery
+	
+	if err := ctx.ShouldBindQuery(&q); err != nil {
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := q.Validate(ctx); err != nil {
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	data, err := handler.service.ProductList(ctx, &q)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return

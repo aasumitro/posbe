@@ -5,7 +5,7 @@ import {useOrderState} from "@/states/order-state";
 import {useFloorDetail} from "@/hooks/use-seating";
 import {AppLoading} from "@/components/app-loading";
 import type {Table} from "@/types/seating";
-import {useEventSource, useEventSourceListener} from "@/hooks/use-sse";
+import {type EventSourceData, useEventSource, useEventSourceListener} from "@/hooks/use-sse";
 import {API_URL} from "@/lib/api";
 
 export function FloorPage() {
@@ -35,7 +35,9 @@ export function FloorPage() {
   }, []);
 
   const [eventSource] = useEventSource(`${API_URL}/orders/events`, true);
-  useEventSourceListener(eventSource, ["update"], (evt) => {
+  useEventSourceListener(eventSource, ["update"], (evt) =>
+      handleEventSourceChange(evt), [handleEventSourceChange]);
+  function handleEventSourceChange(evt: EventSourceData) {
     try {
       const data = JSON.parse(evt.data);
       if (data.type === "table") {
@@ -67,8 +69,10 @@ export function FloorPage() {
       if (data.type === "reload") {
         window.location.reload();
       }
-    } catch (error) {}
-  }, []);
+    } catch (error) {
+      console.log("unexpected json format", error)
+    }
+  }
 
   if (isFetching && !isSuccess) return <AppLoading />;
 

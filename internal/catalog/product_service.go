@@ -50,8 +50,8 @@ func (service productService) DeleteAddon(ctx context.Context, id int64) *utils.
 	return nil
 }
 
-func (service productService) ProductList(ctx context.Context) ([]*model.Product, *utils.ServiceError) {
-	data, err := service.repository.GetAllProduct(ctx)
+func (service productService) ProductList(ctx context.Context, query *ProductQuery) ([]*model.Product, *utils.ServiceError) {
+	data, err := service.repository.GetAllProduct(ctx, query)
 	return utils.HandleMultipleResults[model.Product]("products", data, err)
 }
 

@@ -39,7 +39,7 @@ type IProductRepository interface {
 	UpdateAddon(ctx context.Context, form *AddonForm) error
 	DeleteAddon(ctx context.Context, id int64) error
 
-	GetAllProduct(ctx context.Context) ([]*model.Product, error)
+	GetAllProduct(ctx context.Context, query *ProductQuery) ([]*model.Product, error)
 	GetProductDetail(ctx context.Context, id int64) (*model.Product, error)
 	CreateProduct(ctx context.Context, form *NewProductForm) error
 	UpdateProduct(ctx context.Context, form *ProductUpdateForm) error
@@ -53,7 +53,7 @@ type IProductService interface {
 	UpdateAddon(ctx context.Context, form *AddonForm) *utils.ServiceError
 	DeleteAddon(ctx context.Context, id int64) *utils.ServiceError
 
-	ProductList(ctx context.Context) ([]*model.Product, *utils.ServiceError)
+	ProductList(ctx context.Context, query *ProductQuery) ([]*model.Product, *utils.ServiceError)
 	ProductDetail(ctx context.Context, id int64) (*model.Product, *utils.ServiceError)
 	CreateProduct(ctx context.Context, form *NewProductForm) *utils.ServiceError
 	UpdateProduct(ctx context.Context, form *ProductUpdateForm) *utils.ServiceError

@@ -12,6 +12,7 @@ import {useAttributeState} from "@/states/attribute-state";
 import {useFloorList} from "@/hooks/use-seating";
 import {useSeatingState} from "@/states/seating-state";
 import {OrderListSheet} from "@/features/orders/components/order-list-sheet";
+import {useProductList} from "@/hooks/use-product";
 
 export const Route = createFileRoute('/_authenticated/orders')({
   component: OrderLayout,
@@ -27,12 +28,12 @@ function OrderLayout() {
   // 2. load shift check if theres active shift or not ✅
   // 3. load floors & its own table also subscribe (real time) to table status ✅
   // 4. load active orders
-  // 5. load products
+  // 5. load products ✅
   // 6. load customers (api wip)
 
   // --- Validate active shift ---
   const { data: activeShift, isFetching, isSuccess } = useActiveShift();
-  const {setActiveShift, defaultFloorId, setDefaultFloor} =  useOrderState();
+  const {setActiveShift, defaultFloorId, setDefaultFloor, setProducts} =  useOrderState();
   useEffect(() => {
     if (!isFetching && isSuccess) {
       if (activeShift?.data) setActiveShift(activeShift.data);
@@ -78,6 +79,15 @@ function OrderLayout() {
       }
     }
   }, [memoizedFloors, defaultFloorId]);
+
+  // --- Products ---
+  const {data: products} = useProductList({ status: 'active' });
+  const memoizedProducts = useMemo(() =>
+    products?.data ?? [], [products?.data]);
+  useEffect(() => {
+    if (!memoizedProducts.length) return;
+    setProducts(memoizedProducts);
+  }, [memoizedProducts]);
 
   return (
     <Fragment>

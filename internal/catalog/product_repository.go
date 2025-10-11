@@ -94,7 +94,7 @@ func (repository productRepository) DeleteAddon(ctx context.Context, id int64) e
 	return err
 }
 
-func (repository productRepository) GetAllProduct(ctx context.Context) ([]*model.Product, error) {
+func (repository productRepository) GetAllProduct(ctx context.Context, query *ProductQuery) ([]*model.Product, error) {
 	q := `
 		SELECT 
 		  p.id, p.category_id, p.subcategory_id, p.sku, 
@@ -140,10 +140,33 @@ func (repository productRepository) GetAllProduct(ctx context.Context) ([]*model
 		LEFT JOIN subcategories sc ON p.subcategory_id = sc.id
 		LEFT JOIN product_variants pv ON p.id = pv.product_id
 		LEFT JOIN units u ON pv.unit_id = u.id
-		GROUP BY p.id, c.id, sc.id
-		ORDER BY p.id;
 	`
-	rows, err := repository.db.Query(ctx, q)
+
+	// --- Dynamic WHERE builder ---
+	var conditions []string
+	var args []interface{}
+	argPos := 1
+
+	if query.Status != "" {
+		conditions = append(conditions, fmt.Sprintf("p.status = $%d", argPos))
+		args = append(args, query.Status)
+		argPos++
+	}
+
+	if len(conditions) > 0 {
+		q += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	// TODO: add limit and offest!
+	// if query.Limit > 0 {
+	//	// Ensure Limit and Offset are parameterized just like Status
+	//	q += fmt.Sprintf(" LIMIT $%d OFFSET $%d", argPos, argPos+1)
+	//	args = append(args, query.Limit, query.Offset)
+	// }
+
+	q += " GROUP BY p.id, c.id, sc.id ORDER BY p.id"
+
+	rows, err := repository.db.Query(ctx, q, args...)
 	if err != nil {
 		return nil, err
 	}

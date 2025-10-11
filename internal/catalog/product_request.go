@@ -152,3 +152,15 @@ func NewVariantRules() galidator.Validator {
 	}
 	return g.ComplexValidator(rules)
 }
+
+type ProductQuery struct {
+	Status string `form:"status"`
+}
+
+func (q *ProductQuery) Validate(ctx *gin.Context) interface{} {
+	g := galidator.New()
+	return g.ComplexValidator(galidator.Rules{
+		"Status": g.R("status").Optional().
+			Choices("draft", "active", "inactive"),
+	}).Validate(ctx, q)
+}
