@@ -1,10 +1,13 @@
 package store
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 type seatingHandler struct {
@@ -211,6 +214,13 @@ func (handler seatingHandler) destroyTable(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
+func (handler seatingHandler) events() {
+	ctx := context.Background()
+	utils.SubscribeEvent(ctx, model.TableUpdateEventKey, func(message *redis.Message) {
+		handler.service.ProceedEvent(ctx, message.Payload)
+	})
+}
+
 func NewSeatingHandler(service IStoreSeatingService, router *gin.RouterGroup) {
 	handler := seatingHandler{service: service}
 	authz := router.Group(utils.EmptyPath)
@@ -229,4 +239,5 @@ func NewSeatingHandler(service IStoreSeatingService, router *gin.RouterGroup) {
 		authz.PATCH("/tables/:id", handler.editTable)
 		authz.DELETE("/tables/:id", handler.destroyTable)
 	}
+	go handler.events()
 }

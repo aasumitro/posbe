@@ -31,6 +31,7 @@ type SeatingTableRequest struct {
 	DSize     *float64 `form:"d_size" json:"d_size"`
 	Capacity  int64    `form:"capacity" json:"capacity"`
 	Type      string   `form:"type" json:"type"`
+	Status    string   `form:"status" json:"status"`
 }
 
 func (f *SeatingTableRequest) Validate(ctx *gin.Context) interface{} {
@@ -66,5 +67,7 @@ func (f *SeatingTableRequest) Validate(ctx *gin.Context) interface{} {
 			"DSize":    g.R("d_size").Optional(),
 		}
 	}
+	r["Status"] = g.R("status").Optional().Choices("available",
+		"occupied", "reserved", "disabled", "ordering", "billed")
 	return g.ComplexValidator(r).Validate(ctx, f)
 }

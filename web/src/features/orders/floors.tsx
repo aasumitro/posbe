@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from "react";
-import type {DraggableTableItem} from "@/components/table";
+import type {DraggableTableItem, TableStatus} from "@/components/table";
 import {FloorManagement} from "@/features/orders/components/floor-mgmt";
 import {useOrderState} from "@/states/order-state";
 import {useFloorDetail} from "@/hooks/use-seating";
@@ -28,7 +28,7 @@ export function FloorPage() {
         ? {shape: "circle", diameter: table.d_size, chairs: table.capacity}
         : {shape: "rectangle", width: table.w_size, height: table.h_size, chairs: table.capacity},
       customers: 0,
-      status: "available",
+      status: (table.status as TableStatus) || "available",
     })) ?? []
 
     setTables(defaultTables)

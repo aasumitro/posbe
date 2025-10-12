@@ -60,4 +60,6 @@ type IStoreSeatingService interface {
 	CreateTable(ctx context.Context, form *SeatingTableRequest) *utils.ServiceError
 	UpdateTable(ctx context.Context, form *SeatingTableRequest) *utils.ServiceError
 	DeleteTable(ctx context.Context, tableID int64) *utils.ServiceError
+
+	ProceedEvent(ctx context.Context, data string)
 }

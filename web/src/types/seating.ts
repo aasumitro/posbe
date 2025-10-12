@@ -16,4 +16,5 @@ export interface Table {
   d_size: number,
   capacity: number,
   type: string,
+  status: string,
 }
