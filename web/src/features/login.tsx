@@ -18,6 +18,7 @@ import type {User} from "@/types/user";
 import {isHTTPResponse} from "@/lib/api";
 import {toast} from "sonner";
 import {useAuthStore} from "@/states/auth-state";
+import {getSafeRedirect} from "@/lib/route";
 
 const loginSchema = z.object({
   username:  z.string().min(5).max(10),
@@ -43,9 +44,8 @@ export function LoginPage() {
         auth.setAccessToken(response.data?.token?.access_token as string);
         auth.setUserId(response.data?.user?.id as number)
         auth.setUser(response.data?.user as User)
-
-        const searchParams = new URLSearchParams(location.search);
-        const redirectTo = searchParams.get("redirect") ?? "/";
+        // redirect to next page
+        const redirectTo = getSafeRedirect(location.search);
         toast.success( `redirecting to ${redirectTo === "/" ? "home" : redirectTo} . . .`);
         window.location.href = redirectTo;
       },
