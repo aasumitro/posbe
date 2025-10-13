@@ -6,12 +6,14 @@ import {useFloorDetail} from "@/hooks/use-seating";
 import {AppLoading} from "@/components/app-loading";
 import type {Table} from "@/types/seating";
 import {type EventSourceData, useEventSource, useEventSourceListener} from "@/hooks/use-sse";
-import {API_URL} from "@/lib/api";
+import {API_PATH, API_URL} from "@/lib/api";
+import {useQueryClient} from "@tanstack/react-query";
 
 export function FloorPage() {
   const {defaultFloorId} =  useOrderState();
   const [tables, setTables] = useState<DraggableTableItem[]>([])
   const {data: floor, isFetching, isSuccess} = useFloorDetail(defaultFloorId);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (floor?.data) setDefaultLayout(floor?.data?.tables || []);
@@ -34,10 +36,10 @@ export function FloorPage() {
     setTables(defaultTables)
   }, []);
 
-  const [eventSource] = useEventSource(`${API_URL}/orders/events`, true);
+  const [eventSource] = useEventSource(`${API_URL}${API_PATH.ORDERS.BASE}/events`, true);
   useEventSourceListener(eventSource, ["update"], (evt) =>
       handleEventSourceChange(evt), [handleEventSourceChange]);
-  function handleEventSourceChange(evt: EventSourceData) {
+  async function handleEventSourceChange(evt: EventSourceData) {
     try {
       const data = JSON.parse(evt.data);
       if (data.type === "table") {
@@ -68,6 +70,10 @@ export function FloorPage() {
 
       if (data.type === "reload") {
         window.location.reload();
+      }
+
+      if (data.type === "sync") {
+        await queryClient.invalidateQueries();
       }
     } catch (error) {
       console.log("unexpected json format", error)

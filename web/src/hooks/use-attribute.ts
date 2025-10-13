@@ -70,10 +70,19 @@ export function useDeleteUnit() {
   return useMutation({ mutationFn: deleteUnit })
 }
 
-export function useCategoryList() {
+export function useCategoryList(categoryQueryFilter?: Record<string, unknown>) {
   const categories = async (): Promise<HTTPResponse<Category[]>> => {
     try {
-      const url = API_PATH.CATALOG.ATTRIBUTES.CATEGORIES
+      let url = API_PATH.CATALOG.ATTRIBUTES.CATEGORIES
+      if (categoryQueryFilter && Object.keys(categoryQueryFilter).length > 0) {
+        const params = new URLSearchParams()
+        for (const [key, value] of Object.entries(categoryQueryFilter)) {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, String(value))
+          }
+        }
+        url += `?${params.toString()}`
+      }
       const response =
         await api.get<HTTPResponse<Category[]>>(url);
       return response.data;
@@ -82,7 +91,10 @@ export function useCategoryList() {
     }
   };
 
-  return useSuspenseQuery({ queryKey: ['categories'], queryFn: categories })
+  return useSuspenseQuery({
+    queryKey: ['categories', categoryQueryFilter],
+    queryFn: categories
+  })
 }
 
 export function useNewCategory() {

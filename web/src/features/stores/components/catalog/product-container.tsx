@@ -3,7 +3,7 @@ import {Badge} from "@/components/ui/badge";
 import {Separator} from "@/components/ui/separator";
 import {
   DropdownMenu,
-  DropdownMenuContent,
+  DropdownMenuContent, DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuPortal,
   DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger,
@@ -209,42 +209,56 @@ export function  ProductContainer({status, sort, category}: ProductContainerProp
             <IconDotsVertical />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-48" align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator/>
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={async (e) => {
-              e.preventDefault();
-              await navigate({to: `/stores/products/${product.id}`})
-            }}
-          >Edit</DropdownMenuItem>
-          <DropdownMenuSeparator/>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                {product.status === "active" && (
-                  <>
+        <DropdownMenuContent className="w-48" align="start">
+          <DropdownMenuLabel>Manage Product</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={async (e) => {
+                e.preventDefault();
+                await navigate({to: `/stores/products/${product.id}`})
+              }}
+            >Edit Details</DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  {product.status === "active" && (
+                    <>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.preventDefault();
+                        setProductStatus("draft", product)
+                      }}>Set as Draft</DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => {
+                        e.preventDefault();
+                        setProductStatus("inactive", product)
+                      }}>Set as Inactive</DropdownMenuItem>
+                    </>
+                  )}
+                  {["draft", "inactive"].includes(product.status) && (
                     <DropdownMenuItem onClick={(e) => {
                       e.preventDefault();
-                      setProductStatus("draft", product)
-                    }}>Set as Draft</DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => {
-                      e.preventDefault();
-                      setProductStatus("inactive", product)
-                    }}>Set as Inactive</DropdownMenuItem>
-                  </>
-                )}
-                {["draft", "inactive"].includes(product.status) && (
-                  <DropdownMenuItem onClick={(e) => {
-                    e.preventDefault();
-                    setProductStatus("publish", product)
-                  }}>Set as Active</DropdownMenuItem>
-                )}
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
+                      setProductStatus("publish", product)
+                    }}>Set as Active</DropdownMenuItem>
+                  )}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator/>
+          <DropdownMenuLabel>Sales Insights</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              disabled
+            >Key Metrics</DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              disabled
+            >Performance Charts</DropdownMenuItem>
+          </DropdownMenuGroup>
+
           <DropdownMenuSeparator/>
           <DropdownMenuItem
             className="cursor-pointer"

@@ -30,15 +30,21 @@ export function SubcategoryFilter(
   return (
     <div className="flex gap-3 overflow-x-auto pb-4 px-5 ml-[-20px] mr-[-12px]">
       <div
-        onClick={() => setSelectedSubcategoryId(0)}
+        onClick={() => totalAllProduct > 0 && setSelectedSubcategoryId(0)}
         className={cn(
-          "flex flex-col items-center justify-center min-w-[100px] cursor-pointer",
-          " p-3 rounded-xl border hover:bg-green-50 transition-colors",
+          "flex flex-col items-center justify-center min-w-[100px] p-3 rounded-xl border transition-colors",
           {
-            "bg-green-50 text-green-600": selectedSubcategoryId === 0,
-            "bg-white": selectedSubcategoryId !== 0,
+            // ✅ Disabled state
+            "bg-gray-50 text-gray-400 cursor-not-allowed opacity-50 pointer-events-none":
+              totalAllProduct === 0,
+            // ✅ Active or normal state
+            "bg-green-50 text-green-600":
+              totalAllProduct > 0 && selectedSubcategoryId === 0,
+            "bg-white hover:bg-green-50 cursor-pointer":
+              totalAllProduct > 0 && selectedSubcategoryId !== 0,
           }
         )}
+        aria-disabled={totalAllProduct === 0}
       >
         <Grid className="h-6 w-6 mb-1" />
         <span className="text-sm font-medium">All</span>

@@ -11,6 +11,7 @@ export function MenuSidebarSection({...props}: React.ComponentProps<typeof Sideb
       variant="inset"
       {...props}
     >
+      {/* TODO: display the card and sidebar only when cart data is available */}
       <Cart />
     </Sidebar>
   )

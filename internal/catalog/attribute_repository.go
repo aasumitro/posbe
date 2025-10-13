@@ -93,12 +93,24 @@ func (repository attributeRepository) DeleteUnit(ctx context.Context, id int64) 
 	return err
 }
 
-func (repository attributeRepository) GetAllCategory(ctx context.Context) ([]*model.Category, error) {
-	q := `
+func (repository attributeRepository) GetAllCategory(ctx context.Context, query *AttributeCategoryQuery) ([]*model.Category, error) {
+	var statusFilter string
+	var args []any
+
+	if query.ProductStatus != "" {
+		statusFilter = "AND p.status = $1"
+		args = append(args, query.ProductStatus)
+	}
+
+	q := fmt.Sprintf(`
 		SELECT 
 		  c.id, 
 		  c.name,
-		  (SELECT COUNT(*) FROM products AS p WHERE p.category_id = c.id) AS usage,
+		  (
+		    SELECT COUNT(*) 
+		    FROM products AS p 
+		    WHERE p.category_id = c.id %s
+		  ) AS usage,
 		  COALESCE(
 		    json_agg(
 		      json_build_object(
@@ -106,9 +118,13 @@ func (repository attributeRepository) GetAllCategory(ctx context.Context) ([]*mo
 		        'category_id', sc.category_id,
 		        'name', sc.name,
 		        'usage', COALESCE(
-				  (SELECT COUNT(*) FROM products AS p WHERE p.subcategory_id = sc.id),
-				  0
-				)
+		          (
+		            SELECT COUNT(*) 
+		            FROM products AS p 
+		            WHERE p.subcategory_id = sc.id %s
+		          ),
+		          0
+		        )
 		      )
 		    ) FILTER (WHERE sc.id IS NOT NULL), 
 		    '[]'
@@ -117,8 +133,8 @@ func (repository attributeRepository) GetAllCategory(ctx context.Context) ([]*mo
 		LEFT JOIN subcategories sc ON c.id = sc.category_id
 		GROUP BY c.id, c.name
 		ORDER BY c.id;
-	`
-	rows, err := repository.db.Query(ctx, q)
+	`, statusFilter, statusFilter)
+	rows, err := repository.db.Query(ctx, q, args...)
 	if err != nil {
 		return nil, err
 	}

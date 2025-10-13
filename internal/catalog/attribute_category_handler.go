@@ -23,7 +23,19 @@ type attributeCategoryHandler struct {
 // @Failure 500 {object} utils.ErrorRespond "INTERNAL SERVER ERROR RESPOND"
 // @Router /api/v1/categories [GET]
 func (handler attributeCategoryHandler) fetch(ctx *gin.Context) {
-	data, err := handler.service.CategoryList(ctx)
+	var q AttributeCategoryQuery
+
+	if err := ctx.ShouldBindQuery(&q); err != nil {
+		utils.NewHTTPRespond(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := q.Validate(ctx); err != nil {
+		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	data, err := handler.service.CategoryList(ctx, &q)
 	if err != nil {
 		utils.NewHTTPRespond(ctx, err.Code, err.Message)
 		return

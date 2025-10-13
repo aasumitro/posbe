@@ -49,7 +49,7 @@ export function OrderLayout() {
   }, [memoizedShifts]);
 
   // --- Categories Reference ---
-  const {data: categories} = useCategoryList()
+  const {data: categories} = useCategoryList({ product_status: 'active' })
   const {setCategories} =  useAttributeState();
   const memoizedCategories = useMemo(() =>
     categories?.data ?? [], [categories?.data]);

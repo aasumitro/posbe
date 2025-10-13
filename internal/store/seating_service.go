@@ -2,11 +2,9 @@ package store
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/aasumitro/posbe/config"
 	"github.com/aasumitro/posbe/internal/model"
@@ -111,64 +109,25 @@ func (service seatingService) DeleteTable(ctx context.Context, tableID int64) *u
 }
 
 func (service seatingService) ProceedEvent(ctx context.Context, data string) {
-	// TODO: impl me
-	// Expected sample data:
-	//      {"id": 12, "action": "update", "field": "status", "value": "available"}
+	var payload SeatingTableRequest
 
-	var payload map[string]interface{}
-	if err := json.Unmarshal([]byte(data), &payload); err != nil {
-		log.Printf("error unmarshaling payload: %v", err)
+	form, err := payload.Bind(data)
+	if err != nil {
+		log.Println("Failed to bind seating table request", err)
 		return
 	}
 
-	if len(payload) == 0 {
-		log.Printf("payload is empty: %s", data)
+	if err := service.repository.UpdateTable(ctx, form); err != nil {
+		log.Printf("error updating table: %v", err)
 		return
 	}
 
-	action, ok := payload["action"].(string)
-	if !ok || action == "" {
-		log.Printf("invalid or missing action field: %s", data)
-		return
+	if form.Status != "" {
+		cacheKey := fmt.Sprintf("table:status:%d", form.ID)
+		config.RedisCache.Set(ctx, cacheKey, form.Status, -1)
 	}
 
-	if strings.ToLower(action) == "update" {
-		pid, ok := payload["id"].(float64)
-		if !ok || pid == 0 {
-			log.Printf("invalid or missing id field: %s", data)
-			return
-		}
-		id := int64(pid)
-
-		field, ok := payload["field"].(string)
-		if !ok || field == "" {
-			log.Printf("invalid or missing field field: %s", data)
-			return
-		}
-
-		value, ok := payload["value"].(string)
-		if !ok || value == "" {
-			log.Printf("invalid or missing value field: %s", data)
-			return
-		}
-
-		form := &SeatingTableRequest{ID: id}
-		if field == "status" {
-			form.Status = value
-		}
-
-		if err := service.repository.UpdateTable(ctx, form); err != nil {
-			log.Printf("error updating table: %v", err)
-			return
-		}
-
-		if field == "status" {
-			cacheKey := fmt.Sprintf("table:status:%d", id)
-			config.RedisCache.Set(ctx, cacheKey, value, -1)
-		}
-
-		log.Printf("[ProceedEvent] table updated successfully: ID=%d, %s=%s", id, field, value)
-	}
+	log.Printf("[ProceedEvent] table updated successfully: ID=%d", form.ID)
 }
 
 func NewSeatingService(repository IStoreSeatingRepository) IStoreSeatingService {
