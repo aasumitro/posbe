@@ -204,8 +204,22 @@ func DeleteAsset(folder, name string) error {
 		return fmt.Errorf("cannot resolve project root: %w", err)
 	}
 	basePath := filepath.Join(root, "uploads")
+
+	// Prevent absolute paths and directory traversal
+	if strings.Contains(folder, "..") || strings.Contains(name, "..") {
+		return fmt.Errorf("invalid path: path traversal detected")
+	}
+	if filepath.IsAbs(folder) || filepath.IsAbs(name) {
+		return fmt.Errorf("invalid path: absolute paths not allowed")
+	}
+
 	relativePath := filepath.Clean(folder)
 	filePath := filepath.Join(basePath, relativePath, name)
+
+	// Double-check it's still inside the uploads directory
+	if !strings.HasPrefix(filePath, basePath) {
+		return fmt.Errorf("invalid path: outside uploads directory")
+	}
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return fmt.Errorf("file does not exist: %s", filePath)
