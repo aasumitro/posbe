@@ -69,7 +69,9 @@ export function useDeleteProductAddon() {
   return useMutation({ mutationFn: deleteAddon })
 }
 
-export function useProductList(productQueryFilter?: Record<string, unknown>) {
+export function useProductList(
+  productQueryFilter?: Record<string, unknown>
+) {
   const products = async (): Promise<HTTPResponse<Product[]>> => {
     try {
       let url = API_PATH.CATALOG.PRODUCTS.BASE

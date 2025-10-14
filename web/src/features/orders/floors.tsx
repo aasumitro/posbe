@@ -16,7 +16,8 @@ export function FloorPage() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (floor?.data) setDefaultLayout(floor?.data?.tables || []);
+    if (!floor?.data) return;
+    setDefaultLayout(floor?.data?.tables || []);
   }, [floor?.data])
 
   const setDefaultLayout = useCallback((tables: Table[]) => {

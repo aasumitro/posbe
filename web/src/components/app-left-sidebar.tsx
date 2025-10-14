@@ -13,13 +13,15 @@ import {
   IconHome2,
   IconClipboardList,
   IconArmchair,
-  IconBasketCog,
+  IconBasketCog, IconClockRecord,
 } from "@tabler/icons-react";
 import {cn} from "@/lib/utils";
 import {Link, useRouterState} from "@tanstack/react-router";
 import {BorderBeam} from "@/components/border-beam";
 import {UserMenu} from "@/components/user-menu";
 import {useAuthStore} from "@/states/auth-state";
+import {useActionState} from "@/states/action-state";
+import {CloseShiftModalState} from "@/components/shift-action-close-alert-dialog";
 
 const items = [
   {
@@ -33,13 +35,20 @@ const items = [
     url: "/orders/floors",
     icon: IconArmchair,
     access: ['admin', 'cashier', 'waiter'],
+  },
+  {
+    title: "Close shift",
+    url: "#close-shift",
+    icon: IconClockRecord,
+    access: ['admin', 'cashier'],
   }
 ]
 
 export function AppLeftSidebar() {
   const { location } = useRouterState();
   const pathname = location.pathname;
-  const {auth} = useAuthStore();
+  const { auth } = useAuthStore();
+  const { setBoolState } = useActionState();
 
   const MidIco = (
     <span className="relative">
@@ -91,6 +100,10 @@ export function AppLeftSidebar() {
                   if (auth.user?.role?.name &&
                     !item.access.includes(auth.user?.role?.name)) return;
 
+                  // TODO: apply active shift validation
+                  const noActiveShift = true;
+                  if (item.url === "#close-shift" && noActiveShift) return;
+
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
@@ -98,12 +111,28 @@ export function AppLeftSidebar() {
                         isActive={pathname === item.url}
                         asChild
                       >
-                        <Link to={item.url}>
-                          <item.icon className={cn(
-                            pathname === item.url && "text-gray-500"
-                          )}/>
-                          <span>{item.title}</span>
-                        </Link>
+                        {item.url.includes("#") ? (
+                            <button onClick={(e) => {
+                              e.preventDefault();
+                              const actions: Record<string, string> = {
+                                "#close-shift": CloseShiftModalState,
+                                // "#other-stuff": OtherModalState
+                              };
+                              const stateAction = actions[item.url];
+                              if (!stateAction) return;
+                              setBoolState(stateAction, true);
+                            }} className="cursor-pointer">
+                              <item.icon />
+                              <span>{item.title}</span>
+                            </button>
+                          ) : (
+                          <Link to={item.url}>
+                            <item.icon className={cn(
+                              pathname === item.url && "text-gray-500"
+                            )}/>
+                            <span>{item.title}</span>
+                          </Link>
+                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   )

@@ -55,8 +55,6 @@ export const useAuthStore = create<AuthState>()((set) => {
   const userIdCookieState = Cookies.get(USER_ID)
   const initUserId = userIdCookieState ? Number(userIdCookieState) : null
 
-
-
   return {
     auth: {
       firebaseToken: initFirebaseToken,

@@ -29,6 +29,8 @@ export function OrderLayout() {
   // 6. load customers (api wip)
 
   // --- Validate active shift ---
+  // maybe this will be moved to top level and only the validation can be here
+  // because open and close shift also can be accessed from dashboard
   const { data: activeShift, isFetching, isSuccess } = useActiveShift();
   const {setActiveShift, defaultFloorId, setDefaultFloor, setProducts} =  useOrderState();
   useEffect(() => {
@@ -95,6 +97,7 @@ export function OrderLayout() {
       {pathname.startsWith('/orders/') && (
         <>
           <ShiftActionOpenAlertDialog />
+          {/* TODO: move close shift to top level so its can be access from everywhere */}
           <ShiftActionCloseAlertDialog />
           <AddToCartModal />
         </>

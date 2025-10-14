@@ -70,7 +70,9 @@ export function useDeleteUnit() {
   return useMutation({ mutationFn: deleteUnit })
 }
 
-export function useCategoryList(categoryQueryFilter?: Record<string, unknown>) {
+export function useCategoryList(
+  categoryQueryFilter?: Record<string, unknown>
+) {
   const categories = async (): Promise<HTTPResponse<Category[]>> => {
     try {
       let url = API_PATH.CATALOG.ATTRIBUTES.CATEGORIES

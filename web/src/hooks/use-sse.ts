@@ -6,7 +6,11 @@ export type EventSourceStatus = "init" | "open" | "closed" | "error";
 
 export type EventSourceData = Event & { data: string };
 
-export function useEventSource(url: string, withCredentials?: boolean, ESClass: EventSourceConstructor = EventSource) {
+export function useEventSource(
+  url: string,
+  withCredentials?: boolean,
+  ESClass: EventSourceConstructor = EventSource
+) {
   const source = useRef<EventSource | null>(null);
   const [status, setStatus] = useState<EventSourceStatus>("init");
 
