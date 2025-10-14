@@ -40,6 +40,9 @@ type (
 		Status string `json:"status"`
 		// this will be set if there's an active order linked with current table
 		OrderID string `json:"order_id,omitempty"`
+		// flag for active orders
+		HasOrder   bool `json:"has_order,omitempty"`
+		HasHistory bool `json:"has_history,omitempty"`
 	}
 )
 

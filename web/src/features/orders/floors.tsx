@@ -32,6 +32,8 @@ export function FloorPage() {
         : {shape: "rectangle", width: table.w_size, height: table.h_size, chairs: table.capacity},
       customers: 0,
       status: (table.status as TableStatus) || "available",
+      hasOrder: table.has_order,
+      hasHistory: table.has_history,
     })) ?? []
 
     setTables(defaultTables)

@@ -28,6 +28,8 @@ export interface DraggableTableItem {
   config: RectangleTableConfig | CircleTableConfig
   status: TableStatus
   customers?: number
+  hasOrder?: boolean
+  hasHistory?: boolean
 }
 
 export interface ChairPosition {
