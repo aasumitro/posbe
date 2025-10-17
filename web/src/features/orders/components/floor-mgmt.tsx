@@ -9,6 +9,8 @@ import {TableMenu} from "@/features/orders/components/table-menu";
 import {OrderPanel} from "@/features/orders/components/order-panel";
 import {getTableScale} from "@/lib/table";
 import {cn} from "@/lib/utils";
+import {useActionState} from "@/states/action-state";
+import {MenuOrderDrawerState} from "@/features/orders/components/menu-order-drawer";
 
 interface FloorManagementProps {
   tables: DraggableTableItem[]
@@ -17,12 +19,16 @@ interface FloorManagementProps {
 export function FloorManagement({
   tables,
 }: FloorManagementProps) {
+  const { setBoolState } = useActionState();
+
   function handlePlaceOrder(tableId: number) {
     // TODO:
     //  1. Display a modal for creating a new order.
     //  2. Allow employees to select menu items, set quantities, and confirm the order.
     //  3. Save and link the order to the selected table once confirmed.
-   alert(`Place order ${tableId}`)
+    console.log("test", tableId)
+    document.activeElement instanceof HTMLElement && document.activeElement.blur();
+    setBoolState(MenuOrderDrawerState, true);
   }
 
   function handleEditOrder(tableId: number) {
@@ -32,7 +38,7 @@ export function FloorManagement({
     //     - Add new items.
     //     - Modify or remove items that have not yet been processed.
     //  3. Save and update the order once changes are confirmed.
-    alert(`Edit order ${tableId}`)
+    confirm(`Edit order ${tableId}`)
   }
 
   function handlePrintBill(tableId: number) {
@@ -40,7 +46,7 @@ export function FloorManagement({
     //  1. Generate and format the bill or receipt.
     //  2. If compatible printing hardware is available, integrate direct printing in the future.
     //  3. For now, export the bill as a PDF for manual printing.
-    alert(`Print bill ${tableId}`)
+    confirm(`Print bill ${tableId}`)
   }
 
   function handleProcessPayment(tableId: number) {
@@ -49,19 +55,19 @@ export function FloorManagement({
     //  2. In the modal, display the ordered items, bill details, and total amount.
     //  3. Allow the user to select a payment method (e.g., cash, card, e-wallet).
     //  4. Confirm and finalize the payment once approved.
-    alert(`Process payment ${tableId}`)
+    confirm(`Process payment ${tableId}`)
   }
 
   function handlerSetStatus(tableId: number, status: string) {
     // TODO:
     //  direct call api endpoint
-    alert(`set status ${tableId}: ${status}`)
+    confirm(`set status ${tableId}: ${status}`)
   }
 
   function handleViewHistory(tableId: number) {
     // TODO:
     //  open order panel with table id filter
-    alert(`view history ${tableId}`)
+    confirm(`view history ${tableId}`)
   }
 
   return (

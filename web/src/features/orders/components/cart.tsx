@@ -11,14 +11,17 @@ const cartItems = [
   { title: "Daging Enak Banget", price: 99000, quantity: 1 },
 ]
 
-export function Cart() {
+export function Cart({className}: {className?: string}) {
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
   const tax = subtotal * 0.05
   const service = subtotal * 0.10
   const total = subtotal + tax + service
 
   return (
-    <div className="flex flex-col h-full select-none">
+    <div className={cn(
+      "flex flex-col h-full select-none",
+      className
+    )}>
       <div className="p-4 border-b flex justify-between items-center">
         <h2 className="text-xl font-bold">
           Order

@@ -156,33 +156,34 @@ export function MenuList({
   }
 
   return (
-    <div className="grid gap-4 grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 auto-rows-fr">
+    <div className="flex flex-wrap gap-4 justify-start items-stretch">
       {filteredProducts?.map((product, index) => (
-        <div
-          key={index}
-          className={cn(
-            "border-1 rounded-xl p-4 space-y-6 select-none flex flex-col h-full",
-            "hover:bg-green-50/50 cursor-pointer hover:shadow-md"
-          )}
-          onClick={(e) => {
-            e.preventDefault();
-            onProductSelected(product);
-          }}
-        >
-          <div className="flex-grow space-y-6">
-            <div className="flex gap-4">
-              <div className="rounded-lg w-20 h-20 bg-gray-50/50 flex items-center justify-center">
-                {renderActiveProductImage(product)}
-              </div>
+        <div key={index} className="flex-[1_1_400px] sm:flex-[1_1_50%] lg:flex-[1_1_33%] 2xl:flex-[1_1_25%]">
+          <div
+            className={cn(
+              "border-1 rounded-xl p-4 space-y-6 select-none flex flex-col h-full w-full",
+              "hover:bg-green-50/50 cursor-pointer hover:shadow-md"
+            )}
+            onClick={(e) => {
+              e.preventDefault();
+              onProductSelected(product);
+            }}
+          >
+            <div className="flex-grow space-y-6">
+              <div className="flex gap-4">
+                <div className="rounded-lg w-20 h-20 bg-gray-50/50 flex items-center justify-center">
+                  {renderActiveProductImage(product)}
+                </div>
 
-              <div className="space-y-1">
-                {renderActiveProductName(product)}
+                <div className="space-y-1">
+                  {renderActiveProductName(product)}
 
-                {renderActiveProductTags(product)}
+                  {renderActiveProductTags(product)}
 
-                {renderActiveProductPrice(product, settings?.currency)}
+                  {renderActiveProductPrice(product, settings?.currency)}
 
-                {renderActiveProductVariants(product)}
+                  {renderActiveProductVariants(product)}
+                </div>
               </div>
             </div>
           </div>

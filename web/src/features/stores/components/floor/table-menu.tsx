@@ -24,11 +24,13 @@ type tableErrorResponse = {
 export function TableMenu({
   id,
   fid,
-  shape
+  shape,
+  chairs,
 }: {
   id: number
   fid: number
   shape: string
+  chairs: number
 }) {
   const { setBoolState } = useActionState();
   const {setSelectedTableId, floors} =  useSeatingState();
@@ -83,16 +85,17 @@ export function TableMenu({
       <DropdownMenuTrigger asChild>
         <div
           className={cn(
-            "relative cursor-pointer",
-            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+            "w-full h-full",
+            shape === "circle" && "p-[2px]"
           )}
         >
           <div
             className={cn(
-              "relative z-10 text-xs font-bold",
-              "flex items-center justify-center text-center p-2 w-11 h-11",
+              "w-full h-full flex justify-center items-center text-xs",
+              "cursor-pointer transition-colors hover:brightness-90",
               "bg-gray-50/10 hover:bg-gray-100/50",
-              shape === "circle" ? "rounded-full": "rounded-lg "
+              shape === "circle" ? "rounded-full": "rounded-sm",
+              shape === "rectangle" && chairs <= 2 && "-rotate-90"
             )}
           >
             <IconAdjustmentsCog className="w-4 h-4 text-white" />

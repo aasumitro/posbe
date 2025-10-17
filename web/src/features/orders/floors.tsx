@@ -8,6 +8,7 @@ import type {Table} from "@/types/seating";
 import {type EventSourceData, useEventSource, useEventSourceListener} from "@/hooks/use-sse";
 import {API_PATH, API_URL} from "@/lib/api";
 import {useQueryClient} from "@tanstack/react-query";
+import {MenuOrderDrawer} from "@/features/orders/components/menu-order-drawer";
 
 export function FloorPage() {
   const {defaultFloorId} =  useOrderState();
@@ -88,6 +89,7 @@ export function FloorPage() {
   return (
     <div className="@container/main flex flex-1 flex-col gap-2 p-2">
       <FloorManagement tables={tables}  />
+      <MenuOrderDrawer />
     </div>
   )
 }

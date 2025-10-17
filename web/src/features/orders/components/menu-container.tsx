@@ -5,8 +5,9 @@ import {Input} from "@/components/ui/input";
 import {IconSearch} from "@tabler/icons-react";
 import {MenuList} from "@/features/orders/components/menu-list";
 import {useState} from "react";
+import {cn} from "@/lib/utils";
 
-export function MenuContainer() {
+export function MenuContainer({className}: {className?: string}) {
   const [name, setName] = useState<string>("")
   const [categoryId, setCategoryId] = useState<number>(0)
   const [subcategoryId, setSubcategoryId] = useState<number>(0)
@@ -17,7 +18,7 @@ export function MenuContainer() {
   }
 
   return (
-    <>
+    <div className={cn(className)}>
       <h5 className="text-lg font-bold">Menu</h5>
 
       <div className="flex flex-row gap-6 items-center">
@@ -59,6 +60,6 @@ export function MenuContainer() {
       </div>
 
       <MenuList name={name} categoryId={categoryId} subcategoryId={subcategoryId} />
-    </>
+    </div>
   )
 }

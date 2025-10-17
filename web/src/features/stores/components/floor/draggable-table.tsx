@@ -94,6 +94,7 @@ export function DraggableTable({
           id={item.id}
           fid={item.floor_id}
           shape={item.config.shape}
+          chairs={item.config.chairs}
         />}
       />
     </div>

@@ -225,21 +225,30 @@ export function  ProductContainer({status, sort, category}: ProductContainerProp
                 <DropdownMenuSubContent>
                   {product.status === "active" && (
                     <>
-                      <DropdownMenuItem onClick={(e) => {
-                        e.preventDefault();
-                        setProductStatus("draft", product)
-                      }}>Set as Draft</DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => {
-                        e.preventDefault();
-                        setProductStatus("inactive", product)
-                      }}>Set as Inactive</DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setProductStatus("draft", product)
+                        }}
+                      >Set as Draft</DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setProductStatus("inactive", product)
+                        }}
+                      >Set as Inactive</DropdownMenuItem>
                     </>
                   )}
                   {["draft", "inactive"].includes(product.status) && (
-                    <DropdownMenuItem onClick={(e) => {
-                      e.preventDefault();
-                      setProductStatus("publish", product)
-                    }}>Set as Active</DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setProductStatus("publish", product)
+                      }}
+                    >Set as Active</DropdownMenuItem>
                   )}
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>

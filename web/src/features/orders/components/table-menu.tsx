@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils"
 import type {DraggableTableItem, TableStatus} from "@/components/table";
 import { getLabelBgColorByStatus } from "@/lib/table";
 import {useAuthStore} from "@/states/auth-state";
+import {useState} from "react";
 
 export function TableMenu(
   {table, actions}: {
@@ -28,6 +29,7 @@ export function TableMenu(
     }
   }
 ) {
+  const [open, setOpen] = useState(false);
   const { auth } = useAuthStore();
 
   const canManageTable = ["admin", "cashier", "waiter"].includes(auth?.user?.role?.name ?? "");
@@ -95,20 +97,26 @@ export function TableMenu(
 
   const visibleMenu = tableMenu.filter(item => item.display);
 
+  const handleMenuAction = (fn?: () => void) => {
+    console.log("handleMenuAction", fn);
+    if (fn) fn();
+    setOpen(false);
+  };
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <div className={cn(
           "w-full h-full",
-          table.config.shape.toLowerCase() === "circle" && "p-[2px]"
+          table.config.shape === "circle" && "p-[2px]"
         )}>
           <div
             className={cn(
               "w-full h-full flex justify-center items-center text-xs",
               "cursor-pointer transition-colors hover:brightness-90",
-              table.status.toLowerCase() === "available" && "text-white",
-              table.config.shape.toLowerCase() === "circle" ? "rounded-full": "rounded-sm",
-              table.config.shape.toLowerCase() === "rectangle" && table.config.chairs <= 2 && "-rotate-90"
+              table.status === "available" && "text-white",
+              table.config.shape === "circle" ? "rounded-full": "rounded-sm",
+              table.config.shape === "rectangle" && table.config.chairs <= 2 && "-rotate-90"
             )}
             style={{ backgroundColor: bgColor }}
           >{table.name}</div>
@@ -142,7 +150,12 @@ export function TableMenu(
                           return <DropdownMenuSeparator key={subIndex} />;
                         }
 
-                        return <DropdownMenuItem key={subIndex} onClick={submenu.onClick}>{submenu.label}</DropdownMenuItem>
+                        return (
+                          <DropdownMenuItem
+                            key={subIndex}
+                            onClick={() => handleMenuAction(submenu.onClick)}
+                          >{submenu.label}</DropdownMenuItem>
+                        )
                       })}
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
@@ -150,7 +163,12 @@ export function TableMenu(
               )
             }
 
-            return <DropdownMenuItem key={index} onClick={menu.onClick}>{menu.label}</DropdownMenuItem>
+            return (
+              <DropdownMenuItem
+                key={index}
+                onClick={() => handleMenuAction(menu.onClick)}
+              >{menu.label}</DropdownMenuItem>
+            )
           })}
         </DropdownMenuGroup>
       </DropdownMenuContent>
