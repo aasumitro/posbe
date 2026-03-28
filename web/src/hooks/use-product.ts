@@ -69,10 +69,21 @@ export function useDeleteProductAddon() {
   return useMutation({ mutationFn: deleteAddon })
 }
 
-export function useProductList() {
+export function useProductList(
+  productQueryFilter?: Record<string, unknown>
+) {
   const products = async (): Promise<HTTPResponse<Product[]>> => {
     try {
-      const url = API_PATH.CATALOG.PRODUCTS.BASE
+      let url = API_PATH.CATALOG.PRODUCTS.BASE
+      if (productQueryFilter && Object.keys(productQueryFilter).length > 0) {
+        const params = new URLSearchParams()
+        for (const [key, value] of Object.entries(productQueryFilter)) {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, String(value))
+          }
+        }
+        url += `?${params.toString()}`
+      }
       const response =
         await api.get<HTTPResponse<Product[]>>(url);
       return response.data;
@@ -81,7 +92,10 @@ export function useProductList() {
     }
   };
 
-  return useSuspenseQuery({ queryKey: ['products'], queryFn: products })
+  return useSuspenseQuery({
+    queryKey: ['products', productQueryFilter],
+    queryFn: products
+  })
 }
 
 export function useProductDetail(id?: number) {

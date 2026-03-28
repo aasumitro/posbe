@@ -11,7 +11,7 @@ func New(router *gin.RouterGroup) {
 	attSvc := NewAttributeService(attRepo)
 	prdRepo := NewProductRepository(config.PgxPool)
 	prdSvc := NewProductService(prdRepo)
-	authn := router.Group("")
+	authn := router.Group(utils.EmptyPath)
 	authn.Use(utils.AuthN())
 	{
 		NewAttributeUnitHandler(attSvc, authn)

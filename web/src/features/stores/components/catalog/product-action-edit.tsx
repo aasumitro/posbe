@@ -329,13 +329,14 @@ export function ProductActionEdit() {
               variant="link"
               className="cursor-pointer"
               onClick={() => reset(product)}
+              disabled={!form.formState.isDirty}
             >
               Reset changes
             </Button>
             <Button
               className="cursor-pointer"
               type="submit"
-              disabled={isPending}
+              disabled={isPending || !form.formState.isDirty}
             >
               Save Update
             </Button>

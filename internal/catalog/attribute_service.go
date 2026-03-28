@@ -49,8 +49,8 @@ func (service attributeService) DeleteUnit(ctx context.Context, id int64) *utils
 	return nil
 }
 
-func (service attributeService) CategoryList(ctx context.Context) ([]*model.Category, *utils.ServiceError) {
-	data, err := service.repository.GetAllCategory(ctx)
+func (service attributeService) CategoryList(ctx context.Context, query *AttributeCategoryQuery) ([]*model.Category, *utils.ServiceError) {
+	data, err := service.repository.GetAllCategory(ctx, query)
 	return utils.HandleMultipleResults[model.Category]("categories", data, err)
 }
 

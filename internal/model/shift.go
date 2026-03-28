@@ -9,12 +9,14 @@ const (
 type (
 	// Shift is reference section data for store
 	Shift struct {
-		ID        int           `json:"id"`
-		Name      string        `json:"name"`
-		StartTime int64         `json:"start_time"`
-		EndTime   int64         `json:"end_time"`
-		CreatedAt sql.NullInt64 `json:"created_at"`
-		UpdatedAt sql.NullInt64 `json:"updated_at,omitempty"`
+		ID           int           `json:"id"`
+		Name         string        `json:"name"`
+		StartTime    int64         `json:"start_time"`
+		PrevDayStart bool          `json:"prev_day_start"`
+		EndTime      int64         `json:"end_time"`
+		NextDayEnd   bool          `json:"next_day_end"`
+		CreatedAt    sql.NullInt64 `json:"-"`
+		UpdatedAt    sql.NullInt64 `json:"-"`
 
 		// Relation
 		Active    *ActiveShift   `json:"active,omitempty"`
@@ -93,6 +95,6 @@ func (s *Shift) ApplyCountingData() {
 	}
 
 	s.Net = s.Profit + s.Loss
-	
+
 	s.Histories = nil
 }

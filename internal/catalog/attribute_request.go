@@ -110,3 +110,15 @@ func (f *EditCategoryForm) Validate(ctx *gin.Context) interface{} {
 
 	return nil
 }
+
+type AttributeCategoryQuery struct {
+	ProductStatus string `form:"product_status"`
+}
+
+func (q *AttributeCategoryQuery) Validate(ctx *gin.Context) interface{} {
+	g := galidator.New()
+	return g.ComplexValidator(galidator.Rules{
+		"ProductStatus": g.R("product_status").Optional().
+			Choices("draft", "active", "inactive"),
+	}).Validate(ctx, q)
+}

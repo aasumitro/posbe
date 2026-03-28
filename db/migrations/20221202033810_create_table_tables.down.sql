@@ -1,2 +1,3 @@
 DROP TABLE IF EXISTS tables;
 DROP TYPE IF EXISTS table_types;
+DROP TYPE IF EXISTS table_status;

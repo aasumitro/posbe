@@ -2,15 +2,19 @@ import {useActionState} from "@/states/action-state";
 import {Card, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Separator} from "@/components/ui/separator";
 import {CustomerDetailActionSheetState} from "@/features/stores/components/customer/customer-detail-sheet";
+import type {Customer} from "@/types/customer";
+import {useCustomerState} from "@/states/customer-state";
 
-export function CustomerCard() {
+export function CustomerCard({customer}: {customer: Customer}) {
   const { setBoolState } = useActionState();
+  const { setSelectedCustomer } = useCustomerState();
 
   return (
     <Card
       className="w-96 max-h-56 hover:bg-gray-50/50 select-none cursor-pointer"
       onClick={(e) => {
         e.preventDefault();
+        setSelectedCustomer(customer);
         setBoolState(CustomerDetailActionSheetState, true);
       }}
     >
@@ -24,10 +28,14 @@ export function CustomerCard() {
         </div>
         <div className="w-fit space-y-2">
           <CardTitle className="mt-4">
-            Customer Good
+            {customer?.name}
           </CardTitle>
           <CardDescription>
-            +6282275558899
+            <p className="text-xs">
+              {customer?.phone} {customer?.email && customer?.phone && " • "}
+              <span className="text-sm">{customer?.email}</span>
+            </p>
+            <p>{customer?.description}</p>
           </CardDescription>
         </div>
       </CardHeader>
@@ -36,20 +44,20 @@ export function CustomerCard() {
           <div className="grid flex-1 auto-rows-min gap-0.5 pl-4">
             <div className="text-xs text-muted-foreground">Orders</div>
             <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
-              250
-              <span className="text-sm font-normal text-muted-foreground">
-                items
-              </span>
+              <div className="w-12 h-8 bg-gray-200 rounded-md" />
+              {/*<span className="text-sm font-normal text-muted-foreground">*/}
+              {/*  items*/}
+              {/*</span>*/}
             </div>
           </div>
           <Separator orientation="vertical" className="mx-2 h-10 w-px" />
           <div className="grid flex-1 auto-rows-min gap-0.5">
-            <div className="text-xs text-muted-foreground">Spents</div>
+            <div className="text-xs text-muted-foreground">Spent</div>
             <div className="flex items-baseline gap-1 text-2xl font-bold tabular-nums leading-none">
-              IDR 2,67
-              <span className="text-sm font-normal text-muted-foreground">
-                 Mio
-              </span>
+              <div className="w-12 h-8 bg-gray-200 rounded-md" />
+              {/*<span className="text-sm font-normal text-muted-foreground">*/}
+              {/*   Mio*/}
+              {/*</span>*/}
             </div>
           </div>
         </div>

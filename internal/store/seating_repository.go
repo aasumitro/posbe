@@ -56,7 +56,7 @@ func (repository seatingRepository) GetFloorByID(ctx context.Context, id int64) 
 	batch := &pgx.Batch{}
 	batch.Queue(`SELECT id, name FROM floors WHERE id = $1`, id)
 	batch.Queue(`SELECT id, floor_id, name, 
-		x_pos, y_pos, w_size, h_size, d_size, capacity, type		
+		x_pos, y_pos, w_size, h_size, d_size, capacity, type, status		
 		FROM tables WHERE floor_id = $1 ORDER BY created_at DESC
 	`, id)
 
@@ -80,7 +80,7 @@ func (repository seatingRepository) GetFloorByID(ctx context.Context, id int64) 
 		if err := rows.Scan(
 			&t.ID, &t.FloorID, &t.Name,
 			&t.XPos, &t.YPos, &t.WSize, &t.HSize,
-			&t.DSize, &t.Capacity, &t.Type,
+			&t.DSize, &t.Capacity, &t.Type, &t.Status,
 		); err != nil {
 			rows.Close()
 			return nil, err
@@ -138,7 +138,8 @@ func (repository seatingRepository) DeleteFloor(ctx context.Context, id int64) e
 }
 
 func (repository seatingRepository) GetAllTable(ctx context.Context, floorID int64) ([]*model.Table, error) {
-	q := "SELECT id, floor_id, name, x_pos, y_pos, w_size, h_size, d_size, capacity, type FROM tables WHERE floor_id = $1 ORDER BY created_at DESC"
+	q := "SELECT id, floor_id, name, x_pos, y_pos, w_size, h_size, d_size, capacity, type, status"
+	q += "  FROM tables WHERE floor_id = $1 ORDER BY created_at DESC"
 
 	rows, err := repository.db.Query(ctx, q, floorID)
 	if err != nil {
@@ -151,7 +152,7 @@ func (repository seatingRepository) GetAllTable(ctx context.Context, floorID int
 	if _, err = pgx.ForEachRow(rows, []any{
 		&table.ID, &table.FloorID, &table.Name,
 		&table.XPos, &table.YPos, &table.WSize, &table.HSize,
-		&table.DSize, &table.Capacity, &table.Type,
+		&table.DSize, &table.Capacity, &table.Type, &table.Status,
 	}, func() error {
 		t := table
 		tables = append(tables, &t)
@@ -166,13 +167,13 @@ func (repository seatingRepository) GetAllTable(ctx context.Context, floorID int
 func (repository seatingRepository) GetTableByID(ctx context.Context, id int64) (*model.Table, error) {
 	q := `SELECT id, floor_id, name, x_pos, 
 		y_pos, w_size, h_size, d_size, capacity, 
-		type FROM tables WHERE id = $1
+		type, status FROM tables WHERE id = $1
 	`
 	var table model.Table
 	if err := repository.db.QueryRow(ctx, q, id).Scan(
 		&table.ID, &table.FloorID, &table.Name,
 		&table.XPos, &table.YPos, &table.WSize, &table.HSize,
-		&table.DSize, &table.Capacity, &table.Type,
+		&table.DSize, &table.Capacity, &table.Type, &table.Status,
 	); err != nil {
 		return nil, err
 	}
@@ -244,6 +245,11 @@ func (repository seatingRepository) UpdateTable(ctx context.Context, form *Seati
 	if form.Type != "" {
 		setClauses = append(setClauses, "type = $"+strconv.Itoa(argPos))
 		args = append(args, form.Type)
+		argPos++
+	}
+	if form.Status != "" {
+		setClauses = append(setClauses, "status = $"+strconv.Itoa(argPos))
+		args = append(args, form.Status)
 		argPos++
 	}
 	if len(setClauses) == 0 {

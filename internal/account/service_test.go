@@ -12,7 +12,7 @@ import (
 	"github.com/aasumitro/posbe/internal/account"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
-	"github.com/aasumitro/posbe/mocks"
+	"github.com/aasumitro/posbe/misc/mocks"
 	"github.com/alicebob/miniredis/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/redis/go-redis/v9"
@@ -76,7 +76,7 @@ func (suite *accountTestSuite) SetupSuite() {
 		Message: "UNEXPECTED",
 	}
 
-	config.RdpPool = redis.NewClient(&redis.Options{
+	config.RedisCache = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
 
@@ -108,8 +108,8 @@ func (suite *accountTestSuite) TestAccountService_RoleList_ShouldSuccess_ReturnS
 		Return(nil, nil).Once()
 	jsonData, err := json.Marshal(suite.roles)
 	require.Nil(suite.T(), err)
-	config.RdpPool.Set(context.TODO(), "roles", jsonData, 1)
-	cacheMock.On("CacheFirstData", config.RdpPool, &utils.CacheDataSupplied[[]*model.Role]{
+	config.RedisCache.Set(context.TODO(), "roles", jsonData, 1)
+	cacheMock.On("CacheFirstData", config.RedisCache, &utils.CacheDataSupplied[[]*model.Role]{
 		Key: "roles",
 		TTL: time.Hour * 1,
 		CbF: nil,

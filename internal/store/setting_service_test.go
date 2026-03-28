@@ -10,7 +10,7 @@ import (
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/store"
 	"github.com/aasumitro/posbe/internal/utils"
-	"github.com/aasumitro/posbe/mocks"
+	"github.com/aasumitro/posbe/misc/mocks"
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/mock"
@@ -24,7 +24,7 @@ type settingServiceTestSuite struct {
 }
 
 func (suite *settingServiceTestSuite) SetupTest() {
-	config.RdpPool = redis.NewClient(&redis.Options{
+	config.RedisCache = redis.NewClient(&redis.Options{
 		Addr: miniredis.RunT(suite.T()).Addr(),
 	})
 	suite.svcErr = &utils.ServiceError{

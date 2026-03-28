@@ -25,24 +25,24 @@ const data = {
       icon: IconBuildingStore,
     },
     {
-      url: "/stores/attributes",
-      name: "Attributes",
-      icon: IconDatabase,
-    },
-    {
-      url: "/stores/teams",
-      name: "Teams",
-      icon: IconUsers,
-    },
-    {
       url: "/stores/floors",
       name: "Floor Plan",
       icon: IconStairs,
     },
     {
+      url: "/stores/attributes",
+      name: "Attributes",
+      icon: IconDatabase,
+    },
+    {
       url: "/stores/catalogs",
       name: "Catalogs",
       icon: IconLibrary,
+    },
+    {
+      url: "/stores/teams",
+      name: "Employees",
+      icon: IconUsers,
     },
     {
       url: "/stores/customers",

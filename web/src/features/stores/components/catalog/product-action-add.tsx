@@ -246,14 +246,14 @@ export function ProductActionAdd({categories, units}: ProductActionAddProps) {
               variant="ghost"
               className="cursor-pointer"
               onClick={() => setStatus("draft")}
-              disabled={isPending}
+              disabled={isPending || !form.formState.isDirty}
             >
               Save as Draft
             </Button>
             <Button
               className="cursor-pointer"
               onClick={() => setStatus("publish")}
-              disabled={isPending}
+              disabled={isPending || !form.formState.isDirty}
             >
               Publish
             </Button>

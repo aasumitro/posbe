@@ -15,7 +15,7 @@ type settingService struct {
 }
 
 func (service settingService) AllSetting(ctx context.Context) (*model.StoreSetting, *utils.ServiceError) {
-	data, err := utils.CacheFirstData(ctx, config.RdpPool,
+	data, err := utils.CacheFirstData(ctx, config.RedisCache,
 		&utils.CacheDataSupplied[*model.StoreSetting]{
 			Key: model.StoreSettingCacheKey, TTL: time.Hour * 1,
 			CbF: func() (*model.StoreSetting, error) {
@@ -43,7 +43,7 @@ func (service settingService) UpdateSetting(ctx context.Context, form *SettingFo
 		}
 	}
 
-	config.RdpPool.Del(ctx, model.StoreSettingCacheKey)
+	config.RedisCache.Del(ctx, model.StoreSettingCacheKey)
 
 	return nil
 }

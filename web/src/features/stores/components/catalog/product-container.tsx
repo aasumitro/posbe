@@ -3,10 +3,10 @@ import {Badge} from "@/components/ui/badge";
 import {Separator} from "@/components/ui/separator";
 import {
   DropdownMenu,
-  DropdownMenuContent,
+  DropdownMenuContent, DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  DropdownMenuLabel, DropdownMenuPortal,
+  DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
@@ -19,7 +19,11 @@ import {useProductState} from "@/states/product-state";
 import {formatShortNumber} from "@/lib/numbers";
 import type {Product, ProductVariant} from "@/types/product";
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import {ASSET_URL} from "@/lib/api";
+import {ASSET_URL, isHTTPResponse} from "@/lib/api";
+import {cn} from "@/lib/utils";
+import {useUpdateProduct} from "@/hooks/use-product";
+import {useQueryClient} from "@tanstack/react-query";
+import {toast} from "sonner";
 
 interface ProductContainerProps {
   sort?: Record<string, "asc" | "desc">;
@@ -32,6 +36,8 @@ export function  ProductContainer({status, sort, category}: ProductContainerProp
   const {products, setSelectedProduct} = useProductState();
   const {setBoolState} = useActionState();
   const navigate = useNavigate();
+  const {mutate: editProduct} = useUpdateProduct();
+  const queryClient = useQueryClient();
 
   let sortedProducts = [...(products ?? [])];
 
@@ -115,8 +121,26 @@ export function  ProductContainer({status, sort, category}: ProductContainerProp
     const formattedName = formatted.endsWith(".") ? formatted : formatted + ".";
 
     return (
-      <h5 className="text-xl font-semibold">
+      <h5 className="text-xl font-semibold flex ">
         {formattedName}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className={cn(
+              "flex size-2 rounded-full ml-2 animate-pulse cursor-pointer",
+              product.status === "draft" && "bg-gray-500",
+              product.status === "active" && "bg-green-500",
+              product.status === "inactive" && "bg-red-500"
+            )} title="New"/>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              {["draft", "inactive"].includes(product.status)
+                ? `This product is marked as ${product.status}.`
+                : "This product is live and ready for sale!"}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+
       </h5>
     );
   }
@@ -185,17 +209,66 @@ export function  ProductContainer({status, sort, category}: ProductContainerProp
             <IconDotsVertical />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuContent className="w-48" align="start">
+          <DropdownMenuLabel>Manage Product</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={async (e) => {
+                e.preventDefault();
+                await navigate({to: `/stores/products/${product.id}`})
+              }}
+            >Edit Details</DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  {product.status === "active" && (
+                    <>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setProductStatus("draft", product)
+                        }}
+                      >Set as Draft</DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setProductStatus("inactive", product)
+                        }}
+                      >Set as Inactive</DropdownMenuItem>
+                    </>
+                  )}
+                  {["draft", "inactive"].includes(product.status) && (
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setProductStatus("publish", product)
+                      }}
+                    >Set as Active</DropdownMenuItem>
+                  )}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+
           <DropdownMenuSeparator/>
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={async (e) => {
-              e.preventDefault();
-              await navigate({to: `/stores/products/${product.id}`})
-            }}
-          >Edit</DropdownMenuItem>
-          {/*<DropdownMenuItem>set status</DropdownMenuItem>*/}
+          <DropdownMenuLabel>Sales Insights</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              disabled
+            >Key Metrics</DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              disabled
+            >Performance Charts</DropdownMenuItem>
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator/>
           <DropdownMenuItem
             className="cursor-pointer"
             variant="destructive"
@@ -287,6 +360,43 @@ export function  ProductContainer({status, sort, category}: ProductContainerProp
         ))}
       </div>
     );
+  }
+
+  function setProductStatus(status: string, product: Product) {
+    if (!product) return;
+
+    if (!confirm(`Are you sure you want to set this product as ${status}?`)) return;
+
+    editProduct({
+      id: product.id, body: JSON.stringify({status})
+    }, {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['products'] })
+        toast.success("Product status update successfully");
+      },
+      onError: (error) => {
+        if (error && isHTTPResponse<null>(error)) {
+          if (typeof error.data === "string") {
+            toast.error(error.data);
+            return;
+          }
+
+          if (typeof error.data === "object" && error.data !== null) {
+            // TODO: apply this
+            // const data = error.data as ProductErrorResponse;
+            //
+            // if (data.name && data.name.length > 0) {
+            //   form.setError("name", {type: "manual", message: data.name[0]})
+            // }
+          }
+        }
+
+        if (error instanceof Error) {
+          const clientError = error as Error
+          toast.error(clientError.message);
+        }
+      },
+    })
   }
 
   if (sortedProducts.length < 1) {

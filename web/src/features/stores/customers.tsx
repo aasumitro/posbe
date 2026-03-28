@@ -1,13 +1,19 @@
-import {useState} from "react";
+import {useEffect} from "react";
 import {CustomerContainer} from "@/features/stores/components/customer/customer-container";
-import {AppComingSoon} from "@/components/app-coming-soon";
+import {useCustomerList} from "@/hooks/use-customer";
+import {useCustomerState} from "@/states/customer-state";
 
 export function CustomersPage() {
-  const [soon] = useState(false);
+  const {data: customers, isPending} = useCustomerList()
+  const {setCustomers} = useCustomerState();
 
-  if (!soon) {
-    return  <AppComingSoon feature="customers" type="page" />
-  }
+  useEffect(() => {
+    if (customers?.data) {
+      setCustomers(customers?.data ?? null)
+    }
+  }, [customers?.data]);
+
+  if (isPending) return <>Loading . . .</>
 
   return (
     <div className="w-full pt-4 xl:pt-6 space-y-6">

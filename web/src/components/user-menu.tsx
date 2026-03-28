@@ -63,13 +63,6 @@ export function UserMenu() {
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer" disabled>
-            Get Helps
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-
-        <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
           onClick={(e) => {

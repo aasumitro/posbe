@@ -2,8 +2,11 @@ package store
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"net/http"
 
+	"github.com/aasumitro/posbe/config"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 )
@@ -103,6 +106,28 @@ func (service seatingService) DeleteTable(ctx context.Context, tableID int64) *u
 		}
 	}
 	return nil
+}
+
+func (service seatingService) ProceedEvent(ctx context.Context, data string) {
+	var payload SeatingTableRequest
+
+	form, err := payload.Bind(data)
+	if err != nil {
+		log.Println("Failed to bind seating table request", err)
+		return
+	}
+
+	if err := service.repository.UpdateTable(ctx, form); err != nil {
+		log.Printf("error updating table: %v", err)
+		return
+	}
+
+	if form.Status != "" {
+		cacheKey := fmt.Sprintf("table:status:%d", form.ID)
+		config.RedisCache.Set(ctx, cacheKey, form.Status, -1)
+	}
+
+	log.Printf("[ProceedEvent] table updated successfully: ID=%d", form.ID)
 }
 
 func NewSeatingService(repository IStoreSeatingRepository) IStoreSeatingService {

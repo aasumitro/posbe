@@ -18,18 +18,18 @@ packages:
   github.com/aasumitro/posbe/internal/account:
     config:
       all: true
-      dir: "./mocks"
+      dir: "./misc/mocks"
       filename: "account_module_mocks.go"
       pkgname: mocks
   github.com/aasumitro/posbe/internal/store:
     config:
       all: true
-      dir: "./mocks"
+      dir: "./misc/mocks"
       filename: "store_module_mocks.go"
       pkgname: mocks    
   github.com/aasumitro/posbe/internal/utils:
     config:
       all: true
-      dir: "./mocks"
+      dir: "./misc/mocks"
       filename: "util_module_mocks.go"
       pkgname: mocks

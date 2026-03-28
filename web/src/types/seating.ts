@@ -16,4 +16,7 @@ export interface Table {
   d_size: number,
   capacity: number,
   type: string,
+  status: string,
+  has_order: boolean,
+  has_history: boolean,
 }

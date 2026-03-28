@@ -63,12 +63,12 @@ func AuthZ(accepted []string) gin.HandlerFunc {
 		if len(accepted) > 0 && accepted[0] != "*" {
 			name, ok := ctx.Get("role_name")
 			if !ok {
-				ctx.AbortWithStatusJSON(http.StatusUnauthorized,
+				ctx.AbortWithStatusJSON(http.StatusForbidden,
 					"USER_NOT_AUTHORIZED")
 				return
 			}
 			if !slices.Contains(accepted, name.(string)) {
-				ctx.AbortWithStatusJSON(http.StatusUnauthorized,
+				ctx.AbortWithStatusJSON(http.StatusForbidden,
 					"USER_NOT_AUTHORIZED")
 				return
 			}

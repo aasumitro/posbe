@@ -1,6 +1,9 @@
 package store
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +34,7 @@ type SeatingTableRequest struct {
 	DSize     *float64 `form:"d_size" json:"d_size"`
 	Capacity  int64    `form:"capacity" json:"capacity"`
 	Type      string   `form:"type" json:"type"`
+	Status    string   `form:"status" json:"status"`
 }
 
 func (f *SeatingTableRequest) Validate(ctx *gin.Context) interface{} {
@@ -66,5 +70,71 @@ func (f *SeatingTableRequest) Validate(ctx *gin.Context) interface{} {
 			"DSize":    g.R("d_size").Optional(),
 		}
 	}
+	r["Status"] = g.R("status").Optional().Choices("available",
+		"occupied", "reserved", "disabled", "ordering", "billed")
 	return g.ComplexValidator(r).Validate(ctx, f)
+}
+
+func (f *SeatingTableRequest) Bind(data string) (*SeatingTableRequest, error) {
+	// Expected sample data:
+	//      {"id": 12, "action": "update", "field": "status", "value": "available"}
+
+	var payload map[string]interface{}
+	if err := json.Unmarshal([]byte(data), &payload); err != nil {
+		return nil, fmt.Errorf("error unmarshaling payload: %w", err)
+	}
+
+	if len(payload) == 0 {
+		return nil, errors.New("payload is empty")
+	}
+
+	action, ok := payload["action"].(string)
+	if !ok || action == "" {
+		return nil, errors.New("invalid or missing action field")
+	}
+	f.ActionAdd = strings.ToLower(action) != "update"
+
+	pid, ok := payload["id"].(float64)
+	if !ok || pid == 0 {
+		return nil, errors.New("invalid or missing id field")
+	}
+	f.ID = int64(pid)
+
+	field, ok := payload["field"].(string)
+	if !ok || field == "" {
+		return nil, errors.New("invalid or missing field field")
+	}
+
+	value, exists := payload["value"]
+	if !exists {
+		return nil, errors.New("missing value field")
+	}
+
+	switch strings.ToLower(field) {
+	case "status":
+		if strVal, ok := value.(string); ok && strVal != "" {
+			f.Status = strVal
+		} else {
+			return nil, fmt.Errorf("invalid value for field 'status': %v", value)
+		}
+		// optionally support other future updates here
+		// e.g:
+		// case "capacity":
+		//		switch v := value.(type) {
+		//		case float64:
+		//			f.Capacity = int64(v)
+		//		case int:
+		//			f.Capacity = int64(v)
+		//		case string:
+		//			if parsed, err := strconv.ParseInt(v, 10, 64); err == nil {
+		//				f.Capacity = parsed
+		//			} else {
+		//				return nil, fmt.Errorf("invalid numeric string for capacity: %v", v)
+		//			}
+		//		default:
+		//			return nil, fmt.Errorf("unsupported type for capacity: %T", v)
+		//		}
+	}
+
+	return f, nil
 }

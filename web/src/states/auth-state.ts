@@ -29,6 +29,16 @@ interface AuthState {
   }
 }
 
+// Expiration constants (in hours)
+const ACCESS_TOKEN_EXPIRES_HOURS = 1
+const REFRESH_TOKEN_EXPIRES_HOURS = 8
+
+function getExpiryDate(hours: number): Date {
+  const date = new Date();
+  date.setTime(date.getTime() + hours * 60 * 60 * 1000);
+  return date;
+}
+
 export const useAuthStore = create<AuthState>()((set) => {
   const firebaseTokenCookieState = Cookies.get(FIREBASE_TOKEN)
   const initFirebaseToken = firebaseTokenCookieState ? JSON.parse(firebaseTokenCookieState) : ''
@@ -43,42 +53,60 @@ export const useAuthStore = create<AuthState>()((set) => {
   const initUserProfile = userProfileCookieState ? JSON.parse(userProfileCookieState) : ''
 
   const userIdCookieState = Cookies.get(USER_ID)
-  const initUserId = userIdCookieState ? JSON.parse(userIdCookieState) : ''
+  const initUserId = userIdCookieState ? Number(userIdCookieState) : null
 
   return {
     auth: {
       firebaseToken: initFirebaseToken,
       setFirebaseToken: (firebaseToken) =>
         set((state) => {
-          Cookies.set(FIREBASE_TOKEN, JSON.stringify(firebaseToken))
+          Cookies.set(FIREBASE_TOKEN, JSON.stringify(firebaseToken), {
+            secure: true,
+            sameSite: 'Strict',
+          })
           return { ...state, auth: { ...state.auth, firebaseToken } }
         }),
 
       accessToken: initAccessToken,
       setAccessToken: (accessToken) =>
         set((state) => {
-          Cookies.set(ACCESS_TOKEN, JSON.stringify(accessToken))
+          Cookies.set(ACCESS_TOKEN, JSON.stringify(accessToken), {
+            secure: true,
+            sameSite: 'Strict',
+            expires: getExpiryDate(ACCESS_TOKEN_EXPIRES_HOURS),
+          })
           return { ...state, auth: { ...state.auth, accessToken } }
         }),
 
       refreshToken: initRefreshToken,
       setRefreshToken: (refreshToken) =>
         set((state) => {
-          Cookies.set(REFRESH_TOKEN, JSON.stringify(refreshToken))
+          Cookies.set(REFRESH_TOKEN, JSON.stringify(refreshToken), {
+            secure: true,
+            sameSite: 'Strict',
+            expires: getExpiryDate(REFRESH_TOKEN_EXPIRES_HOURS),
+          })
           return { ...state, auth: { ...state.auth, refreshToken } }
         }),
 
       userId: initUserId,
       setUserId: (userId) =>  set((state) => {
-        Cookies.set(USER_ID, JSON.stringify(userId))
+        Cookies.set(USER_ID, String(userId), {
+          secure: true,
+          sameSite: 'Strict',
+          expires: getExpiryDate(REFRESH_TOKEN_EXPIRES_HOURS),
+        })
         return { ...state, auth: { ...state.auth, userId } }
       }),
 
       user: initUserProfile,
       setUser: (user) =>
         set((state) => {
-          // {sameSite: 'None', secure: true}
-          Cookies.set(USER_PROFILE, JSON.stringify(user))
+          Cookies.set(USER_PROFILE, JSON.stringify(user), {
+            secure: true,
+            sameSite: 'Strict',
+            expires: getExpiryDate(REFRESH_TOKEN_EXPIRES_HOURS),
+          })
           return { ...state, auth: { ...state.auth, user } }
         }),
 

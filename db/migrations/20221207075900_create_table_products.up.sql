@@ -1,4 +1,4 @@
-CREATE TYPE product_status AS ENUM ('active', 'inactive', 'draft', 'in-stock', 'out-of-stock');
+CREATE TYPE product_status AS ENUM ('active', 'inactive', 'draft');
 
 CREATE TABLE IF NOT EXISTS products (
     id BIGSERIAL PRIMARY KEY NOT NULL,

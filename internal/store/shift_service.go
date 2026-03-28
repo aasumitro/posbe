@@ -17,7 +17,7 @@ type shiftService struct {
 }
 
 func (service shiftService) ShiftList(ctx context.Context) ([]*model.Shift, *utils.ServiceError) {
-	data, err := utils.CacheFirstData(ctx, config.RdpPool,
+	data, err := utils.CacheFirstData(ctx, config.RedisCache,
 		&utils.CacheDataSupplied[[]*model.Shift]{
 			Key: model.StoreShiftCacheKey, TTL: time.Minute * 30,
 			CbF: func() ([]*model.Shift, error) {
@@ -47,7 +47,7 @@ func (service shiftService) CreateShift(ctx context.Context, form *ShiftForm) *u
 		}
 	}
 
-	config.RdpPool.Del(ctx, model.StoreShiftCacheKey)
+	config.RedisCache.Del(ctx, model.StoreShiftCacheKey)
 
 	return nil
 }
@@ -60,7 +60,7 @@ func (service shiftService) UpdateShift(ctx context.Context, form *ShiftForm) *u
 		}
 	}
 
-	config.RdpPool.Del(ctx, model.StoreShiftCacheKey)
+	config.RedisCache.Del(ctx, model.StoreShiftCacheKey)
 
 	return nil
 }
@@ -87,31 +87,7 @@ func (service shiftService) DeleteShift(ctx context.Context, id int64) *utils.Se
 		}
 	}
 
-	config.RdpPool.Del(ctx, model.StoreShiftCacheKey)
-
-	return nil
-}
-
-func (service shiftService) ActiveShiftAction(ctx context.Context, form *ActiveShiftForm) *utils.ServiceError {
-	if form.Action == "open" {
-		if err := service.repository.Open(ctx, form); err != nil {
-			return &utils.ServiceError{
-				Code:    http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-		}
-	}
-
-	if form.Action == "close" {
-		if err := service.repository.Close(ctx, form); err != nil {
-			return &utils.ServiceError{
-				Code:    http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-		}
-	}
-
-	config.RdpPool.Del(ctx, model.StoreShiftCacheKey)
+	config.RedisCache.Del(ctx, model.StoreShiftCacheKey)
 
 	return nil
 }

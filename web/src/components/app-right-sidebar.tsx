@@ -3,7 +3,7 @@ import type { ComponentProps } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "@/components/ui/sidebar"
 import { useRouterState } from "@tanstack/react-router";
-import { MenuSidebarSection } from "@/features/menus/components/sidebar";
+import { MenuSidebarSection } from "@/features/orders/components/sidebar";
 import { useActionState } from "@/states/action-state";
 
 export const ActionVisibleRightSidebarKey = "action_visible_right_sidebar";
@@ -35,7 +35,7 @@ export function AppRightSidebar({
             transition: { duration: 0.4, ease: "easeIn" }
           }}
         >
-          {pathname === "/menus" && <MenuSidebarSection {...props} />}
+          {pathname === "/orders/menus" && <MenuSidebarSection {...props} />}
         </motion.div>
       )}
     </AnimatePresence>

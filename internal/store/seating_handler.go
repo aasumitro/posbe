@@ -1,10 +1,13 @@
 package store
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 type seatingHandler struct {
@@ -211,22 +214,30 @@ func (handler seatingHandler) destroyTable(ctx *gin.Context) {
 	utils.NewHTTPRespond(ctx, http.StatusNoContent, nil)
 }
 
+func (handler seatingHandler) events() {
+	ctx := context.Background()
+	utils.SubscribeEvent(ctx, model.TableUpdateEventKey, func(message *redis.Message) {
+		handler.service.ProceedEvent(ctx, message.Payload)
+	})
+}
+
 func NewSeatingHandler(service IStoreSeatingService, router *gin.RouterGroup) {
 	handler := seatingHandler{service: service}
-	authz := router.Group("")
+	router.GET("/floors", handler.fetchFloor)
+	router.GET("/floors/:id", handler.showFloor)
+	router.GET("/floors/:id/tables", handler.fetchFloorTable)
+	router.GET("/tables/:id", handler.showTable)
+	authz := router.Group(utils.EmptyPath)
 	authz.Use(utils.AuthZ([]string{"admin"}))
 	{
 		// store floors endpoint
-		authz.GET("/floors", handler.fetchFloor)
-		authz.GET("/floors/:id", handler.showFloor)
-		authz.GET("/floors/:id/tables", handler.fetchFloorTable)
 		authz.POST("/floors", handler.addFloor)
 		authz.PATCH("/floors/:id", handler.editFloor)
 		authz.DELETE("/floors/:id", handler.destroyFloor)
 		// table mgmt endpoint
-		authz.GET("/tables/:id", handler.showTable)
 		authz.POST("/tables", handler.addTable)
 		authz.PATCH("/tables/:id", handler.editTable)
 		authz.DELETE("/tables/:id", handler.destroyTable)
 	}
+	go handler.events()
 }
