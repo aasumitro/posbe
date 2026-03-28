@@ -22,6 +22,7 @@ import {UserMenu} from "@/components/user-menu";
 import {useAuthStore} from "@/states/auth-state";
 import {useActionState} from "@/states/action-state";
 import {CloseShiftModalState} from "@/components/shift-action-close-alert-dialog";
+import { useStoreState } from "@/states/store-state";
 
 const items = [
   {
@@ -49,6 +50,7 @@ export function AppLeftSidebar() {
   const pathname = location.pathname;
   const { auth } = useAuthStore();
   const { setBoolState } = useActionState();
+  const {settings} =  useStoreState();
 
   const MidIco = (
     <span className="relative">
@@ -103,6 +105,7 @@ export function AppLeftSidebar() {
                   // TODO: apply active shift validation
                   const noActiveShift = true;
                   if (item.url === "#close-shift" && noActiveShift) return;
+                  if (item.url === "/orders/floors" && settings?.feature_floor === "0") return;
 
                   return (
                     <SidebarMenuItem key={item.title}>

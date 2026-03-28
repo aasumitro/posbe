@@ -96,6 +96,7 @@ func (handler shiftHandler) update(ctx *gin.Context) {
 	}
 
 	// validate user input in advance
+	form.ActionAdd = false
 	if val := form.Validate(ctx); val != nil {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
 		return

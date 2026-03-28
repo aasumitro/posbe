@@ -12,7 +12,7 @@ import (
 	"github.com/aasumitro/posbe/internal/account"
 	"github.com/aasumitro/posbe/internal/model"
 	"github.com/aasumitro/posbe/internal/utils"
-	"github.com/aasumitro/posbe/mocks"
+	"github.com/aasumitro/posbe/misc/mocks"
 	"github.com/alicebob/miniredis/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/redis/go-redis/v9"

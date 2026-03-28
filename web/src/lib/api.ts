@@ -41,6 +41,9 @@ export const API_PATH = {
   ORDERS: {
     BASE: "/orders",
     SHIFTS: "/orders/shifts",
+  },
+  CUSTOMER: {
+    BASE: "/customers"
   }
 }
 

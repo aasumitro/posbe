@@ -54,6 +54,7 @@ func (handler productAddonHandler) add(ctx *gin.Context) {
 	}
 
 	// validate user input in advance
+	form.ActionAdd = true
 	if val := form.Validate(ctx); val != nil {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
 		return
@@ -97,6 +98,7 @@ func (handler productAddonHandler) edit(ctx *gin.Context) {
 	}
 
 	// validate user input in advance
+	form.ActionAdd = false
 	if val := form.Validate(ctx); val != nil {
 		utils.NewHTTPRespond(ctx, http.StatusUnprocessableEntity, val)
 		return
